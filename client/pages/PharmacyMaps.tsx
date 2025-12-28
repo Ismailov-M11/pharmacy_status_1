@@ -49,8 +49,6 @@ export default function PharmacyMaps() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [changeHistory, setChangeHistory] = useState<StatusHistoryRecord[]>([]);
   const [isLoadingHistory, setIsLoadingHistory] = useState(false);
-  const [isFullscreen, setIsFullscreen] = useState(false);
-
   const mapRef = useRef<any>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
