@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button";
 
 export function Header() {
   const { language, setLanguage, t } = useLanguage();
-  const { logout } = useAuth();
+  const { logout, role } = useAuth(); // Destructure role here
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -38,34 +38,49 @@ export function Header() {
         </div>
 
         <div className="flex items-center gap-3 sm:gap-6">
-          {(location.pathname === "/admin" ||
-            location.pathname === "/maps") && (
-            <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2">
+            {/* Panel Link based on Role */}
+            {role === "ROLE_ADMIN" && (
               <Button
                 onClick={() => navigate("/admin")}
                 variant={location.pathname === "/admin" ? "default" : "outline"}
-                className={`text-sm ${
-                  location.pathname === "/admin"
-                    ? "bg-purple-700 hover:bg-purple-800 text-white"
-                    : "text-purple-700 border-purple-700 hover:bg-purple-50"
-                }`}
+                className={`text-sm ${location.pathname === "/admin"
+                  ? "bg-purple-700 hover:bg-purple-800 text-white"
+                  : "text-purple-700 border-purple-700 hover:bg-purple-50"
+                  }`}
               >
                 {t.adminPanel || "Админ"}
               </Button>
+            )}
+
+            {(role === "ROLE_AGENT" || role === "ROLE_OPERATOR") && (
+              <Button
+                onClick={() => navigate("/agent")}
+                variant={location.pathname === "/agent" ? "default" : "outline"}
+                className={`text-sm ${location.pathname === "/agent"
+                  ? "bg-purple-700 hover:bg-purple-800 text-white"
+                  : "text-purple-700 border-purple-700 hover:bg-purple-50"
+                  }`}
+              >
+                {t.adminPanel || "Панель"}
+              </Button>
+            )}
+
+            {/* Maps Link - Available for all authorized roles */}
+            {(role === "ROLE_ADMIN" || role === "ROLE_AGENT" || role === "ROLE_OPERATOR") && (
               <Button
                 onClick={() => navigate("/maps")}
                 variant={location.pathname === "/maps" ? "default" : "outline"}
-                className={`text-sm gap-2 ${
-                  location.pathname === "/maps"
-                    ? "bg-purple-700 hover:bg-purple-800 text-white"
-                    : "text-purple-700 border-purple-700 hover:bg-purple-50"
-                }`}
+                className={`text-sm gap-2 ${location.pathname === "/maps"
+                  ? "bg-purple-700 hover:bg-purple-800 text-white"
+                  : "text-purple-700 border-purple-700 hover:bg-purple-50"
+                  }`}
               >
                 <Map className="h-4 w-4" />
                 {t.maps || "Карты"}
               </Button>
-            </div>
-          )}
+            )}
+          </div>
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>

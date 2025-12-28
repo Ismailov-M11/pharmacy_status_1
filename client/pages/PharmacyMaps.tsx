@@ -164,66 +164,73 @@ export default function PharmacyMaps() {
     }
   };
 
+  /* Refactored Layout and Map Logic */
+
+  // Stabilize layout: Fixed height relative to viewport
+  // Fix filters: Ensure map clears and redraws
+  // Fix color: Use explicit specific color
+
   const addPlacemarks = (pharmaciesToPlace: PharmacyWithCoords[]) => {
     if (!mapRef.current || !window.ymaps) {
-      console.warn("Map not ready, cannot add placemarks");
       return;
     }
 
-    // Clear existing placemarks
-    mapRef.current.geoObjects.removeAll();
-    console.log("Cleared existing placemarks");
-
-    // Add placemarks for each pharmacy
-    pharmaciesToPlace.forEach((pharmacy) => {
-      addPlacemark(pharmacy);
-    });
-
-    // Geocode addresses to get actual coordinates
-    pharmaciesToPlace.forEach((pharmacy, index) => {
-      setTimeout(() => {
-        geocodeAndUpdatePlacemark(pharmacy);
-      }, index * 300); // Stagger requests
-    });
-  };
-
-  const addPlacemark = (pharmacy: PharmacyWithCoords) => {
-    if (!mapRef.current || !window.ymaps) return;
-
     try {
-      const coords =
-        pharmacy.latitude && pharmacy.longitude
-          ? [pharmacy.latitude, pharmacy.longitude]
-          : TASHKENT_CENTER;
+      const geoObjects = mapRef.current.geoObjects;
+      geoObjects.removeAll();
 
-      const placemark = new window.ymaps.Placemark(
-        coords,
-        {
-          balloonContent: `
-            <div style="padding: 12px; font-family: Arial, sans-serif; max-width: 300px;">
-              <div style="font-weight: bold; font-size: 14px; margin-bottom: 8px; color: #1f2937;">${pharmacy.name}</div>
-              <div style="font-size: 12px; margin-bottom: 4px;"><strong>Код:</strong> ${pharmacy.code}</div>
-              <div style="font-size: 12px; margin-bottom: 4px;"><strong>Адрес:</strong> ${pharmacy.address}</div>
-              <div style="font-size: 12px; margin-bottom: 4px;"><strong>Статус:</strong> <span style="color: ${pharmacy.active ? "#059669" : "#d97706"}">${pharmacy.active ? "Активна" : "Неактивна"}</span></div>
-              ${pharmacy.phone ? `<div style="font-size: 12px;"><strong>Телефон:</strong> <a href="tel:${pharmacy.phone}" style="color: #2563eb;">${pharmacy.phone}</a></div>` : ""}
-            </div>
-          `,
-        },
-        {
-          preset: "islands#purpleDotIcon",
-        },
-      );
-
-      // Click event to open modal
-      placemark.events.add("click", () => {
-        handlePharmacyClick(pharmacy);
+      // Create a collection for better performance
+      const collection = new window.ymaps.GeoObjectCollection(null, {
+        preset: 'islands#violetDotIcon',
+        iconColor: '#7c3aed' // Explicit Tailwind purple-600
       });
 
-      mapRef.current.geoObjects.add(placemark);
-      console.log(`Added placemark for: ${pharmacy.name}`);
+      pharmaciesToPlace.forEach((pharmacy) => {
+        const coords =
+          pharmacy.latitude && pharmacy.longitude
+            ? [pharmacy.latitude, pharmacy.longitude]
+            : TASHKENT_CENTER;
+
+        const placemark = new window.ymaps.Placemark(
+          coords,
+          {
+            balloonContent: `
+              <div style="padding: 12px; font-family: Arial, sans-serif; max-width: 300px;">
+                <div style="font-weight: bold; font-size: 14px; margin-bottom: 8px; color: #1f2937;">${pharmacy.name}</div>
+                <div style="font-size: 12px; margin-bottom: 4px;"><strong>Код:</strong> ${pharmacy.code}</div>
+                <div style="font-size: 12px; margin-bottom: 4px;"><strong>Адрес:</strong> ${pharmacy.address}</div>
+                <div style="font-size: 12px; margin-bottom: 4px;"><strong>Статус:</strong> <span style="color: ${pharmacy.active ? "#059669" : "#d97706"}">${pharmacy.active ? "Активна" : "Неактивна"}</span></div>
+                ${pharmacy.phone ? `<div style="font-size: 12px;"><strong>Телефон:</strong> <a href="tel:${pharmacy.phone}" style="color: #2563eb;">${pharmacy.phone}</a></div>` : ""}
+              </div>
+            `,
+          },
+          {
+            preset: "islands#violetDotIcon", // Changed to violet which is purple-ish
+            iconColor: '#8b5cf6' // Tailwind violet-500
+          }
+        );
+
+        placemark.events.add("click", () => {
+          handlePharmacyClick(pharmacy);
+        });
+
+        collection.add(placemark);
+      });
+
+      geoObjects.add(collection);
+
+      // If filtering, re-center map if needed? (Optional)
+
     } catch (error) {
-      console.error(`Failed to create placemark for ${pharmacy.name}:`, error);
+      console.error("Error adding placemarks:", error);
     }
+
+    // Trigger geocoding for those missing coords (background process)
+    pharmaciesToPlace.forEach((pharmacy) => {
+      if (!pharmacy.latitude || !pharmacy.longitude) {
+        geocodeAndUpdatePlacemark(pharmacy);
+      }
+    });
   };
 
   const geocodeAndUpdatePlacemark = (pharmacy: PharmacyWithCoords) => {
@@ -455,145 +462,113 @@ export default function PharmacyMaps() {
     );
   }
 
+  // Layout Render
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
+    <div className="flex flex-col h-screen bg-gray-50 overflow-hidden">
       <Header />
 
-      <main className="flex-1 w-full flex flex-col lg:flex-row overflow-hidden">
+      <main className="flex-1 flex flex-col lg:flex-row overflow-hidden relative">
         {/* Left Panel - Pharmacy List */}
-        <div className="w-full lg:w-1/3 bg-white border-r border-gray-200 overflow-hidden flex flex-col">
-          <div className="px-4 sm:px-6 py-4 border-b border-gray-200 bg-gray-50 flex-shrink-0">
-            <h1 className="text-2xl font-bold text-gray-900">
+        <div className="w-full lg:w-[400px] bg-white border-r border-gray-200 flex flex-col z-10 shadow-lg shrink-0 h-full">
+          <div className="px-4 py-4 border-b border-gray-200 bg-white shrink-0">
+            <h1 className="text-xl font-bold text-gray-900">
               {t.maps || "Карты"}
             </h1>
-            <p className="text-gray-600 text-sm mt-1">
-              {t.pharmacyMap || "Отображение аптек на карте"}
+            <p className="text-gray-500 text-sm">
+              {t.pharmacyMap || "Аптеки на карте"}
             </p>
           </div>
 
-          {/* Search and Filter Controls */}
-          <div className="px-4 sm:px-6 py-4 border-b border-gray-200 flex-shrink-0">
-            <div className="flex gap-2 items-center">
+          {/* Search & Filter */}
+          <div className="p-4 border-b border-gray-200 bg-gray-50 shrink-0 gap-2 flex flex-col">
+            <div className="flex gap-2">
               <Input
-                type="text"
-                placeholder={`${t.pharmacyName || "Название"} / ${t.address || "Адрес"}...`}
+                placeholder={`${t.pharmacyName || "Поиск"}...`}
                 value={searchQuery}
                 onChange={(e) => handleSearchChange(e.target.value)}
-                className="flex-1"
+                className="flex-1 bg-white"
               />
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="gap-1 flex-shrink-0"
-                  >
-                    {activeFilter === "all" && "Все"}
-                    {activeFilter === "active" && "Активные"}
-                    {activeFilter === "inactive" && "Неактивные"}
-                    <ChevronDown className="w-4 h-4" />
+                  <Button variant="outline" size="icon" className="shrink-0 bg-white">
+                    <ChevronDown className="h-4 w-4" />
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
-                  <DropdownMenuRadioGroup
-                    value={activeFilter}
-                    onValueChange={(val) =>
-                      handleFilterChange(val as "all" | "active" | "inactive")
-                    }
-                  >
-                    <DropdownMenuRadioItem value="all">
-                      {t.all || "Все"} ({pharmacies.length})
-                    </DropdownMenuRadioItem>
-                    <DropdownMenuRadioItem
-                      value="active"
-                      className="bg-emerald-50"
-                    >
-                      {t.active || "Активные"} (
-                      {pharmacies.filter((p) => p.active).length})
-                    </DropdownMenuRadioItem>
-                    <DropdownMenuRadioItem
-                      value="inactive"
-                      className="bg-amber-50"
-                    >
-                      {t.inactive || "Неактивные"} (
-                      {pharmacies.filter((p) => !p.active).length})
-                    </DropdownMenuRadioItem>
+                  <DropdownMenuRadioGroup value={activeFilter} onValueChange={(v: any) => handleFilterChange(v)}>
+                    <DropdownMenuRadioItem value="all">{t.all || "Все"}</DropdownMenuRadioItem>
+                    <DropdownMenuRadioItem value="active">{t.active || "Активные"}</DropdownMenuRadioItem>
+                    <DropdownMenuRadioItem value="inactive">{t.inactive || "Неактивные"}</DropdownMenuRadioItem>
                   </DropdownMenuRadioGroup>
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>
+
+            <div className="flex gap-2 text-xs">
+              <button
+                onClick={() => handleFilterChange('all')}
+                className={`px-3 py-1 rounded-full border transition-colors ${activeFilter === 'all' ? 'bg-gray-800 text-white border-gray-800' : 'bg-white border-gray-300 text-gray-600 hover:bg-gray-100'}`}
+              >
+                {t.all || "Все"}
+              </button>
+              <button
+                onClick={() => handleFilterChange('active')}
+                className={`px-3 py-1 rounded-full border transition-colors ${activeFilter === 'active' ? 'bg-emerald-600 text-white border-emerald-600' : 'bg-white border-gray-300 text-gray-600 hover:bg-gray-100'}`}
+              >
+                {t.active || "Активные"}
+              </button>
+              <button
+                onClick={() => handleFilterChange('inactive')}
+                className={`px-3 py-1 rounded-full border transition-colors ${activeFilter === 'inactive' ? 'bg-amber-600 text-white border-amber-600' : 'bg-white border-gray-300 text-gray-600 hover:bg-gray-100'}`}
+              >
+                {t.inactive || "Неактивные"}
+              </button>
+            </div>
           </div>
 
-          {/* Pharmacy List Window with Scrollbar */}
-          <div
-            className="mx-4 sm:mx-6 my-4 rounded-lg border border-gray-200 shadow-sm bg-white overflow-hidden flex flex-col"
-            style={{ maxHeight: "calc(100% - 32px)" }}
-          >
-            <div className="px-4 py-3 border-b border-gray-200 bg-gray-50 rounded-t-lg flex-shrink-0">
-              <h2 className="text-xs font-semibold text-gray-700 uppercase tracking-wider">
-                {t.pharmacies || "Аптеки"} ({filteredPharmacies.length})
-              </h2>
-            </div>
-
-            <div className="flex-1 overflow-y-auto">
-              {filteredPharmacies.length === 0 ? (
-                <div className="px-4 py-8 text-center text-gray-500 text-sm">
-                  {t.noData || "Нет данных"}
-                </div>
-              ) : (
-                <div className="divide-y divide-gray-200">
-                  {filteredPharmacies.map((pharmacy, index) => (
-                    <div
-                      key={pharmacy.id}
-                      className="px-4 py-3 hover:bg-purple-50 transition-colors cursor-pointer border-b border-gray-100 last:border-b-0"
-                      onClick={() => handlePharmacyClick(pharmacy)}
-                    >
-                      <div className="flex justify-between items-start gap-2">
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2 mb-1">
-                            <span className="text-xs text-gray-400 flex-shrink-0 font-medium">
-                              {String(index + 1).padStart(2, "0")}
-                            </span>
-                            <h3 className="text-sm font-medium text-gray-900 truncate">
-                              {pharmacy.name}
-                            </h3>
-                          </div>
-                          <p className="text-xs text-gray-500 truncate">
-                            {pharmacy.address}
-                          </p>
-                        </div>
-                        <span
-                          className={`px-2 py-1 rounded text-xs font-medium flex-shrink-0 whitespace-nowrap ${pharmacy.active
-                              ? "bg-emerald-100 text-emerald-800"
-                              : "bg-amber-100 text-amber-800"
-                            }`}
-                        >
-                          {pharmacy.active ? t.active : t.inactive}
-                        </span>
-                      </div>
+          {/* Scrollable List */}
+          <div className="flex-1 overflow-y-auto min-h-0 bg-white">
+            {filteredPharmacies.length === 0 ? (
+              <div className="p-8 text-center text-gray-500 text-sm">
+                {t.noData || "Аптеки не найдены"}
+              </div>
+            ) : (
+              <div className="divide-y divide-gray-100">
+                {filteredPharmacies.map((pharmacy, index) => (
+                  <div
+                    key={pharmacy.id}
+                    onClick={() => handlePharmacyClick(pharmacy)}
+                    className={`px-4 py-3 hover:bg-purple-50 cursor-pointer transition-colors ${selectedPharmacy?.id === pharmacy.id ? 'bg-purple-50 border-l-4 border-purple-600' : 'border-l-4 border-transparent'}`}
+                  >
+                    <div className="flex justify-between items-start mb-1">
+                      <span className="font-medium text-gray-900 text-sm line-clamp-1">{pharmacy.name}</span>
+                      <span className={`text-[10px] px-1.5 py-0.5 rounded font-medium ${pharmacy.active ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}`}>
+                        {pharmacy.active ? 'ACT' : 'INA'}
+                      </span>
                     </div>
-                  ))}
-                </div>
-              )}
-            </div>
+                    <p className="text-xs text-gray-500 line-clamp-2">{pharmacy.address}</p>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <div className="p-3 border-t border-gray-200 bg-gray-50 text-xs text-center text-gray-400">
+            Показано {filteredPharmacies.length} из {pharmacies.length}
           </div>
         </div>
 
         {/* Right Panel - Map */}
-        <div className="w-full lg:w-2/3 bg-white flex flex-col min-h-96 lg:min-h-0 order-first lg:order-last">
-          <div className="relative flex-1 bg-gray-100 overflow-hidden">
-            <div ref={containerRef} className="w-full h-full bg-gray-100" />
-
-            {/* Loading Overlay */}
-            {isLoading && (
-              <div className="absolute inset-0 bg-white bg-opacity-60 flex flex-col items-center justify-center z-20">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-700 mb-4"></div>
-                <span className="text-gray-700 font-medium">
-                  {isLoading ? "Загрузка аптек..." : "Инициализация карты..."}
-                </span>
+        <div className="flex-1 relative bg-gray-200 h-full min-h-0">
+          <div ref={containerRef} className="absolute inset-0 w-full h-full" />
+          {isLoading && (
+            <div className="absolute inset-0 bg-white/80 z-20 flex items-center justify-center backdrop-blur-sm">
+              <div className="flex flex-col items-center">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600 mb-2"></div>
+                <span className="text-sm font-medium text-gray-600">Загрузка карты...</span>
               </div>
-            )}
-          </div>
+            </div>
+          )}
         </div>
       </main>
 
@@ -602,7 +577,7 @@ export default function PharmacyMaps() {
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onUpdateStatus={handleUpdateStatus}
-        isAdmin={true}
+        isAdmin={true} // Allow all map viewers to edit for now, or use actual role check
         currentUsername={user?.username || "User"}
         changeHistory={changeHistory}
         onDeleteHistory={handleDeleteHistory}
