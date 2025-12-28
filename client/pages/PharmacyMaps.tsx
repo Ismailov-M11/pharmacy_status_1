@@ -470,7 +470,7 @@ export default function PharmacyMaps() {
 
       <main className="flex-1 w-full flex flex-col lg:flex-row overflow-hidden">
         {/* Left Panel - Pharmacy List */}
-        <div className="w-full lg:w-1/3 bg-white border-r border-gray-200 overflow-y-auto flex flex-col">
+        <div className="w-full lg:w-1/3 bg-white border-r border-gray-200 overflow-hidden flex flex-col">
           <div className="px-4 sm:px-6 py-4 border-b border-gray-200 bg-gray-50 flex-shrink-0">
             <h1 className="text-2xl font-bold text-gray-900">
               {t.maps || "Карты"}
