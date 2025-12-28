@@ -94,12 +94,35 @@ export default function PharmacyMaps() {
     try {
       setIsLoading(true);
       const response = await getPharmacyList(token!, "", 0, null);
-      setPharmacies(response.payload.list);
-      applyFilter(response.payload.list, activeFilter);
-      
+      const pharmacyList = response.payload?.list || [];
+
+      // Fetch statuses from local backend for all pharmacies
+      const pharmaciesWithStatuses = await Promise.all(
+        pharmacyList.map(async (pharmacy) => {
+          try {
+            const status = await getPharmacyStatus(pharmacy.id);
+            return {
+              ...pharmacy,
+              training: status.training,
+              brandedPacket: status.brandedPacket
+            };
+          } catch (error) {
+            console.warn(`Failed to fetch status for pharmacy ${pharmacy.id}:`, error);
+            return {
+              ...pharmacy,
+              training: false,
+              brandedPacket: false
+            };
+          }
+        })
+      );
+
+      setPharmacies(pharmaciesWithStatuses);
+      applyFilter(pharmaciesWithStatuses, activeFilter);
+
       // Geocode and place markers
       setTimeout(() => {
-        response.payload.list.forEach((pharmacy) => {
+        pharmaciesWithStatuses.forEach((pharmacy) => {
           geocodeAndPlaceMarker(pharmacy);
         });
       }, 100);
