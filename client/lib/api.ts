@@ -179,18 +179,30 @@ export interface StatusHistoryRecord {
 export async function getPharmacyStatus(
   pharmacyId: number
 ): Promise<PharmacyStatus> {
-  const response = await fetch(`${STATUS_API_BASE_URL}/${pharmacyId}`, {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  });
+  try {
+    const response = await fetch(`${STATUS_API_BASE_URL}/${pharmacyId}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
 
-  if (!response.ok) {
-    throw new Error('Failed to fetch pharmacy status');
+    if (!response.ok) {
+      console.warn(`Status API returned ${response.status} for pharmacy ${pharmacyId}`);
+      throw new Error('Failed to fetch pharmacy status');
+    }
+
+    return response.json();
+  } catch (error) {
+    // If backend is unavailable, return default values
+    console.warn(`Backend status service unavailable for pharmacy ${pharmacyId}:`, error);
+    return {
+      pharmacy_id: String(pharmacyId),
+      training: false,
+      brandedPacket: false,
+      updated_at: new Date().toISOString(),
+    };
   }
-
-  return response.json();
 }
 
 export async function updatePharmacyStatusLocal(
@@ -272,4 +284,3 @@ export async function deleteHistoryRecord(id: number): Promise<void> {
     throw new Error('Failed to delete history record');
   }
 }
-
