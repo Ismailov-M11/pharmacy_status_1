@@ -473,12 +473,19 @@ export default function PharmacyMaps() {
             </p>
           </div>
 
-          {/* Filter Buttons */}
-          <div className="px-4 sm:px-6 py-4 border-b border-gray-200 flex-shrink-0">
-            <div className="flex flex-col gap-2">
+          {/* Search and Filter Controls */}
+          <div className="px-4 sm:px-6 py-4 border-b border-gray-200 space-y-3 flex-shrink-0">
+            <Input
+              type="text"
+              placeholder={`${t.pharmacyName || "Название"} / ${t.address || "Адрес"}...`}
+              value={searchQuery}
+              onChange={(e) => handleSearchChange(e.target.value)}
+              className="w-full"
+            />
+            <div className="flex gap-2">
               <Button
                 onClick={() => handleFilterChange("all")}
-                className={`w-full text-left ${
+                className={`flex-1 text-xs sm:text-sm ${
                   activeFilter === "all"
                     ? "bg-purple-700 hover:bg-purple-800 text-white"
                     : "bg-white border border-gray-300 text-gray-700 hover:bg-gray-50"
@@ -488,7 +495,7 @@ export default function PharmacyMaps() {
               </Button>
               <Button
                 onClick={() => handleFilterChange("active")}
-                className={`w-full text-left ${
+                className={`flex-1 text-xs sm:text-sm ${
                   activeFilter === "active"
                     ? "bg-green-600 hover:bg-green-700 text-white"
                     : "bg-white border border-gray-300 text-gray-700 hover:bg-gray-50"
@@ -499,7 +506,7 @@ export default function PharmacyMaps() {
               </Button>
               <Button
                 onClick={() => handleFilterChange("inactive")}
-                className={`w-full text-left ${
+                className={`flex-1 text-xs sm:text-sm ${
                   activeFilter === "inactive"
                     ? "bg-red-600 hover:bg-red-700 text-white"
                     : "bg-white border border-gray-300 text-gray-700 hover:bg-gray-50"
@@ -511,54 +518,56 @@ export default function PharmacyMaps() {
             </div>
           </div>
 
-          {/* Pharmacy List Table */}
-          <div className="flex-1 overflow-y-auto">
-            <div className="px-4 sm:px-6 py-4 border-b border-gray-200 bg-gray-50 flex-shrink-0">
-              <h2 className="text-sm font-semibold text-gray-900">
+          {/* Pharmacy List with Scrollbar */}
+          <div className="flex-1 overflow-hidden flex flex-col bg-white">
+            <div className="px-4 sm:px-6 py-3 border-b border-gray-200 bg-gray-50 flex-shrink-0">
+              <h2 className="text-xs font-semibold text-gray-700 uppercase tracking-wider">
                 {t.pharmacies || "Аптеки"} ({filteredPharmacies.length})
               </h2>
             </div>
 
-            {filteredPharmacies.length === 0 ? (
-              <div className="px-4 sm:px-6 py-8 text-center text-gray-500">
-                {t.noData || "Нет данных"}
-              </div>
-            ) : (
-              <div className="divide-y divide-gray-200">
-                {filteredPharmacies.map((pharmacy, index) => (
-                  <div
-                    key={pharmacy.id}
-                    className="px-4 sm:px-6 py-3 hover:bg-gray-50 transition-colors cursor-pointer border-b border-gray-200"
-                    onClick={() => handlePharmacyClick(pharmacy)}
-                  >
-                    <div className="flex justify-between items-start gap-2">
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-1">
-                          <span className="text-xs text-gray-500 flex-shrink-0">
-                            #{index + 1}
-                          </span>
-                          <h3 className="text-sm font-medium text-gray-900 truncate">
-                            {pharmacy.name}
-                          </h3>
+            <div className="flex-1 overflow-y-auto">
+              {filteredPharmacies.length === 0 ? (
+                <div className="px-4 sm:px-6 py-8 text-center text-gray-500 text-sm">
+                  {t.noData || "Нет данных"}
+                </div>
+              ) : (
+                <div className="divide-y divide-gray-200">
+                  {filteredPharmacies.map((pharmacy, index) => (
+                    <div
+                      key={pharmacy.id}
+                      className="px-4 sm:px-6 py-3 hover:bg-purple-50 transition-colors cursor-pointer border-b border-gray-100 last:border-b-0"
+                      onClick={() => handlePharmacyClick(pharmacy)}
+                    >
+                      <div className="flex justify-between items-start gap-2">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 mb-1">
+                            <span className="text-xs text-gray-400 flex-shrink-0 font-medium">
+                              {String(index + 1).padStart(2, "0")}
+                            </span>
+                            <h3 className="text-sm font-medium text-gray-900 truncate">
+                              {pharmacy.name}
+                            </h3>
+                          </div>
+                          <p className="text-xs text-gray-500 truncate">
+                            {pharmacy.address}
+                          </p>
                         </div>
-                        <p className="text-xs text-gray-600 truncate">
-                          {pharmacy.address}
-                        </p>
+                        <span
+                          className={`px-2 py-1 rounded text-xs font-medium flex-shrink-0 whitespace-nowrap ${
+                            pharmacy.active
+                              ? "bg-emerald-100 text-emerald-800"
+                              : "bg-amber-100 text-amber-800"
+                          }`}
+                        >
+                          {pharmacy.active ? t.active : t.inactive}
+                        </span>
                       </div>
-                      <span
-                        className={`px-2 py-1 rounded text-xs font-medium flex-shrink-0 ${
-                          pharmacy.active
-                            ? "bg-emerald-100 text-emerald-800"
-                            : "bg-amber-100 text-amber-800"
-                        }`}
-                      >
-                        {pharmacy.active ? t.active : t.inactive}
-                      </span>
                     </div>
-                  </div>
-                ))}
-              </div>
-            )}
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
