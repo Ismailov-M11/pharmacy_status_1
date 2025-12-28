@@ -203,7 +203,7 @@ export default function PharmacyMaps() {
           `,
         },
         {
-          preset: "islands#violetDotIcon",
+          preset: "islands#dotIcon",
           iconColor: "7E22CE", // Purple color rgb(126, 34, 206)
         },
       );
