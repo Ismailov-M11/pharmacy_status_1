@@ -143,7 +143,7 @@ export default function PharmacyMaps() {
       mapRef.current = new window.ymaps.Map(containerRef.current, {
         center: TASHKENT_CENTER,
         zoom: 11,
-        controls: ["zoomControl"],
+        controls: ["zoomControl", "fullscreenControl"],
         behaviors: ["default", "scrollZoom"],
       });
 

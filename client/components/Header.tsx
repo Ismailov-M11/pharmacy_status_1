@@ -85,50 +85,61 @@ export function Header() {
                   ? "bg-purple-700 hover:bg-purple-800 text-white"
                   : "text-purple-700 border-purple-700 hover:bg-purple-50"
                   }`}
+                size="sm"
               >
                 <Map className="h-4 w-4" />
-                {t.maps || "Карты"}
+                <span className="hidden md:block">
+                  {t.maps || "Карты"}
+                </span>
               </Button>
             )}
           </div>
 
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="text-gray-600 hover:text-purple-700"
-              >
-                <Globe className="h-5 w-5" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem
-                onClick={() => setLanguage("ru")}
-                className={
-                  language === "ru" ? "bg-purple-50 text-purple-700" : ""
-                }
-              >
-                🇷🇺 Русский
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() => setLanguage("uz")}
-                className={
-                  language === "uz" ? "bg-purple-50 text-purple-700" : ""
-                }
-              >
-                🇺🇿 O'zbekcha
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <div className="flex items-center gap-2">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="text-gray-600 hover:text-purple-700 h-8 w-8 md:h-10 md:w-10"
+                >
+                  <Globe className="h-5 w-5" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem
+                  onClick={() => setLanguage("ru")}
+                  className={
+                    language === "ru" ? "bg-purple-50 text-purple-700" : ""
+                  }
+                >
+                  🇷🇺 Русский
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => setLanguage("uz")}
+                  className={
+                    language === "uz" ? "bg-purple-50 text-purple-700" : ""
+                  }
+                >
+                  🇺🇿 O'zbekcha
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
 
-          <Button
-            onClick={handleLogout}
-            variant="outline"
-            className="text-purple-700 border-purple-700 hover:bg-purple-50 hover:text-purple-700 text-sm"
-          >
-            {t.logout}
-          </Button>
+            <Button
+              onClick={handleLogout}
+              variant="outline"
+              className="text-purple-700 border-purple-700 hover:bg-purple-50 hover:text-purple-700 text-sm px-3"
+              size="sm"
+            >
+              <span className="block md:hidden">
+                <LogOut className="h-4 w-4" />
+              </span>
+              <span className="hidden md:block">
+                {t.logout}
+              </span>
+            </Button>
+          </div>
         </div>
       </div>
     </header>
