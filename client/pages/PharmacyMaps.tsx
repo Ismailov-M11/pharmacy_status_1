@@ -39,6 +39,29 @@ interface PharmacyWithCoords extends Pharmacy {
   longitude?: number;
 }
 
+// Caching Helpers
+const CACHE_KEY = "pharmacy_coords_cache";
+
+const loadCachedCoords = (): Record<number, { lat: number; lon: number }> => {
+  try {
+    const cached = localStorage.getItem(CACHE_KEY);
+    return cached ? JSON.parse(cached) : {};
+  } catch (e) {
+    console.warn("Failed to load coords cache", e);
+    return {};
+  }
+};
+
+const saveCachedCoords = (id: number, lat: number, lon: number) => {
+  try {
+    const current = loadCachedCoords();
+    current[id] = { lat, lon };
+    localStorage.setItem(CACHE_KEY, JSON.stringify(current));
+  } catch (e) {
+    console.warn("Failed to save coords cache", e);
+  }
+};
+
 export default function PharmacyMaps() {
   const { t } = useLanguage();
   const { token, user, isLoading: authLoading } = useAuth();
@@ -148,18 +171,33 @@ export default function PharmacyMaps() {
 
       // Fetch status for ALL pharmacies to validation filters
       // We chunk requests to avoid overwhelming the browser/server if list is huge
+      const cachedCoords = loadCachedCoords();
+
       const pharmaciesWithStatus = await Promise.all(
         pharmacyList.map(async (pharmacy) => {
+          let lat = pharmacy.latitude;
+          let lon = pharmacy.longitude;
+
+          // Try cache if no explicit coords
+          if ((!lat || !lon) && cachedCoords[pharmacy.id]) {
+            lat = cachedCoords[pharmacy.id].lat;
+            lon = cachedCoords[pharmacy.id].lon;
+          }
+
           try {
             const status = await getPharmacyStatus(pharmacy.id);
             return {
               ...pharmacy,
+              latitude: lat,
+              longitude: lon,
               training: status.training,
               brandedPacket: status.brandedPacket,
             };
           } catch {
             return {
               ...pharmacy,
+              latitude: lat,
+              longitude: lon,
               training: false,
               brandedPacket: false,
             };
@@ -238,7 +276,7 @@ export default function PharmacyMaps() {
             `,
           },
           {
-            preset: 'islands#violetDotIcon'
+            preset: pharmacy.active ? 'islands#greenDotIcon' : 'islands#redDotIcon'
           }
         );
 
@@ -257,6 +295,8 @@ export default function PharmacyMaps() {
 
     // Trigger geocoding for those missing coords (background process)
     pharmaciesToPlace.forEach((pharmacy) => {
+      // Check cache again just in case (though fetchPharmacies should have handled it) 
+      // AND check ref to prevent session duplicates
       if ((!pharmacy.latitude || !pharmacy.longitude) && !geocodedRef.current.has(pharmacy.id)) {
         geocodedRef.current.add(pharmacy.id); // Mark as attempted
         geocodeAndUpdatePlacemark(pharmacy);
@@ -297,6 +337,9 @@ export default function PharmacyMaps() {
                   latitude: coords[0],
                   longitude: coords[1],
                 };
+
+                // Save to Cache
+                saveCachedCoords(pharmacy.id, coords[0], coords[1]);
 
                 // Just update the pharmacy with coordinates, don't rebuild map
                 setPharmacies((prev) =>

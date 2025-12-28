@@ -1,7 +1,8 @@
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate, useLocation } from "react-router-dom";
-import { ChevronDown, Globe, Map, Headset, UserCog } from "lucide-react";
+import { useNavigate, useLocation } from "react-router-dom";
+import { ChevronDown, Globe, Map, Headset, UserCog, LayoutDashboard, LogOut } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
