@@ -273,27 +273,40 @@ export default function PharmacyMaps() {
     setSelectedPharmacy(pharmacy);
     setIsModalOpen(true);
 
+    setIsLoadingHistory(true);
     try {
-      setIsLoadingHistory(true);
-      const [status, history] = await Promise.all([
-        getPharmacyStatus(pharmacy.id),
-        getStatusHistory(pharmacy.id)
-      ]);
+      // Fetch status with timeout
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 8000);
 
-      setSelectedPharmacy((prev) =>
-        prev
-          ? {
-              ...prev,
-              training: status.training,
-              brandedPacket: status.brandedPacket
-            }
-          : null
-      );
+      try {
+        const status = await getPharmacyStatus(pharmacy.id);
+        clearTimeout(timeoutId);
 
-      setChangeHistory(history);
+        setSelectedPharmacy((prev) =>
+          prev
+            ? {
+                ...prev,
+                training: status.training,
+                brandedPacket: status.brandedPacket
+              }
+            : null
+        );
+      } catch (statusError) {
+        console.warn(`Could not load status for pharmacy ${pharmacy.id}:`, statusError);
+        // Keep pharmacy data but with default status - don't crash
+      }
+
+      // Fetch history
+      try {
+        const history = await getStatusHistory(pharmacy.id);
+        setChangeHistory(history);
+      } catch (historyError) {
+        console.warn(`Could not load history for pharmacy ${pharmacy.id}:`, historyError);
+        setChangeHistory([]);
+      }
     } catch (error) {
-      console.error("Failed to fetch pharmacy details:", error);
-      setChangeHistory([]);
+      console.error("Error loading pharmacy details:", error);
     } finally {
       setIsLoadingHistory(false);
     }
