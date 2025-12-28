@@ -139,23 +139,51 @@ export default function PharmacyMaps() {
     }
   };
 
-  const geocodeAndPlaceMarker = (pharmacy: Pharmacy) => {
+  const geocodeAndPlaceMarker = (pharmacy: Pharmacy, retryCount = 0) => {
     if (!window.ymaps || !mapInstanceRef.current) return;
 
-    window.ymaps.geocode(pharmacy.address, { results: 1 }).then((result: any) => {
-      if (result.geoObjects.length > 0) {
-        const firstGeoObject = result.geoObjects.get(0);
-        const coords = firstGeoObject.geometry.getCoordinates();
-        placeMarker(pharmacy, coords);
-      } else {
-        // Place marker at default location if geocoding fails
-        placeMarker(pharmacy, [41.2995, 69.2401]);
-      }
-    }).catch((error: Error) => {
-      console.error(`Failed to geocode address for ${pharmacy.name}:`, error);
-      // Place marker at default location if geocoding fails
-      placeMarker(pharmacy, [41.2995, 69.2401]);
+    // Try to geocode the address
+    const geocodeRequest = window.ymaps.geocode(pharmacy.address, {
+      results: 1,
+      boundedBy: [[39.5, 68.5], [42.5, 70.5]] // Tashkent region bounds
     });
+
+    geocodeRequest
+      .then((result: any) => {
+        try {
+          if (result && result.geoObjects && result.geoObjects.getLength && result.geoObjects.getLength() > 0) {
+            const firstGeoObject = result.geoObjects.get(0);
+            if (firstGeoObject && firstGeoObject.geometry) {
+              const coords = firstGeoObject.geometry.getCoordinates();
+              if (coords && coords.length === 2) {
+                placeMarker(pharmacy, coords);
+                console.log(`✓ Successfully geocoded: ${pharmacy.name}`);
+                return;
+              }
+            }
+          }
+
+          // If geocoding didn't find anything, place at default Tashkent location
+          console.warn(`No geocoding result for: ${pharmacy.name}, using default location`);
+          placeMarker(pharmacy, [41.2995, 69.2401]);
+        } catch (parseError) {
+          console.error(`Error parsing geocode result for ${pharmacy.name}:`, parseError);
+          placeMarker(pharmacy, [41.2995, 69.2401]);
+        }
+      })
+      .catch((error: any) => {
+        console.error(`Geocoding failed for "${pharmacy.name}" (${pharmacy.address}):`, error?.message || error);
+        // Retry once if it fails
+        if (retryCount < 1) {
+          console.log(`Retrying geocode for: ${pharmacy.name}`);
+          setTimeout(() => {
+            geocodeAndPlaceMarker(pharmacy, retryCount + 1);
+          }, 500);
+        } else {
+          // Place at default location after retry fails
+          placeMarker(pharmacy, [41.2995, 69.2401]);
+        }
+      });
   };
 
   const placeMarker = (pharmacy: Pharmacy, coords: [number, number]) => {
