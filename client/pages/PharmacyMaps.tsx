@@ -54,7 +54,7 @@ export default function PharmacyMaps() {
   const [filterTelegram, setFilterTelegram] = useState<"all" | "yes" | "no">("all");
   const [filterPacket, setFilterPacket] = useState<"all" | "yes" | "no">("all");
   const [filterTraining, setFilterTraining] = useState<"all" | "yes" | "no">("all");
-  const [filterStatus, setFilterStatus] = useState<"all" | "active" | "inactive">("all");
+  const [filterStatus, setFilterStatus] = useState<"all" | "active" | "inactive">("active"); // Default: active
 
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedPharmacy, setSelectedPharmacy] =
@@ -215,14 +215,24 @@ export default function PharmacyMaps() {
             balloonContent: `
               <div style="padding: 12px; font-family: Arial, sans-serif; max-width: 300px;">
                 <div style="font-weight: bold; font-size: 14px; margin-bottom: 8px; color: #1f2937;">${pharmacy.name}</div>
-                <div style="font-size: 12px; margin-bottom: 4px;"><strong>Код:</strong> ${pharmacy.code}</div>
-                <div style="font-size: 12px; margin-bottom: 4px;"><strong>Адрес:</strong> ${pharmacy.address}</div>
-                <div style="font-size: 12px; margin-bottom: 4px;"><strong>Статус:</strong> <span style="color: ${pharmacy.active ? "#059669" : "#d97706"}">${pharmacy.active ? "Активна" : "Неактивна"}</span></div>
-                ${pharmacy.phone ? `<div style="font-size: 12px;"><strong>Телефон:</strong> <a href="tel:${pharmacy.phone}" style="color: #2563eb;">${pharmacy.phone}</a></div>` : ""}
-                 <div style="margin-top: 8px; border-top: 1px solid #eee; padding-top: 8px; display: flex; gap: 8px; flex-wrap: wrap;">
-                    ${pharmacy.marketChats?.length ? '<span style="background: #e0f2fe; color: #0284c7; padding: 2px 6px; border-radius: 4px; font-size: 10px;">Telegram</span>' : ''}
-                    ${pharmacy.brandedPacket ? '<span style="background: #fdf4ff; color: #9333ea; padding: 2px 6px; border-radius: 4px; font-size: 10px;">Пакет</span>' : ''}
-                    ${pharmacy.training ? '<span style="background: #f0fdf4; color: #16a34a; padding: 2px 6px; border-radius: 4px; font-size: 10px;">Обучение</span>' : ''}
+                <div style="font-size: 12px; margin-bottom: 4px;"><strong>${t.code || "Код"}:</strong> ${pharmacy.code}</div>
+                <div style="font-size: 12px; margin-bottom: 4px;"><strong>${t.address || "Адрес"}:</strong> ${pharmacy.address}</div>
+                <div style="font-size: 12px; margin-bottom: 4px;"><strong>${t.status || "Статус"}:</strong> <span style="color: ${pharmacy.active ? "#059669" : "#d97706"}">${pharmacy.active ? (t.active || "Активна") : (t.inactive || "Неактивна")}</span></div>
+                ${pharmacy.phone ? `<div style="font-size: 12px; margin-bottom: 8px;"><strong>${t.pharmacyPhone || "Телефон"}:</strong> <a href="tel:${pharmacy.phone}" style="color: #2563eb;">${pharmacy.phone}</a></div>` : ""}
+                
+                 <div style="margin-top: 8px; border-top: 1px solid #eee; padding-top: 8px; display: flex; flex-direction: column; gap: 4px;">
+                    <div style="font-size: 12px; display: flex; justify-content: space-between;">
+                        <span style="color: #6b7280;">${t.telegramBot || "Telegram Bot"}:</span>
+                        <span style="font-weight: bold; color: ${pharmacy.marketChats?.length ? '#059669' : '#dc2626'};">${pharmacy.marketChats?.length ? (t.yes || "ЕСТЬ") : (t.no || "НЕТ")}</span>
+                    </div>
+                    <div style="font-size: 12px; display: flex; justify-content: space-between;">
+                        <span style="color: #6b7280;">${t.brandedPacket || "Пакет"}:</span>
+                        <span style="font-weight: bold; color: ${pharmacy.brandedPacket ? '#059669' : '#dc2626'};">${pharmacy.brandedPacket ? (t.yes || "ЕСТЬ") : (t.no || "НЕТ")}</span>
+                    </div>
+                    <div style="font-size: 12px; display: flex; justify-content: space-between;">
+                         <span style="color: #6b7280;">${t.training || "Обучение"}:</span>
+                         <span style="font-weight: bold; color: ${pharmacy.training ? '#059669' : '#dc2626'};">${pharmacy.training ? (t.yes || "ЕСТЬ") : (t.no || "НЕТ")}</span>
+                    </div>
                  </div>
               </div>
             `,
@@ -545,7 +555,7 @@ export default function PharmacyMaps() {
 
       <main className="flex-1 flex flex-col lg:flex-row overflow-hidden relative">
         {/* Left Panel - Pharmacy List */}
-        <div className="w-full lg:w-[400px] bg-white border-r border-gray-200 flex flex-col z-10 shadow-lg shrink-0 h-full">
+        <div className="w-full lg:w-[400px] bg-white border-r border-gray-200 flex flex-col z-10 shadow-lg shrink-0 h-[45vh] lg:h-full">
           <div className="px-4 py-4 border-b border-gray-200 bg-white shrink-0">
             <h1 className="text-xl font-bold text-gray-900">
               {t.maps || "Карты"}
@@ -569,7 +579,7 @@ export default function PharmacyMaps() {
                 size="icon"
                 onClick={() => setIsFiltersOpen(!isFiltersOpen)}
                 className={`shrink-0 ${isFiltersOpen ? 'bg-purple-600 hover:bg-purple-700 text-white' : ''}`}
-                title="Фильтры"
+                title={t.filter || "Фильтры"}
               >
                 <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${isFiltersOpen ? 'rotate-180' : ''}`} />
               </Button>
@@ -578,22 +588,22 @@ export default function PharmacyMaps() {
             {isFiltersOpen && (
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2 border-t border-gray-100 animate-in slide-in-from-top-2 duration-200">
                 <FilterCell
-                  title="Telegram Bot"
+                  title={t.telegramBot || "Telegram Bot"}
                   value={filterTelegram}
                   onChange={setFilterTelegram}
                 />
                 <FilterCell
-                  title="Пакет"
+                  title={t.brandedPacket || "Пакет"}
                   value={filterPacket}
                   onChange={setFilterPacket}
                 />
                 <FilterCell
-                  title="Обучение"
+                  title={t.training || "Обучение"}
                   value={filterTraining}
                   onChange={setFilterTraining}
                 />
                 <FilterCell
-                  title="Статус"
+                  title={t.status || "Статус"}
                   value={filterStatus}
                   onChange={setFilterStatus}
                 />

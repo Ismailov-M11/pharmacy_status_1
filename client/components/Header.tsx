@@ -1,7 +1,7 @@
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate, useLocation } from "react-router-dom";
-import { ChevronDown, Globe, Map } from "lucide-react";
+import { ChevronDown, Globe, Map, Headset, UserCog } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -62,9 +62,16 @@ export function Header() {
                   : "text-purple-700 border-purple-700 hover:bg-purple-50"
                   }`}
               >
-                {role === "ROLE_OPERATOR"
-                  ? t.operatorPanel || "Панель оператора"
-                  : t.agentPanel || "Панель агента"}
+                {/* Mobile Icon */}
+                <span className="block md:hidden">
+                  {role === "ROLE_OPERATOR" ? <Headset className="h-4 w-4" /> : <UserCog className="h-4 w-4" />}
+                </span>
+                {/* Desktop Text */}
+                <span className="hidden md:block">
+                  {role === "ROLE_OPERATOR"
+                    ? t.operatorPanel || "Панель оператора"
+                    : t.agentPanel || "Панель агента"}
+                </span>
               </Button>
             )}
 
