@@ -62,7 +62,9 @@ export function Header() {
                   : "text-purple-700 border-purple-700 hover:bg-purple-50"
                   }`}
               >
-                {t.adminPanel || "Панель"}
+                {role === "ROLE_OPERATOR"
+                  ? t.operatorPanel || "Панель оператора"
+                  : t.agentPanel || "Панель агента"}
               </Button>
             )}
 

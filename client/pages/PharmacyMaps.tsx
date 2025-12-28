@@ -181,8 +181,7 @@ export default function PharmacyMaps() {
 
       // Create a collection for better performance
       const collection = new window.ymaps.GeoObjectCollection(null, {
-        preset: 'islands#violetDotIcon',
-        iconColor: '#7c3aed' // Explicit Tailwind purple-600
+        preset: 'islands#violetDotIcon'
       });
 
       pharmaciesToPlace.forEach((pharmacy) => {
@@ -205,8 +204,7 @@ export default function PharmacyMaps() {
             `,
           },
           {
-            preset: "islands#violetDotIcon", // Changed to violet which is purple-ish
-            iconColor: '#8b5cf6' // Tailwind violet-500
+            preset: 'islands#violetDotIcon'
           }
         );
 
@@ -505,24 +503,7 @@ export default function PharmacyMaps() {
             </div>
 
             <div className="flex gap-2 text-xs">
-              <button
-                onClick={() => handleFilterChange('all')}
-                className={`px-3 py-1 rounded-full border transition-colors ${activeFilter === 'all' ? 'bg-gray-800 text-white border-gray-800' : 'bg-white border-gray-300 text-gray-600 hover:bg-gray-100'}`}
-              >
-                {t.all || "Все"}
-              </button>
-              <button
-                onClick={() => handleFilterChange('active')}
-                className={`px-3 py-1 rounded-full border transition-colors ${activeFilter === 'active' ? 'bg-emerald-600 text-white border-emerald-600' : 'bg-white border-gray-300 text-gray-600 hover:bg-gray-100'}`}
-              >
-                {t.active || "Активные"}
-              </button>
-              <button
-                onClick={() => handleFilterChange('inactive')}
-                className={`px-3 py-1 rounded-full border transition-colors ${activeFilter === 'inactive' ? 'bg-amber-600 text-white border-amber-600' : 'bg-white border-gray-300 text-gray-600 hover:bg-gray-100'}`}
-              >
-                {t.inactive || "Неактивные"}
-              </button>
+              {/* Filter buttons removed as per request */}
             </div>
           </div>
 
@@ -577,7 +558,7 @@ export default function PharmacyMaps() {
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onUpdateStatus={handleUpdateStatus}
-        isAdmin={true} // Allow all map viewers to edit for now, or use actual role check
+        isAdmin={user?.role === "ROLE_ADMIN"}
         currentUsername={user?.username || "User"}
         changeHistory={changeHistory}
         onDeleteHistory={handleDeleteHistory}
