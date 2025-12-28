@@ -86,13 +86,13 @@ export default function PharmacyMaps() {
 
   const initializeMap = () => {
     if (!containerRef.current) {
-      console.error("Map container not found");
+      console.error("❌ Map container not found");
       return;
     }
 
     try {
-      console.log("Initializing Yandex Map...");
-      
+      console.log("📍 Initializing Yandex Map...");
+
       mapRef.current = new window.ymaps.Map(containerRef.current, {
         center: TASHKENT_CENTER,
         zoom: 11,
@@ -100,12 +100,13 @@ export default function PharmacyMaps() {
         behaviors: ["default", "scrollZoom"]
       });
 
-      console.log("Map initialized successfully");
-      
+      console.log("✅ Map initialized successfully");
+      console.log(`🌍 API Backend URL: ${import.meta.env.VITE_BACKEND_URL || 'default'}`);
+
       // Fetch pharmacies after map is initialized
       fetchPharmacies();
     } catch (error) {
-      console.error("Failed to initialize map:", error);
+      console.error("❌ Failed to initialize map:", error);
       toast.error("Не удалось инициализировать карту");
     }
   };
