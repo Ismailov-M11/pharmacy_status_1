@@ -90,9 +90,9 @@ export function Header() {
               <Button
                 onClick={() => navigate("/admin")}
                 variant={location.pathname === "/admin" ? "default" : "outline"}
-                className={`h-10 w-full md:w-auto md:h-9 md:px-3 text-sm justify-center flex-1 md:flex-none ${location.pathname === "/admin"
+                className={`h-10 w-full md:w-auto md:h-9 md:px-3 text-sm justify-center flex-1 md:flex-none transition-colors ${location.pathname === "/admin"
                   ? "bg-purple-700 hover:bg-purple-800 text-white"
-                  : "text-purple-700 border-purple-700 hover:bg-purple-50"
+                  : "text-purple-700 border-purple-700 hover:bg-purple-50 hover:text-purple-700"
                   }`}
               >
                 <User className="h-5 w-5 md:mr-2 md:h-4 md:w-4" />
@@ -111,9 +111,9 @@ export function Header() {
               <Button
                 onClick={() => navigate("/agent")}
                 variant={location.pathname === "/agent" ? "default" : "outline"}
-                className={`h-10 w-full md:w-auto md:h-9 md:px-3 text-sm justify-center flex-1 md:flex-none ${location.pathname === "/agent"
+                className={`h-10 w-full md:w-auto md:h-9 md:px-3 text-sm justify-center flex-1 md:flex-none transition-colors ${location.pathname === "/agent"
                   ? "bg-purple-700 hover:bg-purple-800 text-white"
-                  : "text-purple-700 border-purple-700 hover:bg-purple-50"
+                  : "text-purple-700 border-purple-700 hover:bg-purple-50 hover:text-purple-700"
                   }`}
               >
                 {role === "ROLE_OPERATOR" ? <Headset className="h-5 w-5 md:mr-2 md:h-4 md:w-4" /> : <UserCog className="h-5 w-5 md:mr-2 md:h-4 md:w-4" />}
@@ -133,9 +133,9 @@ export function Header() {
               <Button
                 onClick={() => navigate("/maps")}
                 variant={location.pathname === "/maps" ? "default" : "outline"}
-                className={`h-10 w-full md:w-auto md:h-9 md:px-3 text-sm justify-center flex-1 md:flex-none ${location.pathname === "/maps"
+                className={`h-10 w-full md:w-auto md:h-9 md:px-3 text-sm justify-center flex-1 md:flex-none transition-colors ${location.pathname === "/maps"
                   ? "bg-purple-700 hover:bg-purple-800 text-white"
-                  : "text-purple-700 border-purple-700 hover:bg-purple-50"
+                  : "text-purple-700 border-purple-700 hover:bg-purple-50 hover:text-purple-700"
                   }`}
               >
                 <Map className="h-5 w-5 md:mr-2 md:h-4 md:w-4" />

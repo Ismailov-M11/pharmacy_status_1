@@ -671,9 +671,9 @@ export default function PharmacyMaps() {
                     onClick={() => handlePharmacyClick(pharmacy)}
                     className={`px-4 py-3 hover:bg-purple-50 cursor-pointer transition-colors ${selectedPharmacy?.id === pharmacy.id ? 'bg-purple-50 border-l-4 border-purple-600' : 'border-l-4 border-transparent'}`}
                   >
-                    <div className="flex justify-between items-start mb-1">
+                    <div className="flex justify-between items-center mb-1">
                       <span className="font-medium text-gray-900 text-sm line-clamp-1">{pharmacy.name}</span>
-                      <div className={`w-2 h-2 rounded-full ${pharmacy.active ? 'bg-emerald-500' : 'bg-red-500'}`} title={pharmacy.active ? 'Active' : 'Inactive'} />
+                      <div className={`w-3 h-3 rounded-full border-2 border-white ring-1 ${pharmacy.active ? 'bg-emerald-500 ring-emerald-500' : 'bg-red-500 ring-red-500'} shadow-sm`} title={pharmacy.active ? 'Active' : 'Inactive'} />
                     </div>
                     <p className="text-xs text-gray-500 line-clamp-2">{pharmacy.address}</p>
                   </div>
