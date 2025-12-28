@@ -53,16 +53,21 @@ export default function PharmacyMaps() {
     const loadYandexMaps = () => {
       if (!window.ymaps) {
         const script = document.createElement("script");
-        script.src = "https://api-maps.yandex.ru/2.1/?lang=ru_RU&apikey=";
+        // Use public Yandex Maps API without API key parameter
+        script.src = "https://api-maps.yandex.ru/2.1/?lang=ru_RU";
         script.type = "text/javascript";
         script.async = true;
+        script.onerror = () => {
+          console.error("Failed to load Yandex Maps API");
+          toast.error("Не удалось загрузить карты");
+        };
         script.onload = () => {
           if (window.ymaps) {
             window.ymaps.ready(initMap);
           }
         };
         document.head.appendChild(script);
-      } else if (window.ymaps.ready) {
+      } else if (window.ymaps && window.ymaps.ready) {
         window.ymaps.ready(initMap);
       }
     };
