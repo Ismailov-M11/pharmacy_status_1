@@ -58,6 +58,11 @@ export const translations = {
     agentPanel: "Панель Агента",
     operatorPanel: "Панель оператора колл-центра",
     adminPanel: "Панель Администратора",
+    maps: "Карты",
+    pharmacyMap: "Отображение аптек на карте",
+    pharmacies: "Аптеки",
+    all: "Все",
+    action: "Действие",
 
     // Actions
     edit: "Редактировать",
