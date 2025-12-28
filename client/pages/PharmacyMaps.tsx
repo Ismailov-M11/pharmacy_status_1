@@ -222,41 +222,42 @@ export default function PharmacyMaps() {
   };
 
   const geocodeAndUpdateMarker = (pharmacy: Pharmacy) => {
-    if (!window.ymaps) {
-      console.warn("ymaps not available for geocoding");
-      return;
-    }
+    // Use OpenStreetMap Nominatim API (free, no authentication required)
+    const query = encodeURIComponent(`${pharmacy.address}, Tashkent, Uzbekistan`);
 
-    window.ymaps
-      .geocode(pharmacy.address, {
-        results: 1,
-        boundedBy: [[39.0, 68.0], [43.0, 71.0]] // Extended Tashkent region
+    fetch(`https://nominatim.openstreetmap.org/search?q=${query}&format=json&limit=1`)
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
       })
-      .then((result: any) => {
-        try {
-          if (result?.geoObjects?.getLength?.() > 0) {
-            const geoObject = result.geoObjects.get(0);
-            const coords = geoObject.geometry.getCoordinates();
-            
-            if (coords && Array.isArray(coords) && coords.length === 2) {
-              // Remove old marker and place new one with correct coordinates
-              const oldMarker = markersRef.current.get(pharmacy.id);
-              if (oldMarker) {
+      .then((data: any) => {
+        if (Array.isArray(data) && data.length > 0) {
+          const result = data[0];
+          const coords: [number, number] = [parseFloat(result.lat), parseFloat(result.lon)];
+
+          if (coords && coords.length === 2 && !isNaN(coords[0]) && !isNaN(coords[1])) {
+            // Remove old marker and place new one with correct coordinates
+            const oldMarker = markersRef.current.get(pharmacy.id);
+            if (oldMarker) {
+              try {
                 mapInstanceRef.current?.geoObjects.remove(oldMarker);
+              } catch (e) {
+                console.warn("Error removing old marker:", e);
               }
-              
-              placeMarker(pharmacy, coords);
-              console.log(`✓ Geocoded: ${pharmacy.name} → [${coords[0]}, ${coords[1]}]`);
             }
-          } else {
-            console.log(`No geocoding result for: ${pharmacy.name}`);
+
+            placeMarker(pharmacy, coords);
+            console.log(`✓ Geocoded: ${pharmacy.name} → [${coords[0].toFixed(4)}, ${coords[1].toFixed(4)}]`);
           }
-        } catch (parseError) {
-          console.error(`Error processing geocode result for ${pharmacy.name}:`, parseError);
+        } else {
+          console.log(`No geocoding result found for: ${pharmacy.name}`);
         }
       })
       .catch((error: any) => {
-        console.error(`Geocoding error for "${pharmacy.name}":`, error?.message || error);
+        console.warn(`Geocoding failed for "${pharmacy.name}" (${pharmacy.address}):`, error?.message || error);
+        // Marker remains at default location - this is acceptable
       });
   };
 
