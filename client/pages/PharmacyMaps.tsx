@@ -438,75 +438,117 @@ export default function PharmacyMaps() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 flex flex-col">
       <Header />
 
-      <main className="w-full">
-        <div className="mb-4 sm:mb-8 px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
-          <h1 className="text-3xl font-bold text-gray-900">
-            {t.maps || "Карты"}
-          </h1>
-          <p className="text-gray-600 mt-2">
-            {t.pharmacyMap || "Отображение аптек на карте"}
-          </p>
-        </div>
-
-        <div className="px-4 sm:px-6 lg:px-8 pb-8 space-y-4">
-          {/* Filter Buttons */}
-          <div className="flex gap-2 flex-wrap">
-            <Button
-              onClick={() => handleFilterChange("all")}
-              className={`${
-                activeFilter === "all"
-                  ? "bg-purple-700 hover:bg-purple-800 text-white"
-                  : "bg-white border border-gray-300 text-gray-700 hover:bg-gray-50"
-              }`}
-            >
-              {t.all || "Все"} ({pharmacies.length})
-            </Button>
-            <Button
-              onClick={() => handleFilterChange("active")}
-              className={`${
-                activeFilter === "active"
-                  ? "bg-green-600 hover:bg-green-700 text-white"
-                  : "bg-white border border-gray-300 text-gray-700 hover:bg-gray-50"
-              }`}
-            >
-              {t.active || "Активные"} (
-              {pharmacies.filter((p) => p.active).length})
-            </Button>
-            <Button
-              onClick={() => handleFilterChange("inactive")}
-              className={`${
-                activeFilter === "inactive"
-                  ? "bg-red-600 hover:bg-red-700 text-white"
-                  : "bg-white border border-gray-300 text-gray-700 hover:bg-gray-50"
-              }`}
-            >
-              {t.inactive || "Неактивные"} (
-              {pharmacies.filter((p) => !p.active).length})
-            </Button>
+      <main className="flex-1 w-full flex flex-col lg:flex-row overflow-hidden">
+        {/* Left Panel - Pharmacy List */}
+        <div className="w-full lg:w-1/3 bg-white border-r border-gray-200 overflow-y-auto flex flex-col">
+          <div className="px-4 sm:px-6 py-4 border-b border-gray-200 bg-gray-50 flex-shrink-0">
+            <h1 className="text-2xl font-bold text-gray-900">
+              {t.maps || "Карты"}
+            </h1>
+            <p className="text-gray-600 text-sm mt-1">
+              {t.pharmacyMap || "Отображение аптек на карте"}
+            </p>
           </div>
 
-          {/* Map Container */}
-          <div className="relative bg-white rounded-lg shadow-sm overflow-hidden border border-gray-200">
+          {/* Filter Buttons */}
+          <div className="px-4 sm:px-6 py-4 border-b border-gray-200 flex-shrink-0">
+            <div className="flex flex-col gap-2">
+              <Button
+                onClick={() => handleFilterChange("all")}
+                className={`w-full text-left ${
+                  activeFilter === "all"
+                    ? "bg-purple-700 hover:bg-purple-800 text-white"
+                    : "bg-white border border-gray-300 text-gray-700 hover:bg-gray-50"
+                }`}
+              >
+                {t.all || "Все"} ({pharmacies.length})
+              </Button>
+              <Button
+                onClick={() => handleFilterChange("active")}
+                className={`w-full text-left ${
+                  activeFilter === "active"
+                    ? "bg-green-600 hover:bg-green-700 text-white"
+                    : "bg-white border border-gray-300 text-gray-700 hover:bg-gray-50"
+                }`}
+              >
+                {t.active || "Активные"} (
+                {pharmacies.filter((p) => p.active).length})
+              </Button>
+              <Button
+                onClick={() => handleFilterChange("inactive")}
+                className={`w-full text-left ${
+                  activeFilter === "inactive"
+                    ? "bg-red-600 hover:bg-red-700 text-white"
+                    : "bg-white border border-gray-300 text-gray-700 hover:bg-gray-50"
+                }`}
+              >
+                {t.inactive || "Неактивные"} (
+                {pharmacies.filter((p) => !p.active).length})
+              </Button>
+            </div>
+          </div>
+
+          {/* Pharmacy List Table */}
+          <div className="flex-1 overflow-y-auto">
+            <div className="px-4 sm:px-6 py-4 border-b border-gray-200 bg-gray-50 flex-shrink-0">
+              <h2 className="text-sm font-semibold text-gray-900">
+                {t.pharmacies || "Аптеки"} ({filteredPharmacies.length})
+              </h2>
+            </div>
+
+            {filteredPharmacies.length === 0 ? (
+              <div className="px-4 sm:px-6 py-8 text-center text-gray-500">
+                {t.noData || "Нет данных"}
+              </div>
+            ) : (
+              <div className="divide-y divide-gray-200">
+                {filteredPharmacies.map((pharmacy, index) => (
+                  <div
+                    key={pharmacy.id}
+                    className="px-4 sm:px-6 py-3 hover:bg-gray-50 transition-colors cursor-pointer border-b border-gray-200"
+                    onClick={() => handlePharmacyClick(pharmacy)}
+                  >
+                    <div className="flex justify-between items-start gap-2">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="text-xs text-gray-500 flex-shrink-0">
+                            #{index + 1}
+                          </span>
+                          <h3 className="text-sm font-medium text-gray-900 truncate">
+                            {pharmacy.name}
+                          </h3>
+                        </div>
+                        <p className="text-xs text-gray-600 truncate">
+                          {pharmacy.address}
+                        </p>
+                      </div>
+                      <span
+                        className={`px-2 py-1 rounded text-xs font-medium flex-shrink-0 ${
+                          pharmacy.active
+                            ? "bg-emerald-100 text-emerald-800"
+                            : "bg-amber-100 text-amber-800"
+                        }`}
+                      >
+                        {pharmacy.active ? t.active : t.inactive}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Right Panel - Map */}
+        <div className="w-full lg:w-2/3 bg-white flex flex-col min-h-96 lg:min-h-0 order-first lg:order-last">
+          <div className="relative flex-1 bg-gray-100 overflow-hidden">
             <div
               ref={containerRef}
-              className="w-full bg-gray-100"
-              style={{
-                height: isFullscreen ? "100vh" : "600px",
-                minHeight: "400px",
-              }}
+              className="w-full h-full bg-gray-100"
             />
-
-            {/* Fullscreen Button */}
-            <button
-              onClick={toggleFullscreen}
-              className="absolute top-4 right-4 bg-white border border-gray-300 rounded-lg p-2 hover:bg-gray-50 z-10 shadow-md"
-              title={isFullscreen ? "Exit fullscreen" : "Enter fullscreen"}
-            >
-              <Maximize2 className="w-5 h-5 text-gray-700" />
-            </button>
 
             {/* Loading Overlay */}
             {isLoading && (
@@ -517,76 +559,6 @@ export default function PharmacyMaps() {
                 </span>
               </div>
             )}
-          </div>
-
-          {/* Pharmacy List */}
-          <div className="bg-white rounded-lg shadow-sm overflow-hidden border border-gray-200">
-            <div className="px-4 sm:px-6 py-4 border-b border-gray-200 bg-gray-50">
-              <h2 className="text-lg font-semibold text-gray-900">
-                {t.pharmacies || "Аптеки"} ({filteredPharmacies.length})
-              </h2>
-            </div>
-
-            <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
-                      №
-                    </th>
-                    <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
-                      {t.pharmacyName || "Название аптеки"}
-                    </th>
-                    <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
-                      {t.address || "Адрес"}
-                    </th>
-                    <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
-                      {t.status || "Статус"}
-                    </th>
-                    <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
-                      {t.action || "Действие"}
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                  {filteredPharmacies.map((pharmacy, index) => (
-                    <tr
-                      key={pharmacy.id}
-                      className="hover:bg-gray-50 transition-colors"
-                    >
-                      <td className="px-4 sm:px-6 py-3 text-xs sm:text-sm text-gray-500">
-                        {index + 1}
-                      </td>
-                      <td className="px-4 sm:px-6 py-3 text-xs sm:text-sm font-medium text-gray-900">
-                        {pharmacy.name}
-                      </td>
-                      <td className="px-4 sm:px-6 py-3 text-xs sm:text-sm text-gray-600">
-                        {pharmacy.address}
-                      </td>
-                      <td className="px-4 sm:px-6 py-3 text-xs sm:text-sm">
-                        <span
-                          className={`px-3 py-1 rounded-full text-xs font-medium ${
-                            pharmacy.active
-                              ? "bg-emerald-100 text-emerald-800"
-                              : "bg-amber-100 text-amber-800"
-                          }`}
-                        >
-                          {pharmacy.active ? t.active : t.inactive}
-                        </span>
-                      </td>
-                      <td className="px-4 sm:px-6 py-3 text-xs sm:text-sm">
-                        <Button
-                          onClick={() => handlePharmacyClick(pharmacy)}
-                          className="bg-purple-700 hover:bg-purple-800 text-white h-8 text-xs"
-                        >
-                          {t.details || "Подробнее"}
-                        </Button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
           </div>
         </div>
       </main>
