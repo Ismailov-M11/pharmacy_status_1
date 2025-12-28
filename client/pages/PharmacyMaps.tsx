@@ -440,6 +440,12 @@ export default function PharmacyMaps() {
     applyFilter(pharmacies, activeFilter, query);
   };
 
+  // Update map when filter or search changes
+  useEffect(() => {
+    if (mapRef.current && !isLoading) {
+      addPlacemarks(filteredPharmacies);
+    }
+  }, [filteredPharmacies, isLoading]);
 
   if (authLoading) {
     return (
