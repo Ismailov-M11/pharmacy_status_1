@@ -1,7 +1,6 @@
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate, useLocation } from "react-router-dom";
-import { useNavigate, useLocation } from "react-router-dom";
 import { ChevronDown, Globe, Map, Headset, UserCog, LayoutDashboard, LogOut, User } from "lucide-react";
 import {
   DropdownMenu,
@@ -24,33 +23,87 @@ export function Header() {
 
   return (
     <header className="bg-white border-b border-gray-200 shadow-sm sticky top-0 z-50">
-      <div className="w-full max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
-        <div className="flex items-center gap-3">
+      <div className="w-full max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-3 md:py-4 flex flex-wrap items-center justify-between gap-y-3">
+        {/* Logo - Order 1 */}
+        <div className="flex items-center gap-3 order-1">
           <img
             src="/logo.png"
             alt={t.siteTitle || "Aptekalar holati"}
-            className="w-12 h-12"
+            className="w-10 h-10 md:w-12 md:h-12"
           />
           <div>
-            <div className="font-bold text-xl text-purple-700">
+            <div className="font-bold text-lg md:text-xl text-purple-700">
               {t.siteTitle || "Aptekalar holati"}
             </div>
           </div>
         </div>
 
-        <div className="flex items-center gap-3 sm:gap-6">
-          <div className="flex items-center gap-2">
+        {/* Language & Logout - Order 2 Mobile, Order 3 Desktop (Right aligned) */}
+        <div className="flex items-center gap-2 order-2 md:order-3">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="text-gray-600 hover:text-purple-700 h-9 w-9 md:h-10 md:w-10"
+              >
+                <Globe className="h-5 w-5" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem
+                onClick={() => setLanguage("ru")}
+                className={
+                  language === "ru" ? "bg-purple-50 text-purple-700" : ""
+                }
+              >
+                🇷🇺 Русский
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => setLanguage("uz")}
+                className={
+                  language === "uz" ? "bg-purple-50 text-purple-700" : ""
+                }
+              >
+                🇺🇿 O'zbekcha
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          <Button
+            onClick={handleLogout}
+            variant="outline"
+            className="h-9 w-9 md:w-auto md:px-3 p-0 md:py-2 text-purple-700 border-purple-700 hover:bg-purple-50 hover:text-purple-700 text-sm justify-center"
+          >
+            <LogOut className="h-5 w-5 md:mr-2 md:h-4 md:w-4" />
+            <span className="hidden md:block">
+              {t.logout}
+            </span>
+          </Button>
+        </div>
+
+        {/* Nav Buttons - Order 3 Mobile (Row 2), Order 2 Desktop */}
+        <div className="flex items-center gap-3 w-full md:w-auto justify-between md:justify-start order-3 md:order-2">
+          <div className="flex items-center gap-3 w-full md:w-auto">
             {/* Panel Link based on Role */}
             {role === "ROLE_ADMIN" && (
               <Button
                 onClick={() => navigate("/admin")}
                 variant={location.pathname === "/admin" ? "default" : "outline"}
-                className={`text-sm ${location.pathname === "/admin"
+                className={`h-10 w-full md:w-auto md:h-9 md:px-3 text-sm justify-center flex-1 md:flex-none ${location.pathname === "/admin"
                   ? "bg-purple-700 hover:bg-purple-800 text-white"
                   : "text-purple-700 border-purple-700 hover:bg-purple-50"
                   }`}
               >
-                {t.adminPanel || "Админ"}
+                <User className="h-5 w-5 md:mr-2 md:h-4 md:w-4" />
+                <span className="md:block hidden">{t.adminPanel || "Админ"}</span>
+                {/* On mobile, show text or just icon? User asked for "icon still doesn't appear... fix this" 
+                   AND "move to second line". I'll show Icon + Text on mobile row 2 to fill space nicely, 
+                   or revert to icon only if text is too long? "Админ" is short. 
+                   With w-full and flex-1, there is plenty of space for text. 
+                   Let's show text on mobile too for clarity since we have a full row now.
+                */}
+                <span className="block md:hidden ml-2">{t.adminPanel || "Админ"}</span>
               </Button>
             )}
 
@@ -58,87 +111,42 @@ export function Header() {
               <Button
                 onClick={() => navigate("/agent")}
                 variant={location.pathname === "/agent" ? "default" : "outline"}
-                className={`text-sm ${location.pathname === "/agent"
+                className={`h-10 w-full md:w-auto md:h-9 md:px-3 text-sm justify-center flex-1 md:flex-none ${location.pathname === "/agent"
                   ? "bg-purple-700 hover:bg-purple-800 text-white"
                   : "text-purple-700 border-purple-700 hover:bg-purple-50"
                   }`}
               >
-                {/* Mobile Icon */}
-                <span className="block md:hidden">
-                  {role === "ROLE_OPERATOR" ? <Headset className="h-4 w-4" /> : <UserCog className="h-4 w-4" />}
-                </span>
-                {/* Desktop Text */}
+                {role === "ROLE_OPERATOR" ? <Headset className="h-5 w-5 md:mr-2 md:h-4 md:w-4" /> : <UserCog className="h-5 w-5 md:mr-2 md:h-4 md:w-4" />}
                 <span className="hidden md:block">
                   {role === "ROLE_OPERATOR"
                     ? t.operatorPanel || "Панель оператора"
                     : t.agentPanel || "Панель агента"}
                 </span>
+                <span className="block md:hidden ml-2">
+                  {role === "ROLE_OPERATOR" ? (t.operatorPanel || "Оператор") : (t.agentPanel || "Агент")}
+                </span>
               </Button>
             )}
 
-            {/* Maps Link - Available for all authorized roles */}
+            {/* Maps Link */}
             {(role === "ROLE_ADMIN" || role === "ROLE_AGENT" || role === "ROLE_OPERATOR") && (
               <Button
                 onClick={() => navigate("/maps")}
                 variant={location.pathname === "/maps" ? "default" : "outline"}
-                className={`text-sm gap-2 ${location.pathname === "/maps"
+                className={`h-10 w-full md:w-auto md:h-9 md:px-3 text-sm justify-center flex-1 md:flex-none ${location.pathname === "/maps"
                   ? "bg-purple-700 hover:bg-purple-800 text-white"
                   : "text-purple-700 border-purple-700 hover:bg-purple-50"
                   }`}
-                size="sm"
               >
-                <Map className="h-4 w-4" />
+                <Map className="h-5 w-5 md:mr-2 md:h-4 md:w-4" />
                 <span className="hidden md:block">
+                  {t.maps || "Карты"}
+                </span>
+                <span className="block md:hidden ml-2">
                   {t.maps || "Карты"}
                 </span>
               </Button>
             )}
-          </div>
-
-          <div className="flex items-center gap-2">
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="text-gray-600 hover:text-purple-700 h-8 w-8 md:h-10 md:w-10"
-                >
-                  <Globe className="h-5 w-5" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem
-                  onClick={() => setLanguage("ru")}
-                  className={
-                    language === "ru" ? "bg-purple-50 text-purple-700" : ""
-                  }
-                >
-                  🇷🇺 Русский
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  onClick={() => setLanguage("uz")}
-                  className={
-                    language === "uz" ? "bg-purple-50 text-purple-700" : ""
-                  }
-                >
-                  🇺🇿 O'zbekcha
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-
-            <Button
-              onClick={handleLogout}
-              variant="outline"
-              className="text-purple-700 border-purple-700 hover:bg-purple-50 hover:text-purple-700 text-sm px-3"
-              size="sm"
-            >
-              <span className="block md:hidden">
-                <LogOut className="h-4 w-4" />
-              </span>
-              <span className="hidden md:block">
-                {t.logout}
-              </span>
-            </Button>
           </div>
         </div>
       </div>

@@ -276,7 +276,7 @@ export default function PharmacyMaps() {
             `,
           },
           {
-            preset: pharmacy.active ? 'islands#greenDotIcon' : 'islands#redDotIcon'
+            preset: 'islands#violetDotIcon'
           }
         );
 
