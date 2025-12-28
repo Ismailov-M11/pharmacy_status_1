@@ -26,27 +26,30 @@ declare global {
   }
 }
 
+interface PharmacyWithCoords extends Pharmacy {
+  latitude?: number;
+  longitude?: number;
+}
+
 export default function PharmacyMaps() {
   const { t } = useLanguage();
   const { token, user, isLoading: authLoading } = useAuth();
   const navigate = useNavigate();
   
-  const [pharmacies, setPharmacies] = useState<Pharmacy[]>([]);
-  const [filteredPharmacies, setFilteredPharmacies] = useState<Pharmacy[]>([]);
+  const [pharmacies, setPharmacies] = useState<PharmacyWithCoords[]>([]);
+  const [filteredPharmacies, setFilteredPharmacies] = useState<PharmacyWithCoords[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [mapReady, setMapReady] = useState(false);
   const [activeFilter, setActiveFilter] = useState<"all" | "active" | "inactive">("all");
-  const [selectedPharmacy, setSelectedPharmacy] = useState<Pharmacy | null>(null);
+  const [selectedPharmacy, setSelectedPharmacy] = useState<PharmacyWithCoords | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [changeHistory, setChangeHistory] = useState<StatusHistoryRecord[]>([]);
   const [isLoadingHistory, setIsLoadingHistory] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   
-  const mapRef = useRef<HTMLDivElement>(null);
-  const mapInstanceRef = useRef<any>(null);
-  const markersRef = useRef<Map<number, any>>(new Map());
+  const mapRef = useRef<any>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
-  // Load Yandex Maps API
+  // Load Yandex Maps API and initialize
   useEffect(() => {
     if (authLoading) return;
     if (!token) {
@@ -54,56 +57,52 @@ export default function PharmacyMaps() {
       return;
     }
 
-    // Check if ymaps is already loaded
-    if (window.ymaps) {
-      window.ymaps.ready(() => {
-        initializeMap();
-      });
-    } else {
-      // Load the script
-      const script = document.createElement("script");
-      script.src = "https://api-maps.yandex.ru/2.1/?lang=ru_RU";
-      script.type = "text/javascript";
-      script.async = true;
-      
-      script.onload = () => {
-        console.log("Yandex Maps API loaded");
-        if (window.ymaps) {
-          window.ymaps.ready(() => {
-            initializeMap();
-          });
-        }
-      };
-      
-      script.onerror = () => {
-        console.error("Failed to load Yandex Maps API");
-        toast.error("Не удалось загрузить карты Яндекса");
-      };
-      
-      document.head.appendChild(script);
-    }
+    // Load Yandex Maps API script
+    const script = document.createElement("script");
+    script.src = "https://api-maps.yandex.ru/2.1/?apikey=e0d28efd-ef86-451e-a276-c38260877cbb&lang=ru_RU";
+    script.type = "text/javascript";
+    script.async = true;
+
+    script.onload = () => {
+      console.log("Yandex Maps API script loaded");
+      if (window.ymaps) {
+        window.ymaps.ready(() => {
+          initializeMap();
+        });
+      }
+    };
+
+    script.onerror = () => {
+      console.error("Failed to load Yandex Maps API script");
+      toast.error("Не удалось загрузить Yandex Maps");
+    };
+
+    document.head.appendChild(script);
+
+    return () => {
+      // Cleanup script on unmount if needed
+    };
   }, [token, authLoading, navigate]);
 
   const initializeMap = () => {
-    if (!mapRef.current) {
+    if (!containerRef.current) {
       console.error("Map container not found");
       return;
     }
 
     try {
       console.log("Initializing Yandex Map...");
-      const map = new window.ymaps.Map(mapRef.current, {
+      
+      mapRef.current = new window.ymaps.Map(containerRef.current, {
         center: TASHKENT_CENTER,
         zoom: 11,
         controls: ["zoomControl", "fullscreenControl"],
         behaviors: ["default", "scrollZoom"]
       });
 
-      mapInstanceRef.current = map;
-      setMapReady(true);
       console.log("Map initialized successfully");
       
-      // Fetch pharmacies after map is ready
+      // Fetch pharmacies after map is initialized
       fetchPharmacies();
     } catch (error) {
       console.error("Failed to initialize map:", error);
@@ -144,9 +143,9 @@ export default function PharmacyMaps() {
       setPharmacies(pharmaciesWithStatuses);
       applyFilter(pharmaciesWithStatuses, activeFilter);
       
-      // Place markers on map
-      if (mapInstanceRef.current) {
-        placeAllMarkers(pharmaciesWithStatuses);
+      // Add placemarks to map
+      if (mapRef.current) {
+        addPlacemarks(pharmaciesWithStatuses);
       }
     } catch (error) {
       console.error("Failed to fetch pharmacies:", error);
@@ -156,39 +155,37 @@ export default function PharmacyMaps() {
     }
   };
 
-  const placeAllMarkers = (pharmaciesToPlace: Pharmacy[]) => {
-    console.log(`Placing ${pharmaciesToPlace.length} markers on map`);
-    
-    // Clear existing markers
-    markersRef.current.forEach((marker) => {
-      try {
-        mapInstanceRef.current?.geoObjects.remove(marker);
-      } catch (e) {
-        console.warn("Error removing marker:", e);
-      }
-    });
-    markersRef.current.clear();
-
-    // Place all markers at default location first
-    pharmaciesToPlace.forEach((pharmacy) => {
-      placeMarker(pharmacy, TASHKENT_CENTER);
-    });
-
-    // Then try to geocode and update locations
-    pharmaciesToPlace.forEach((pharmacy, index) => {
-      setTimeout(() => {
-        geocodeAndUpdateMarker(pharmacy);
-      }, index * 200);
-    });
-  };
-
-  const placeMarker = (pharmacy: Pharmacy, coords: [number, number]) => {
-    if (!mapInstanceRef.current || !window.ymaps) {
-      console.warn("Map not ready, cannot place marker");
+  const addPlacemarks = (pharmaciesToPlace: PharmacyWithCoords[]) => {
+    if (!mapRef.current || !window.ymaps) {
+      console.warn("Map not ready, cannot add placemarks");
       return;
     }
 
+    // Clear existing placemarks
+    mapRef.current.geoObjects.removeAll();
+    console.log("Cleared existing placemarks");
+
+    // Add placemarks for each pharmacy
+    pharmaciesToPlace.forEach((pharmacy) => {
+      addPlacemark(pharmacy);
+    });
+
+    // Geocode addresses to get actual coordinates
+    pharmaciesToPlace.forEach((pharmacy, index) => {
+      setTimeout(() => {
+        geocodeAndUpdatePlacemark(pharmacy);
+      }, index * 300); // Stagger requests
+    });
+  };
+
+  const addPlacemark = (pharmacy: PharmacyWithCoords) => {
+    if (!mapRef.current || !window.ymaps) return;
+
     try {
+      const coords = pharmacy.latitude && pharmacy.longitude
+        ? [pharmacy.latitude, pharmacy.longitude]
+        : TASHKENT_CENTER;
+
       const placemark = new window.ymaps.Placemark(
         coords,
         {
@@ -198,13 +195,13 @@ export default function PharmacyMaps() {
               <div style="font-size: 12px; margin-bottom: 4px;"><strong>Код:</strong> ${pharmacy.code}</div>
               <div style="font-size: 12px; margin-bottom: 4px;"><strong>Адрес:</strong> ${pharmacy.address}</div>
               <div style="font-size: 12px; margin-bottom: 4px;"><strong>Статус:</strong> <span style="color: ${pharmacy.active ? '#059669' : '#d97706'}">${pharmacy.active ? "Активна" : "Неактивна"}</span></div>
-              ${pharmacy.phone ? `<div style="font-size: 12px;"><strong>Телефон:</strong> ${pharmacy.phone}</div>` : ""}
+              ${pharmacy.phone ? `<div style="font-size: 12px;"><strong>Телефон:</strong> <a href="tel:${pharmacy.phone}" style="color: #2563eb;">${pharmacy.phone}</a></div>` : ""}
             </div>
           `
         },
         {
           preset: "islands#violetDotIcon",
-          iconColor: "7E22CE"
+          iconColor: "7E22CE" // Purple color rgb(126, 34, 206)
         }
       );
 
@@ -213,63 +210,67 @@ export default function PharmacyMaps() {
         handlePharmacyClick(pharmacy);
       });
 
-      mapInstanceRef.current.geoObjects.add(placemark);
-      markersRef.current.set(pharmacy.id, placemark);
-      console.log(`Placed marker for: ${pharmacy.name}`);
+      mapRef.current.geoObjects.add(placemark);
+      console.log(`Added placemark for: ${pharmacy.name}`);
     } catch (error) {
-      console.error(`Failed to create marker for ${pharmacy.name}:`, error);
+      console.error(`Failed to create placemark for ${pharmacy.name}:`, error);
     }
   };
 
-  const geocodeAndUpdateMarker = (pharmacy: Pharmacy) => {
-    // Use OpenStreetMap Nominatim API (free, no authentication required)
-    const query = encodeURIComponent(`${pharmacy.address}, Tashkent, Uzbekistan`);
+  const geocodeAndUpdatePlacemark = (pharmacy: PharmacyWithCoords) => {
+    if (!window.ymaps) {
+      console.warn("ymaps not available for geocoding");
+      return;
+    }
 
-    fetch(`https://nominatim.openstreetmap.org/search?q=${query}&format=json&limit=1`, {
-      headers: {
-        'Accept': 'application/json',
-        'User-Agent': 'PharmacyMap/1.0'
-      }
-    })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        return response.json();
+    window.ymaps
+      .geocode(pharmacy.address, {
+        results: 1,
+        boundedBy: [[39.5, 68.5], [42.5, 70.5]], // Tashkent region bounds
+        format: "json"
       })
-      .then((data: any) => {
-        if (Array.isArray(data) && data.length > 0) {
-          const result = data[0];
-          const lat = parseFloat(result.lat);
-          const lon = parseFloat(result.lon);
+      .then((result: any) => {
+        try {
+          if (result && result.geoObjects && result.geoObjects.getLength && result.geoObjects.getLength() > 0) {
+            const geoObject = result.geoObjects.get(0);
+            const coords = geoObject.geometry.getCoordinates();
+            
+            if (coords && Array.isArray(coords) && coords.length === 2) {
+              const updatedPharmacy: PharmacyWithCoords = {
+                ...pharmacy,
+                latitude: coords[0],
+                longitude: coords[1]
+              };
 
-          if (!isNaN(lat) && !isNaN(lon)) {
-            const coords: [number, number] = [lat, lon];
+              // Update pharmacy with coordinates
+              setPharmacies((prev) =>
+                prev.map((p) => (p.id === pharmacy.id ? updatedPharmacy : p))
+              );
+              setFilteredPharmacies((prev) =>
+                prev.map((p) => (p.id === pharmacy.id ? updatedPharmacy : p))
+              );
 
-            // Remove old marker and place new one with correct coordinates
-            const oldMarker = markersRef.current.get(pharmacy.id);
-            if (oldMarker) {
-              try {
-                mapInstanceRef.current?.geoObjects.remove(oldMarker);
-              } catch (e) {
-                console.warn("Error removing old marker:", e);
-              }
+              // Remove old placemark and add new one
+              mapRef.current.geoObjects.removeAll();
+              addPlacemarks(
+                pharmacies.map((p) => (p.id === pharmacy.id ? updatedPharmacy : p))
+              );
+
+              console.log(`✓ Geocoded: ${pharmacy.name} → [${coords[0].toFixed(4)}, ${coords[1].toFixed(4)}]`);
             }
-
-            placeMarker(pharmacy, coords);
-            console.log(`✓ Geocoded: ${pharmacy.name} → [${lat.toFixed(4)}, ${lon.toFixed(4)}]`);
+          } else {
+            console.log(`No geocoding result for: ${pharmacy.name}`);
           }
-        } else {
-          console.log(`⚠ No location found for: ${pharmacy.name}`);
+        } catch (parseError) {
+          console.error(`Error parsing geocode result for ${pharmacy.name}:`, parseError);
         }
       })
       .catch((error: any) => {
-        console.warn(`Geocoding unavailable for "${pharmacy.name}":`, error?.message || error);
-        // Marker remains at default location - this is acceptable
+        console.warn(`Geocoding failed for "${pharmacy.name}":`, error?.message || error);
       });
   };
 
-  const handlePharmacyClick = async (pharmacy: Pharmacy) => {
+  const handlePharmacyClick = async (pharmacy: PharmacyWithCoords) => {
     setSelectedPharmacy(pharmacy);
     setIsModalOpen(true);
 
@@ -280,11 +281,15 @@ export default function PharmacyMaps() {
         getStatusHistory(pharmacy.id)
       ]);
 
-      setSelectedPharmacy(prev => prev ? {
-        ...prev,
-        training: status.training,
-        brandedPacket: status.brandedPacket
-      } : null);
+      setSelectedPharmacy((prev) =>
+        prev
+          ? {
+              ...prev,
+              training: status.training,
+              brandedPacket: status.brandedPacket
+            }
+          : null
+      );
 
       setChangeHistory(history);
     } catch (error) {
@@ -313,7 +318,7 @@ export default function PharmacyMaps() {
       const history = await getStatusHistory(pharmacyId);
       setChangeHistory(history);
 
-      const updatePharmacy = (p: Pharmacy) => {
+      const updatePharmacy = (p: PharmacyWithCoords) => {
         if (p.id === pharmacyId) {
           return {
             ...p,
@@ -326,7 +331,7 @@ export default function PharmacyMaps() {
 
       setPharmacies((prev) => prev.map(updatePharmacy));
       setFilteredPharmacies((prev) => prev.map(updatePharmacy));
-      setSelectedPharmacy((prev) => prev ? updatePharmacy(prev) : null);
+      setSelectedPharmacy((prev) => (prev ? updatePharmacy(prev) : null));
 
       toast.success(t.saved);
     } catch (error) {
@@ -341,8 +346,8 @@ export default function PharmacyMaps() {
 
   const handleDeleteHistory = async (ids: number[]) => {
     try {
-      await Promise.all(ids.map(id => deleteHistoryRecord(id)));
-      setChangeHistory(prev => prev.filter(record => !ids.includes(record.id)));
+      await Promise.all(ids.map((id) => deleteHistoryRecord(id)));
+      setChangeHistory((prev) => prev.filter((record) => !ids.includes(record.id)));
       toast.success(t.deleted || "Deleted");
     } catch (error) {
       console.error("Failed to delete history:", error);
@@ -350,13 +355,16 @@ export default function PharmacyMaps() {
     }
   };
 
-  const applyFilter = (pharmaciesToFilter: Pharmacy[], filter: "all" | "active" | "inactive") => {
+  const applyFilter = (
+    pharmaciesToFilter: PharmacyWithCoords[],
+    filter: "all" | "active" | "inactive"
+  ) => {
     let filtered = pharmaciesToFilter;
 
     if (filter === "active") {
-      filtered = pharmaciesToFilter.filter(p => p.active);
+      filtered = pharmaciesToFilter.filter((p) => p.active);
     } else if (filter === "inactive") {
-      filtered = pharmaciesToFilter.filter(p => !p.active);
+      filtered = pharmaciesToFilter.filter((p) => !p.active);
     }
 
     setFilteredPharmacies(filtered);
@@ -368,25 +376,23 @@ export default function PharmacyMaps() {
   };
 
   const toggleFullscreen = async () => {
-    if (!mapRef.current) return;
+    if (!containerRef.current) return;
 
     try {
       if (!isFullscreen) {
-        if (mapRef.current.requestFullscreen) {
-          await mapRef.current.requestFullscreen();
-          setIsFullscreen(true);
-        } else if ((mapRef.current as any).webkitRequestFullscreen) {
-          await (mapRef.current as any).webkitRequestFullscreen();
-          setIsFullscreen(true);
+        if (containerRef.current.requestFullscreen) {
+          await containerRef.current.requestFullscreen();
+        } else if ((containerRef.current as any).webkitRequestFullscreen) {
+          await (containerRef.current as any).webkitRequestFullscreen();
         }
+        setIsFullscreen(true);
       } else {
         if (document.fullscreenElement) {
           await document.exitFullscreen();
-          setIsFullscreen(false);
         } else if ((document as any).webkitFullscreenElement) {
           await (document as any).webkitExitFullscreen();
-          setIsFullscreen(false);
         }
+        setIsFullscreen(false);
       }
     } catch (error) {
       console.error("Fullscreen toggle failed:", error);
@@ -432,7 +438,7 @@ export default function PharmacyMaps() {
                   : "bg-white border border-gray-300 text-gray-700 hover:bg-gray-50"
               }`}
             >
-              {t.active || "Активные"} ({pharmacies.filter(p => p.active).length})
+              {t.active || "Активные"} ({pharmacies.filter((p) => p.active).length})
             </Button>
             <Button
               onClick={() => handleFilterChange("inactive")}
@@ -442,21 +448,21 @@ export default function PharmacyMaps() {
                   : "bg-white border border-gray-300 text-gray-700 hover:bg-gray-50"
               }`}
             >
-              {t.inactive || "Неактивные"} ({pharmacies.filter(p => !p.active).length})
+              {t.inactive || "Неактивные"} ({pharmacies.filter((p) => !p.active).length})
             </Button>
           </div>
 
           {/* Map Container */}
           <div className="relative bg-white rounded-lg shadow-sm overflow-hidden border border-gray-200">
             <div
-              ref={mapRef}
+              ref={containerRef}
               className="w-full bg-gray-100"
-              style={{ 
+              style={{
                 height: isFullscreen ? "100vh" : "600px",
                 minHeight: "400px"
               }}
             />
-            
+
             {/* Fullscreen Button */}
             <button
               onClick={toggleFullscreen}
@@ -467,11 +473,11 @@ export default function PharmacyMaps() {
             </button>
 
             {/* Loading Overlay */}
-            {(isLoading || !mapReady) && (
+            {isLoading && (
               <div className="absolute inset-0 bg-white bg-opacity-60 flex flex-col items-center justify-center z-20">
                 <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-700 mb-4"></div>
                 <span className="text-gray-700 font-medium">
-                  {!mapReady ? "Загрузка карты..." : "Загрузка аптек..."}
+                  {isLoading ? "Загрузка аптек..." : "Инициализация карты..."}
                 </span>
               </div>
             )}
