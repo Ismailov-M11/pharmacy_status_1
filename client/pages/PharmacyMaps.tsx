@@ -530,7 +530,7 @@ export default function PharmacyMaps() {
           </div>
 
           {/* Pharmacy List Window with Scrollbar */}
-          <div className="flex-1 overflow-hidden flex flex-col mx-4 sm:mx-6 my-4 rounded-lg border border-gray-200 shadow-sm bg-white">
+          <div className="mx-4 sm:mx-6 my-4 rounded-lg border border-gray-200 shadow-sm bg-white overflow-hidden flex flex-col" style={{ maxHeight: "calc(100% - 32px)" }}>
             <div className="px-4 py-3 border-b border-gray-200 bg-gray-50 rounded-t-lg flex-shrink-0">
               <h2 className="text-xs font-semibold text-gray-700 uppercase tracking-wider">
                 {t.pharmacies || "Аптеки"} ({filteredPharmacies.length})
