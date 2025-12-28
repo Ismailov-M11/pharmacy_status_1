@@ -263,25 +263,13 @@ export default function PharmacyMaps() {
                   longitude: coords[1],
                 };
 
-                // Update pharmacy with coordinates
+                // Just update the pharmacy with coordinates, don't rebuild map
                 setPharmacies((prev) =>
                   prev.map((p) => (p.id === pharmacy.id ? updatedPharmacy : p)),
                 );
                 setFilteredPharmacies((prev) =>
                   prev.map((p) => (p.id === pharmacy.id ? updatedPharmacy : p)),
                 );
-
-                // Rebuild all placemarks with updated coordinates
-                if (mapRef.current) {
-                  mapRef.current.geoObjects.removeAll();
-                  setPharmacies((prevPharmacies) => {
-                    const updated = prevPharmacies.map((p) =>
-                      p.id === pharmacy.id ? updatedPharmacy : p,
-                    );
-                    addPlacemarks(updated);
-                    return updated;
-                  });
-                }
 
                 console.log(
                   `✓ Geocoded: ${pharmacy.name} → [${coords[0].toFixed(4)}, ${coords[1].toFixed(4)}]`,
