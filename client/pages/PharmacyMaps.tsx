@@ -11,7 +11,7 @@ import {
   updatePharmacyStatusLocal,
   getStatusHistory,
   deleteHistoryRecord,
-  StatusHistoryRecord
+  StatusHistoryRecord,
 } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { Maximize2 } from "lucide-react";
@@ -35,17 +35,22 @@ export default function PharmacyMaps() {
   const { t } = useLanguage();
   const { token, user, isLoading: authLoading } = useAuth();
   const navigate = useNavigate();
-  
+
   const [pharmacies, setPharmacies] = useState<PharmacyWithCoords[]>([]);
-  const [filteredPharmacies, setFilteredPharmacies] = useState<PharmacyWithCoords[]>([]);
+  const [filteredPharmacies, setFilteredPharmacies] = useState<
+    PharmacyWithCoords[]
+  >([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [activeFilter, setActiveFilter] = useState<"all" | "active" | "inactive">("all");
-  const [selectedPharmacy, setSelectedPharmacy] = useState<PharmacyWithCoords | null>(null);
+  const [activeFilter, setActiveFilter] = useState<
+    "all" | "active" | "inactive"
+  >("all");
+  const [selectedPharmacy, setSelectedPharmacy] =
+    useState<PharmacyWithCoords | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [changeHistory, setChangeHistory] = useState<StatusHistoryRecord[]>([]);
   const [isLoadingHistory, setIsLoadingHistory] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
-  
+
   const mapRef = useRef<any>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -59,7 +64,8 @@ export default function PharmacyMaps() {
 
     // Load Yandex Maps API script
     const script = document.createElement("script");
-    script.src = "https://api-maps.yandex.ru/2.1/?apikey=e0d28efd-ef86-451e-a276-c38260877cbb&lang=ru_RU";
+    script.src =
+      "https://api-maps.yandex.ru/2.1/?apikey=e0d28efd-ef86-451e-a276-c38260877cbb&lang=ru_RU";
     script.type = "text/javascript";
     script.async = true;
 
@@ -102,11 +108,13 @@ export default function PharmacyMaps() {
         center: TASHKENT_CENTER,
         zoom: 11,
         controls: ["zoomControl", "fullscreenControl"],
-        behaviors: ["default", "scrollZoom"]
+        behaviors: ["default", "scrollZoom"],
       });
 
       console.log("✅ Map initialized successfully");
-      console.log(`🌍 API Backend URL: ${import.meta.env.VITE_BACKEND_URL || 'default'}`);
+      console.log(
+        `🌍 API Backend URL: ${import.meta.env.VITE_BACKEND_URL || "default"}`,
+      );
 
       // Fetch pharmacies after map is initialized
       fetchPharmacies();
@@ -130,7 +138,7 @@ export default function PharmacyMaps() {
       const pharmaciesWithDefaults = pharmacyList.map((pharmacy) => ({
         ...pharmacy,
         training: false,
-        brandedPacket: false
+        brandedPacket: false,
       }));
 
       setPharmacies(pharmaciesWithDefaults);
@@ -141,7 +149,9 @@ export default function PharmacyMaps() {
         addPlacemarks(pharmaciesWithDefaults);
       }
 
-      console.log(`Successfully loaded ${pharmaciesWithDefaults.length} pharmacies on map`);
+      console.log(
+        `Successfully loaded ${pharmaciesWithDefaults.length} pharmacies on map`,
+      );
     } catch (error) {
       console.error("Failed to fetch pharmacies:", error);
       toast.error(t.error);
@@ -177,9 +187,10 @@ export default function PharmacyMaps() {
     if (!mapRef.current || !window.ymaps) return;
 
     try {
-      const coords = pharmacy.latitude && pharmacy.longitude
-        ? [pharmacy.latitude, pharmacy.longitude]
-        : TASHKENT_CENTER;
+      const coords =
+        pharmacy.latitude && pharmacy.longitude
+          ? [pharmacy.latitude, pharmacy.longitude]
+          : TASHKENT_CENTER;
 
       const placemark = new window.ymaps.Placemark(
         coords,
@@ -189,15 +200,15 @@ export default function PharmacyMaps() {
               <div style="font-weight: bold; font-size: 14px; margin-bottom: 8px; color: #1f2937;">${pharmacy.name}</div>
               <div style="font-size: 12px; margin-bottom: 4px;"><strong>Код:</strong> ${pharmacy.code}</div>
               <div style="font-size: 12px; margin-bottom: 4px;"><strong>Адрес:</strong> ${pharmacy.address}</div>
-              <div style="font-size: 12px; margin-bottom: 4px;"><strong>Статус:</strong> <span style="color: ${pharmacy.active ? '#059669' : '#d97706'}">${pharmacy.active ? "Активна" : "Неактивна"}</span></div>
+              <div style="font-size: 12px; margin-bottom: 4px;"><strong>Статус:</strong> <span style="color: ${pharmacy.active ? "#059669" : "#d97706"}">${pharmacy.active ? "Активна" : "Неактивна"}</span></div>
               ${pharmacy.phone ? `<div style="font-size: 12px;"><strong>Телефон:</strong> <a href="tel:${pharmacy.phone}" style="color: #2563eb;">${pharmacy.phone}</a></div>` : ""}
             </div>
-          `
+          `,
         },
         {
           preset: "islands#violetDotIcon",
-          iconColor: "7E22CE" // Purple color rgb(126, 34, 206)
-        }
+          iconColor: "7E22CE", // Purple color rgb(126, 34, 206)
+        },
       );
 
       // Click event to open modal
@@ -222,12 +233,20 @@ export default function PharmacyMaps() {
       window.ymaps
         .geocode(pharmacy.address, {
           results: 1,
-          boundedBy: [[39.5, 68.5], [42.5, 70.5]], // Tashkent region bounds
-          format: "json"
+          boundedBy: [
+            [39.5, 68.5],
+            [42.5, 70.5],
+          ], // Tashkent region bounds
+          format: "json",
         })
         .then((result: any) => {
           try {
-            if (result && result.geoObjects && result.geoObjects.getLength && result.geoObjects.getLength() > 0) {
+            if (
+              result &&
+              result.geoObjects &&
+              result.geoObjects.getLength &&
+              result.geoObjects.getLength() > 0
+            ) {
               const geoObject = result.geoObjects.get(0);
               const coords = geoObject.geometry.getCoordinates();
 
@@ -235,15 +254,15 @@ export default function PharmacyMaps() {
                 const updatedPharmacy: PharmacyWithCoords = {
                   ...pharmacy,
                   latitude: coords[0],
-                  longitude: coords[1]
+                  longitude: coords[1],
                 };
 
                 // Update pharmacy with coordinates
                 setPharmacies((prev) =>
-                  prev.map((p) => (p.id === pharmacy.id ? updatedPharmacy : p))
+                  prev.map((p) => (p.id === pharmacy.id ? updatedPharmacy : p)),
                 );
                 setFilteredPharmacies((prev) =>
-                  prev.map((p) => (p.id === pharmacy.id ? updatedPharmacy : p))
+                  prev.map((p) => (p.id === pharmacy.id ? updatedPharmacy : p)),
                 );
 
                 // Rebuild all placemarks with updated coordinates
@@ -251,24 +270,31 @@ export default function PharmacyMaps() {
                   mapRef.current.geoObjects.removeAll();
                   setPharmacies((prevPharmacies) => {
                     const updated = prevPharmacies.map((p) =>
-                      p.id === pharmacy.id ? updatedPharmacy : p
+                      p.id === pharmacy.id ? updatedPharmacy : p,
                     );
                     addPlacemarks(updated);
                     return updated;
                   });
                 }
 
-                console.log(`✓ Geocoded: ${pharmacy.name} → [${coords[0].toFixed(4)}, ${coords[1].toFixed(4)}]`);
+                console.log(
+                  `✓ Geocoded: ${pharmacy.name} → [${coords[0].toFixed(4)}, ${coords[1].toFixed(4)}]`,
+                );
               }
             } else {
               console.log(`⚠ No geocoding result for: ${pharmacy.name}`);
             }
           } catch (parseError) {
-            console.warn(`Error parsing geocode result for ${pharmacy.name}:`, parseError);
+            console.warn(
+              `Error parsing geocode result for ${pharmacy.name}:`,
+              parseError,
+            );
           }
         })
         .catch((error: any) => {
-          console.warn(`Geocoding skipped for "${pharmacy.name}" - using default location`);
+          console.warn(
+            `Geocoding skipped for "${pharmacy.name}" - using default location`,
+          );
         });
     } catch (error) {
       console.warn(`Geocoding unavailable for "${pharmacy.name}":`, error);
@@ -294,12 +320,15 @@ export default function PharmacyMaps() {
             ? {
                 ...prev,
                 training: status.training,
-                brandedPacket: status.brandedPacket
+                brandedPacket: status.brandedPacket,
               }
-            : null
+            : null,
         );
       } catch (statusError) {
-        console.warn(`Could not load status for pharmacy ${pharmacy.id}:`, statusError);
+        console.warn(
+          `Could not load status for pharmacy ${pharmacy.id}:`,
+          statusError,
+        );
         // Keep pharmacy data but with default status - don't crash
       }
 
@@ -308,7 +337,10 @@ export default function PharmacyMaps() {
         const history = await getStatusHistory(pharmacy.id);
         setChangeHistory(history);
       } catch (historyError) {
-        console.warn(`Could not load history for pharmacy ${pharmacy.id}:`, historyError);
+        console.warn(
+          `Could not load history for pharmacy ${pharmacy.id}:`,
+          historyError,
+        );
         setChangeHistory([]);
       }
     } catch (error) {
@@ -322,7 +354,7 @@ export default function PharmacyMaps() {
     pharmacyId: number,
     field: "brandedPacket" | "training",
     value: boolean,
-    comment: string
+    comment: string,
   ) => {
     try {
       await updatePharmacyStatusLocal(
@@ -330,7 +362,7 @@ export default function PharmacyMaps() {
         field,
         value,
         comment,
-        user?.username || "User"
+        user?.username || "User",
       );
 
       const history = await getStatusHistory(pharmacyId);
@@ -341,7 +373,8 @@ export default function PharmacyMaps() {
           return {
             ...p,
             training: field === "training" ? value : (p as any).training,
-            brandedPacket: field === "brandedPacket" ? value : (p as any).brandedPacket
+            brandedPacket:
+              field === "brandedPacket" ? value : (p as any).brandedPacket,
           };
         }
         return p;
@@ -355,7 +388,9 @@ export default function PharmacyMaps() {
     } catch (error) {
       console.error("Failed to update pharmacy:", error);
       if (error instanceof Error && error.message === "BACKEND_SLEEPING") {
-        toast.error("Сервер запускается. Пожалуйста, попробуйте еще раз через 1-2 минуты.");
+        toast.error(
+          "Сервер запускается. Пожалуйста, попробуйте еще раз через 1-2 минуты.",
+        );
       } else {
         toast.error(t.error);
       }
@@ -365,7 +400,9 @@ export default function PharmacyMaps() {
   const handleDeleteHistory = async (ids: number[]) => {
     try {
       await Promise.all(ids.map((id) => deleteHistoryRecord(id)));
-      setChangeHistory((prev) => prev.filter((record) => !ids.includes(record.id)));
+      setChangeHistory((prev) =>
+        prev.filter((record) => !ids.includes(record.id)),
+      );
       toast.success(t.deleted || "Deleted");
     } catch (error) {
       console.error("Failed to delete history:", error);
@@ -375,7 +412,7 @@ export default function PharmacyMaps() {
 
   const applyFilter = (
     pharmaciesToFilter: PharmacyWithCoords[],
-    filter: "all" | "active" | "inactive"
+    filter: "all" | "active" | "inactive",
   ) => {
     let filtered = pharmaciesToFilter;
 
@@ -431,8 +468,12 @@ export default function PharmacyMaps() {
 
       <main className="w-full">
         <div className="mb-4 sm:mb-8 px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
-          <h1 className="text-3xl font-bold text-gray-900">{t.maps || "Карты"}</h1>
-          <p className="text-gray-600 mt-2">{t.pharmacyMap || "Отображение аптек на карте"}</p>
+          <h1 className="text-3xl font-bold text-gray-900">
+            {t.maps || "Карты"}
+          </h1>
+          <p className="text-gray-600 mt-2">
+            {t.pharmacyMap || "Отображение аптек на карте"}
+          </p>
         </div>
 
         <div className="px-4 sm:px-6 lg:px-8 pb-8 space-y-4">
@@ -456,7 +497,8 @@ export default function PharmacyMaps() {
                   : "bg-white border border-gray-300 text-gray-700 hover:bg-gray-50"
               }`}
             >
-              {t.active || "Активные"} ({pharmacies.filter((p) => p.active).length})
+              {t.active || "Активные"} (
+              {pharmacies.filter((p) => p.active).length})
             </Button>
             <Button
               onClick={() => handleFilterChange("inactive")}
@@ -466,7 +508,8 @@ export default function PharmacyMaps() {
                   : "bg-white border border-gray-300 text-gray-700 hover:bg-gray-50"
               }`}
             >
-              {t.inactive || "Неактивные"} ({pharmacies.filter((p) => !p.active).length})
+              {t.inactive || "Неактивные"} (
+              {pharmacies.filter((p) => !p.active).length})
             </Button>
           </div>
 
@@ -477,7 +520,7 @@ export default function PharmacyMaps() {
               className="w-full bg-gray-100"
               style={{
                 height: isFullscreen ? "100vh" : "600px",
-                minHeight: "400px"
+                minHeight: "400px",
               }}
             />
 
@@ -532,7 +575,10 @@ export default function PharmacyMaps() {
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
                   {filteredPharmacies.map((pharmacy, index) => (
-                    <tr key={pharmacy.id} className="hover:bg-gray-50 transition-colors">
+                    <tr
+                      key={pharmacy.id}
+                      className="hover:bg-gray-50 transition-colors"
+                    >
                       <td className="px-4 sm:px-6 py-3 text-xs sm:text-sm text-gray-500">
                         {index + 1}
                       </td>

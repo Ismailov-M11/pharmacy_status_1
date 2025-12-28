@@ -206,7 +206,8 @@ export const translations = {
     deleteSelected: "Tanlanganlarni o'chirish",
     clear: "Tozalash",
     deleteWarning: "Bu yozuv qaytarib bo'lmaydigan tarzda o'chiriladi.",
-    deleteWarningMultiple: "Tanlangan yozuvlar qaytarib bo'lmaydigan tarzda o'chiriladi.",
+    deleteWarningMultiple:
+      "Tanlangan yozuvlar qaytarib bo'lmaydigan tarzda o'chiriladi.",
     year: "yil",
     confirmYes: "HA",
     confirmNo: "YO'Q",

@@ -71,7 +71,9 @@ const App = () => (
               <Route
                 path="/agent"
                 element={
-                  <RoleBasedRoute allowedRoles={["ROLE_AGENT", "ROLE_OPERATOR"]}>
+                  <RoleBasedRoute
+                    allowedRoles={["ROLE_AGENT", "ROLE_OPERATOR"]}
+                  >
                     <AgentPanel />
                   </RoleBasedRoute>
                 }
