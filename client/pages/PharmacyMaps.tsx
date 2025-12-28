@@ -151,10 +151,7 @@ export default function PharmacyMaps() {
       setPharmacies(pharmaciesWithDefaults);
       applyFilter(pharmaciesWithDefaults, activeFilter);
 
-      // Add placemarks to map
-      if (mapRef.current) {
-        addPlacemarks(pharmaciesWithDefaults);
-      }
+      // Map will be updated by the useEffect that watches filteredPharmacies
 
       console.log(
         `Successfully loaded ${pharmaciesWithDefaults.length} pharmacies on map`,
