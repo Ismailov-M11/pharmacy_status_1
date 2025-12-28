@@ -83,16 +83,25 @@ export default function PharmacyMaps() {
   }, [token, authLoading, navigate]);
 
   const initMap = () => {
-    if (!mapRef.current) return;
+    if (!mapRef.current || !window.ymaps) {
+      console.error("Map container or ymaps not available");
+      return;
+    }
 
-    const map = new window.ymaps.Map(mapRef.current, {
-      center: [41.2995, 69.2401],
-      zoom: 11,
-      controls: ["zoomControl", "fullscreenControl"]
-    });
+    try {
+      const map = new window.ymaps.Map(mapRef.current, {
+        center: [41.2995, 69.2401], // Tashkent coordinates
+        zoom: 11,
+        controls: ["zoomControl", "fullscreenControl"]
+      });
 
-    mapInstanceRef.current = map;
-    fetchPharmacies();
+      mapInstanceRef.current = map;
+      console.log("Map initialized successfully");
+      fetchPharmacies();
+    } catch (error) {
+      console.error("Failed to initialize map:", error);
+      toast.error("Не удалось инициализировать карту");
+    }
   };
 
   const fetchPharmacies = async () => {
