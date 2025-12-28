@@ -196,32 +196,36 @@ export default function PharmacyMaps() {
   };
 
   const placeMarker = (pharmacy: Pharmacy, coords: [number, number]) => {
-    if (!window.ymaps || !mapInstanceRef.current) return;
+    if (!window.ymaps || !mapInstanceRef.current) {
+      console.warn("Cannot place marker: map or ymaps not available");
+      return;
+    }
 
-    const markerColor = pharmacy.active ? "#7E22CE" : "#7E22CE";
-    const iconColor = pharmacy.active ? "7E22CE" : "7E22CE";
+    try {
+      const placemark = new window.ymaps.Placemark(coords, {
+        balloonContent: `
+          <div style="padding: 10px; font-family: Arial, sans-serif;">
+            <div style="font-weight: bold; margin-bottom: 5px;">${pharmacy.name}</div>
+            <div style="font-size: 12px; margin-bottom: 3px;"><strong>Код:</strong> ${pharmacy.code}</div>
+            <div style="font-size: 12px; margin-bottom: 3px;"><strong>Адрес:</strong> ${pharmacy.address}</div>
+            <div style="font-size: 12px; margin-bottom: 3px;"><strong>Статус:</strong> ${pharmacy.active ? "Активна" : "Неактивна"}</div>
+            ${pharmacy.phone ? `<div style="font-size: 12px; margin-bottom: 3px;"><strong>Телефон:</strong> ${pharmacy.phone}</div>` : ""}
+          </div>
+        `
+      }, {
+        preset: "islands#violetDotIcon",
+        iconColor: "7E22CE" // Purple color: rgb(126, 34, 206)
+      });
 
-    const placemark = new window.ymaps.Placemark(coords, {
-      balloonContent: `
-        <div style="padding: 10px; font-family: Arial, sans-serif;">
-          <div style="font-weight: bold; margin-bottom: 5px;">${pharmacy.name}</div>
-          <div style="font-size: 12px; margin-bottom: 3px;"><strong>Код:</strong> ${pharmacy.code}</div>
-          <div style="font-size: 12px; margin-bottom: 3px;"><strong>Адрес:</strong> ${pharmacy.address}</div>
-          <div style="font-size: 12px; margin-bottom: 3px;"><strong>Статус:</strong> ${pharmacy.active ? "Активна" : "Неактивна"}</div>
-          ${pharmacy.phone ? `<div style="font-size: 12px; margin-bottom: 3px;"><strong>Телефон:</strong> ${pharmacy.phone}</div>` : ""}
-        </div>
-      `
-    }, {
-      preset: "islands#violetDotIcon",
-      iconColor: iconColor
-    });
+      placemark.events.add("click", () => {
+        handlePharmacyClick(pharmacy);
+      });
 
-    placemark.events.add("click", () => {
-      handlePharmacyClick(pharmacy);
-    });
-
-    mapInstanceRef.current?.geoObjects.add(placemark);
-    markersRef.current.push(placemark);
+      mapInstanceRef.current.geoObjects.add(placemark);
+      markersRef.current.push(placemark);
+    } catch (error) {
+      console.error(`Failed to create marker for ${pharmacy.name}:`, error);
+    }
   };
 
   const handlePharmacyClick = async (pharmacy: Pharmacy) => {
