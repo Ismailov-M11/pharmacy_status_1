@@ -483,7 +483,11 @@ export default function PharmacyMaps() {
               />
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="outline" size="sm" className="gap-1 flex-shrink-0">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="gap-1 flex-shrink-0"
+                  >
                     {activeFilter === "all" && "Все"}
                     {activeFilter === "active" && "Активные"}
                     {activeFilter === "inactive" && "Неактивные"}
@@ -521,7 +525,10 @@ export default function PharmacyMaps() {
           </div>
 
           {/* Pharmacy List Window with Scrollbar */}
-          <div className="mx-4 sm:mx-6 my-4 rounded-lg border border-gray-200 shadow-sm bg-white overflow-hidden flex flex-col" style={{ maxHeight: "calc(100% - 32px)" }}>
+          <div
+            className="mx-4 sm:mx-6 my-4 rounded-lg border border-gray-200 shadow-sm bg-white overflow-hidden flex flex-col"
+            style={{ maxHeight: "calc(100% - 32px)" }}
+          >
             <div className="px-4 py-3 border-b border-gray-200 bg-gray-50 rounded-t-lg flex-shrink-0">
               <h2 className="text-xs font-semibold text-gray-700 uppercase tracking-wider">
                 {t.pharmacies || "Аптеки"} ({filteredPharmacies.length})
@@ -576,10 +583,7 @@ export default function PharmacyMaps() {
         {/* Right Panel - Map */}
         <div className="w-full lg:w-2/3 bg-white flex flex-col min-h-96 lg:min-h-0 order-first lg:order-last">
           <div className="relative flex-1 bg-gray-100 overflow-hidden">
-            <div
-              ref={containerRef}
-              className="w-full h-full bg-gray-100"
-            />
+            <div ref={containerRef} className="w-full h-full bg-gray-100" />
 
             {/* Loading Overlay */}
             {isLoading && (

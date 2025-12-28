@@ -90,11 +90,7 @@ const App = () => (
                 path="/maps"
                 element={
                   <RoleBasedRoute
-                    allowedRoles={[
-                      "ROLE_ADMIN",
-                      "ROLE_AGENT",
-                      "ROLE_OPERATOR",
-                    ]}
+                    allowedRoles={["ROLE_ADMIN", "ROLE_AGENT", "ROLE_OPERATOR"]}
                   >
                     <PharmacyMaps />
                   </RoleBasedRoute>
