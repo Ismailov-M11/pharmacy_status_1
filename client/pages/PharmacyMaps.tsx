@@ -64,19 +64,24 @@ export default function PharmacyMaps() {
     script.async = true;
 
     script.onload = () => {
-      console.log("Yandex Maps API script loaded");
+      console.log("✅ Yandex Maps API script loaded successfully");
       if (window.ymaps) {
+        console.log("📍 ymaps object available, waiting for ready...");
         window.ymaps.ready(() => {
+          console.log("📍 ymaps ready, initializing map");
           initializeMap();
         });
+      } else {
+        console.error("❌ ymaps object not available after script load");
       }
     };
 
     script.onerror = () => {
-      console.error("Failed to load Yandex Maps API script");
+      console.error("❌ Failed to load Yandex Maps API script");
       toast.error("Не удалось загрузить Yandex Maps");
     };
 
+    console.log("📌 Adding Yandex Maps script to document");
     document.head.appendChild(script);
 
     return () => {
