@@ -43,6 +43,7 @@ export default function PharmacyMaps() {
   const [activeFilter, setActiveFilter] = useState<
     "all" | "active" | "inactive"
   >("all");
+  const [searchQuery, setSearchQuery] = useState("");
   const [selectedPharmacy, setSelectedPharmacy] =
     useState<PharmacyWithCoords | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
