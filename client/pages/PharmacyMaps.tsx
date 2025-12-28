@@ -62,6 +62,8 @@ export default function PharmacyMaps() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [changeHistory, setChangeHistory] = useState<StatusHistoryRecord[]>([]);
   const [isLoadingHistory, setIsLoadingHistory] = useState(false);
+  const [isFiltersOpen, setIsFiltersOpen] = useState(false);
+  const geocodedRef = useRef<Set<number>>(new Set());
   const mapRef = useRef<any>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -245,7 +247,8 @@ export default function PharmacyMaps() {
 
     // Trigger geocoding for those missing coords (background process)
     pharmaciesToPlace.forEach((pharmacy) => {
-      if (!pharmacy.latitude || !pharmacy.longitude) {
+      if ((!pharmacy.latitude || !pharmacy.longitude) && !geocodedRef.current.has(pharmacy.id)) {
+        geocodedRef.current.add(pharmacy.id); // Mark as attempted
         geocodeAndUpdatePlacemark(pharmacy);
       }
     });
@@ -554,35 +557,48 @@ export default function PharmacyMaps() {
 
           {/* Search & Filter Grid */}
           <div className="p-4 border-b border-gray-200 bg-white shrink-0 gap-4 flex flex-col shadow-sm z-20">
-            <Input
-              placeholder={`${t.pharmacyName || "Поиск аптеки"}...`}
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)} // State update triggers effect
-              className="w-full bg-gray-50 border-gray-200 focus:bg-white transition-colors"
-            />
-
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2 border-t border-gray-100">
-              <FilterCell
-                title="Telegram Bot"
-                value={filterTelegram}
-                onChange={setFilterTelegram}
+            <div className="flex gap-2">
+              <Input
+                placeholder={`${t.pharmacyName || "Поиск аптеки"}...`}
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)} // State update triggers effect
+                className="w-full bg-gray-50 border-gray-200 focus:bg-white transition-colors"
               />
-              <FilterCell
-                title="Пакет"
-                value={filterPacket}
-                onChange={setFilterPacket}
-              />
-              <FilterCell
-                title="Обучение"
-                value={filterTraining}
-                onChange={setFilterTraining}
-              />
-              <FilterCell
-                title="Статус"
-                value={filterStatus}
-                onChange={setFilterStatus}
-              />
+              <Button
+                variant={isFiltersOpen ? "default" : "outline"}
+                size="icon"
+                onClick={() => setIsFiltersOpen(!isFiltersOpen)}
+                className={`shrink-0 ${isFiltersOpen ? 'bg-purple-600 hover:bg-purple-700 text-white' : ''}`}
+                title="Фильтры"
+              >
+                <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${isFiltersOpen ? 'rotate-180' : ''}`} />
+              </Button>
             </div>
+
+            {isFiltersOpen && (
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2 border-t border-gray-100 animate-in slide-in-from-top-2 duration-200">
+                <FilterCell
+                  title="Telegram Bot"
+                  value={filterTelegram}
+                  onChange={setFilterTelegram}
+                />
+                <FilterCell
+                  title="Пакет"
+                  value={filterPacket}
+                  onChange={setFilterPacket}
+                />
+                <FilterCell
+                  title="Обучение"
+                  value={filterTraining}
+                  onChange={setFilterTraining}
+                />
+                <FilterCell
+                  title="Статус"
+                  value={filterStatus}
+                  onChange={setFilterStatus}
+                />
+              </div>
+            )}
           </div>
 
           {/* Scrollable List */}
