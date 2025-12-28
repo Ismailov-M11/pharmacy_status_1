@@ -540,18 +540,20 @@ export default function PharmacyMaps() {
   const FilterCell = ({
     title,
     value,
-    onChange
+    onChange,
+    type = "boolean" // "boolean" | "status"
   }: {
     title: string;
     value: "all" | "yes" | "no" | "active" | "inactive";
-    onChange: (v: any) => void
+    onChange: (v: any) => void;
+    type?: "boolean" | "status";
   }) => {
     // Logic for Status (3 options) vs others
-    const isStatus = title === "Статус";
+    const isStatus = type === "status";
 
     return (
       <div className="flex flex-col gap-1 min-w-[100px]">
-        <span className="text-[10px] uppercase font-bold text-gray-400 tracking-wider pl-1">{title}</span>
+        <span className="text-[10px] uppercase font-bold text-gray-400 tracking-wider pl-1 whitespace-nowrap">{title}</span>
         <div className="flex flex-col gap-0.5">
           <button
             onClick={() => onChange("all")}
@@ -649,6 +651,7 @@ export default function PharmacyMaps() {
                   title={t.status || "Статус"}
                   value={filterStatus}
                   onChange={setFilterStatus}
+                  type="status"
                 />
               </div>
             )}
@@ -670,9 +673,7 @@ export default function PharmacyMaps() {
                   >
                     <div className="flex justify-between items-start mb-1">
                       <span className="font-medium text-gray-900 text-sm line-clamp-1">{pharmacy.name}</span>
-                      <span className={`text-[10px] px-1.5 py-0.5 rounded font-medium ${pharmacy.active ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}`}>
-                        {pharmacy.active ? 'ACT' : 'INA'}
-                      </span>
+                      <div className={`w-2 h-2 rounded-full ${pharmacy.active ? 'bg-emerald-500' : 'bg-red-500'}`} title={pharmacy.active ? 'Active' : 'Inactive'} />
                     </div>
                     <p className="text-xs text-gray-500 line-clamp-2">{pharmacy.address}</p>
                   </div>
@@ -682,7 +683,7 @@ export default function PharmacyMaps() {
           </div>
 
           <div className="p-3 border-t border-gray-200 bg-gray-50 text-xs text-center text-gray-400">
-            Показано {filteredPharmacies.length} из {pharmacies.length}
+            {t.shown || "Показано"} {filteredPharmacies.length} {t.from || "из"} {pharmacies.length}
           </div>
         </div>
 

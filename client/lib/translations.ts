@@ -105,9 +105,13 @@ export const translations = {
     year: "год",
     confirmYes: "ДА",
     confirmNo: "НЕТ",
+    shown: "Показано",
+    from: "из",
   },
   uz: {
     // Common
+    shown: "Ko'rsatildi",
+    from: "dan",
     save: "Saqlandi",
     error: "Xatolik",
     logout: "Chiqish",
