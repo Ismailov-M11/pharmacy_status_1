@@ -428,29 +428,6 @@ export default function PharmacyMaps() {
     applyFilter(pharmacies, filter);
   };
 
-  const toggleFullscreen = async () => {
-    if (!containerRef.current) return;
-
-    try {
-      if (!isFullscreen) {
-        if (containerRef.current.requestFullscreen) {
-          await containerRef.current.requestFullscreen();
-        } else if ((containerRef.current as any).webkitRequestFullscreen) {
-          await (containerRef.current as any).webkitRequestFullscreen();
-        }
-        setIsFullscreen(true);
-      } else {
-        if (document.fullscreenElement) {
-          await document.exitFullscreen();
-        } else if ((document as any).webkitFullscreenElement) {
-          await (document as any).webkitExitFullscreen();
-        }
-        setIsFullscreen(false);
-      }
-    } catch (error) {
-      console.error("Fullscreen toggle failed:", error);
-    }
-  };
 
   if (authLoading) {
     return (
