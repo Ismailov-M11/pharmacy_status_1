@@ -114,39 +114,28 @@ export default function PharmacyMaps() {
     try {
       setIsLoading(true);
       console.log("Fetching pharmacies...");
-      
+
       const response = await getPharmacyList(token!, "", 0, null);
       const pharmacyList = response.payload?.list || [];
       console.log(`Fetched ${pharmacyList.length} pharmacies`);
 
-      // Fetch statuses from local backend
-      const pharmaciesWithStatuses = await Promise.all(
-        pharmacyList.map(async (pharmacy) => {
-          try {
-            const status = await getPharmacyStatus(pharmacy.id);
-            return {
-              ...pharmacy,
-              training: status.training,
-              brandedPacket: status.brandedPacket
-            };
-          } catch (error) {
-            console.warn(`Failed to fetch status for pharmacy ${pharmacy.id}`);
-            return {
-              ...pharmacy,
-              training: false,
-              brandedPacket: false
-            };
-          }
-        })
-      );
+      // Don't wait for statuses - just show pharmacies on map
+      // Statuses will be loaded when user clicks on a pharmacy
+      const pharmaciesWithDefaults = pharmacyList.map((pharmacy) => ({
+        ...pharmacy,
+        training: false,
+        brandedPacket: false
+      }));
 
-      setPharmacies(pharmaciesWithStatuses);
-      applyFilter(pharmaciesWithStatuses, activeFilter);
-      
+      setPharmacies(pharmaciesWithDefaults);
+      applyFilter(pharmaciesWithDefaults, activeFilter);
+
       // Add placemarks to map
       if (mapRef.current) {
-        addPlacemarks(pharmaciesWithStatuses);
+        addPlacemarks(pharmaciesWithDefaults);
       }
+
+      console.log(`Successfully loaded ${pharmaciesWithDefaults.length} pharmacies on map`);
     } catch (error) {
       console.error("Failed to fetch pharmacies:", error);
       toast.error(t.error);
