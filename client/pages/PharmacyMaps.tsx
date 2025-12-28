@@ -14,7 +14,15 @@ import {
   StatusHistoryRecord,
 } from "@/lib/api";
 import { Button } from "@/components/ui/button";
-import { Maximize2 } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { ChevronDown } from "lucide-react";
 import { toast } from "sonner";
 
 // Tashkent city coordinates
@@ -43,14 +51,13 @@ export default function PharmacyMaps() {
   const [isLoading, setIsLoading] = useState(true);
   const [activeFilter, setActiveFilter] = useState<
     "all" | "active" | "inactive"
-  >("all");
+  >("active");
+  const [searchQuery, setSearchQuery] = useState("");
   const [selectedPharmacy, setSelectedPharmacy] =
     useState<PharmacyWithCoords | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [changeHistory, setChangeHistory] = useState<StatusHistoryRecord[]>([]);
   const [isLoadingHistory, setIsLoadingHistory] = useState(false);
-  const [isFullscreen, setIsFullscreen] = useState(false);
-
   const mapRef = useRef<any>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -107,7 +114,7 @@ export default function PharmacyMaps() {
       mapRef.current = new window.ymaps.Map(containerRef.current, {
         center: TASHKENT_CENTER,
         zoom: 11,
-        controls: ["zoomControl", "fullscreenControl"],
+        controls: ["zoomControl"],
         behaviors: ["default", "scrollZoom"],
       });
 
@@ -144,10 +151,7 @@ export default function PharmacyMaps() {
       setPharmacies(pharmaciesWithDefaults);
       applyFilter(pharmaciesWithDefaults, activeFilter);
 
-      // Add placemarks to map
-      if (mapRef.current) {
-        addPlacemarks(pharmaciesWithDefaults);
-      }
+      // Map will be updated by the useEffect that watches filteredPharmacies
 
       console.log(
         `Successfully loaded ${pharmaciesWithDefaults.length} pharmacies on map`,
@@ -206,8 +210,7 @@ export default function PharmacyMaps() {
           `,
         },
         {
-          preset: "islands#violetDotIcon",
-          iconColor: "7E22CE", // Purple color rgb(126, 34, 206)
+          preset: "islands#purpleDotIcon",
         },
       );
 
@@ -257,25 +260,13 @@ export default function PharmacyMaps() {
                   longitude: coords[1],
                 };
 
-                // Update pharmacy with coordinates
+                // Just update the pharmacy with coordinates, don't rebuild map
                 setPharmacies((prev) =>
                   prev.map((p) => (p.id === pharmacy.id ? updatedPharmacy : p)),
                 );
                 setFilteredPharmacies((prev) =>
                   prev.map((p) => (p.id === pharmacy.id ? updatedPharmacy : p)),
                 );
-
-                // Rebuild all placemarks with updated coordinates
-                if (mapRef.current) {
-                  mapRef.current.geoObjects.removeAll();
-                  setPharmacies((prevPharmacies) => {
-                    const updated = prevPharmacies.map((p) =>
-                      p.id === pharmacy.id ? updatedPharmacy : p,
-                    );
-                    addPlacemarks(updated);
-                    return updated;
-                  });
-                }
 
                 console.log(
                   `✓ Geocoded: ${pharmacy.name} → [${coords[0].toFixed(4)}, ${coords[1].toFixed(4)}]`,
@@ -413,13 +404,27 @@ export default function PharmacyMaps() {
   const applyFilter = (
     pharmaciesToFilter: PharmacyWithCoords[],
     filter: "all" | "active" | "inactive",
+    search: string = searchQuery,
   ) => {
     let filtered = pharmaciesToFilter;
 
+    // Apply status filter
     if (filter === "active") {
       filtered = pharmaciesToFilter.filter((p) => p.active);
     } else if (filter === "inactive") {
       filtered = pharmaciesToFilter.filter((p) => !p.active);
+    }
+
+    // Apply search filter
+    if (search.trim()) {
+      const query = search.toLowerCase();
+      filtered = filtered.filter(
+        (p) =>
+          p.name.toLowerCase().includes(query) ||
+          p.address.toLowerCase().includes(query) ||
+          p.code.toLowerCase().includes(query) ||
+          (p.phone && p.phone.includes(query)),
+      );
     }
 
     setFilteredPharmacies(filtered);
@@ -427,32 +432,20 @@ export default function PharmacyMaps() {
 
   const handleFilterChange = (filter: "all" | "active" | "inactive") => {
     setActiveFilter(filter);
-    applyFilter(pharmacies, filter);
+    applyFilter(pharmacies, filter, searchQuery);
   };
 
-  const toggleFullscreen = async () => {
-    if (!containerRef.current) return;
+  const handleSearchChange = (query: string) => {
+    setSearchQuery(query);
+    applyFilter(pharmacies, activeFilter, query);
+  };
 
-    try {
-      if (!isFullscreen) {
-        if (containerRef.current.requestFullscreen) {
-          await containerRef.current.requestFullscreen();
-        } else if ((containerRef.current as any).webkitRequestFullscreen) {
-          await (containerRef.current as any).webkitRequestFullscreen();
-        }
-        setIsFullscreen(true);
-      } else {
-        if (document.fullscreenElement) {
-          await document.exitFullscreen();
-        } else if ((document as any).webkitFullscreenElement) {
-          await (document as any).webkitExitFullscreen();
-        }
-        setIsFullscreen(false);
-      }
-    } catch (error) {
-      console.error("Fullscreen toggle failed:", error);
+  // Update map when filter or search changes
+  useEffect(() => {
+    if (mapRef.current && !isLoading) {
+      addPlacemarks(filteredPharmacies);
     }
-  };
+  }, [filteredPharmacies, isLoading]);
 
   if (authLoading) {
     return (
@@ -463,75 +456,134 @@ export default function PharmacyMaps() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 flex flex-col">
       <Header />
 
-      <main className="w-full">
-        <div className="mb-4 sm:mb-8 px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
-          <h1 className="text-3xl font-bold text-gray-900">
-            {t.maps || "Карты"}
-          </h1>
-          <p className="text-gray-600 mt-2">
-            {t.pharmacyMap || "Отображение аптек на карте"}
-          </p>
-        </div>
-
-        <div className="px-4 sm:px-6 lg:px-8 pb-8 space-y-4">
-          {/* Filter Buttons */}
-          <div className="flex gap-2 flex-wrap">
-            <Button
-              onClick={() => handleFilterChange("all")}
-              className={`${
-                activeFilter === "all"
-                  ? "bg-purple-700 hover:bg-purple-800 text-white"
-                  : "bg-white border border-gray-300 text-gray-700 hover:bg-gray-50"
-              }`}
-            >
-              {t.all || "Все"} ({pharmacies.length})
-            </Button>
-            <Button
-              onClick={() => handleFilterChange("active")}
-              className={`${
-                activeFilter === "active"
-                  ? "bg-green-600 hover:bg-green-700 text-white"
-                  : "bg-white border border-gray-300 text-gray-700 hover:bg-gray-50"
-              }`}
-            >
-              {t.active || "Активные"} (
-              {pharmacies.filter((p) => p.active).length})
-            </Button>
-            <Button
-              onClick={() => handleFilterChange("inactive")}
-              className={`${
-                activeFilter === "inactive"
-                  ? "bg-red-600 hover:bg-red-700 text-white"
-                  : "bg-white border border-gray-300 text-gray-700 hover:bg-gray-50"
-              }`}
-            >
-              {t.inactive || "Неактивные"} (
-              {pharmacies.filter((p) => !p.active).length})
-            </Button>
+      <main className="flex-1 w-full flex flex-col lg:flex-row overflow-hidden">
+        {/* Left Panel - Pharmacy List */}
+        <div className="w-full lg:w-1/3 bg-white border-r border-gray-200 overflow-hidden flex flex-col">
+          <div className="px-4 sm:px-6 py-4 border-b border-gray-200 bg-gray-50 flex-shrink-0">
+            <h1 className="text-2xl font-bold text-gray-900">
+              {t.maps || "Карты"}
+            </h1>
+            <p className="text-gray-600 text-sm mt-1">
+              {t.pharmacyMap || "Отображение аптек на карте"}
+            </p>
           </div>
 
-          {/* Map Container */}
-          <div className="relative bg-white rounded-lg shadow-sm overflow-hidden border border-gray-200">
-            <div
-              ref={containerRef}
-              className="w-full bg-gray-100"
-              style={{
-                height: isFullscreen ? "100vh" : "600px",
-                minHeight: "400px",
-              }}
-            />
+          {/* Search and Filter Controls */}
+          <div className="px-4 sm:px-6 py-4 border-b border-gray-200 flex-shrink-0">
+            <div className="flex gap-2 items-center">
+              <Input
+                type="text"
+                placeholder={`${t.pharmacyName || "Название"} / ${t.address || "Адрес"}...`}
+                value={searchQuery}
+                onChange={(e) => handleSearchChange(e.target.value)}
+                className="flex-1"
+              />
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="gap-1 flex-shrink-0"
+                  >
+                    {activeFilter === "all" && "Все"}
+                    {activeFilter === "active" && "Активные"}
+                    {activeFilter === "inactive" && "Неактивные"}
+                    <ChevronDown className="w-4 h-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuRadioGroup
+                    value={activeFilter}
+                    onValueChange={(val) =>
+                      handleFilterChange(val as "all" | "active" | "inactive")
+                    }
+                  >
+                    <DropdownMenuRadioItem value="all">
+                      {t.all || "Все"} ({pharmacies.length})
+                    </DropdownMenuRadioItem>
+                    <DropdownMenuRadioItem
+                      value="active"
+                      className="bg-emerald-50"
+                    >
+                      {t.active || "Активные"} (
+                      {pharmacies.filter((p) => p.active).length})
+                    </DropdownMenuRadioItem>
+                    <DropdownMenuRadioItem
+                      value="inactive"
+                      className="bg-amber-50"
+                    >
+                      {t.inactive || "Неактивные"} (
+                      {pharmacies.filter((p) => !p.active).length})
+                    </DropdownMenuRadioItem>
+                  </DropdownMenuRadioGroup>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+          </div>
 
-            {/* Fullscreen Button */}
-            <button
-              onClick={toggleFullscreen}
-              className="absolute top-4 right-4 bg-white border border-gray-300 rounded-lg p-2 hover:bg-gray-50 z-10 shadow-md"
-              title={isFullscreen ? "Exit fullscreen" : "Enter fullscreen"}
-            >
-              <Maximize2 className="w-5 h-5 text-gray-700" />
-            </button>
+          {/* Pharmacy List Window with Scrollbar */}
+          <div
+            className="mx-4 sm:mx-6 my-4 rounded-lg border border-gray-200 shadow-sm bg-white overflow-hidden flex flex-col"
+            style={{ maxHeight: "calc(100% - 32px)" }}
+          >
+            <div className="px-4 py-3 border-b border-gray-200 bg-gray-50 rounded-t-lg flex-shrink-0">
+              <h2 className="text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                {t.pharmacies || "Аптеки"} ({filteredPharmacies.length})
+              </h2>
+            </div>
+
+            <div className="flex-1 overflow-y-auto">
+              {filteredPharmacies.length === 0 ? (
+                <div className="px-4 py-8 text-center text-gray-500 text-sm">
+                  {t.noData || "Нет данных"}
+                </div>
+              ) : (
+                <div className="divide-y divide-gray-200">
+                  {filteredPharmacies.map((pharmacy, index) => (
+                    <div
+                      key={pharmacy.id}
+                      className="px-4 py-3 hover:bg-purple-50 transition-colors cursor-pointer border-b border-gray-100 last:border-b-0"
+                      onClick={() => handlePharmacyClick(pharmacy)}
+                    >
+                      <div className="flex justify-between items-start gap-2">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 mb-1">
+                            <span className="text-xs text-gray-400 flex-shrink-0 font-medium">
+                              {String(index + 1).padStart(2, "0")}
+                            </span>
+                            <h3 className="text-sm font-medium text-gray-900 truncate">
+                              {pharmacy.name}
+                            </h3>
+                          </div>
+                          <p className="text-xs text-gray-500 truncate">
+                            {pharmacy.address}
+                          </p>
+                        </div>
+                        <span
+                          className={`px-2 py-1 rounded text-xs font-medium flex-shrink-0 whitespace-nowrap ${
+                            pharmacy.active
+                              ? "bg-emerald-100 text-emerald-800"
+                              : "bg-amber-100 text-amber-800"
+                          }`}
+                        >
+                          {pharmacy.active ? t.active : t.inactive}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Right Panel - Map */}
+        <div className="w-full lg:w-2/3 bg-white flex flex-col min-h-96 lg:min-h-0 order-first lg:order-last">
+          <div className="relative flex-1 bg-gray-100 overflow-hidden">
+            <div ref={containerRef} className="w-full h-full bg-gray-100" />
 
             {/* Loading Overlay */}
             {isLoading && (
@@ -542,76 +594,6 @@ export default function PharmacyMaps() {
                 </span>
               </div>
             )}
-          </div>
-
-          {/* Pharmacy List */}
-          <div className="bg-white rounded-lg shadow-sm overflow-hidden border border-gray-200">
-            <div className="px-4 sm:px-6 py-4 border-b border-gray-200 bg-gray-50">
-              <h2 className="text-lg font-semibold text-gray-900">
-                {t.pharmacies || "Аптеки"} ({filteredPharmacies.length})
-              </h2>
-            </div>
-
-            <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
-                      №
-                    </th>
-                    <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
-                      {t.pharmacyName || "Название аптеки"}
-                    </th>
-                    <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
-                      {t.address || "Адрес"}
-                    </th>
-                    <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
-                      {t.status || "Статус"}
-                    </th>
-                    <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
-                      {t.action || "Действие"}
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                  {filteredPharmacies.map((pharmacy, index) => (
-                    <tr
-                      key={pharmacy.id}
-                      className="hover:bg-gray-50 transition-colors"
-                    >
-                      <td className="px-4 sm:px-6 py-3 text-xs sm:text-sm text-gray-500">
-                        {index + 1}
-                      </td>
-                      <td className="px-4 sm:px-6 py-3 text-xs sm:text-sm font-medium text-gray-900">
-                        {pharmacy.name}
-                      </td>
-                      <td className="px-4 sm:px-6 py-3 text-xs sm:text-sm text-gray-600">
-                        {pharmacy.address}
-                      </td>
-                      <td className="px-4 sm:px-6 py-3 text-xs sm:text-sm">
-                        <span
-                          className={`px-3 py-1 rounded-full text-xs font-medium ${
-                            pharmacy.active
-                              ? "bg-emerald-100 text-emerald-800"
-                              : "bg-amber-100 text-amber-800"
-                          }`}
-                        >
-                          {pharmacy.active ? t.active : t.inactive}
-                        </span>
-                      </td>
-                      <td className="px-4 sm:px-6 py-3 text-xs sm:text-sm">
-                        <Button
-                          onClick={() => handlePharmacyClick(pharmacy)}
-                          className="bg-purple-700 hover:bg-purple-800 text-white h-8 text-xs"
-                        >
-                          {t.details || "Подробнее"}
-                        </Button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
           </div>
         </div>
       </main>
