@@ -14,6 +14,7 @@ export function Header() {
   const { language, setLanguage, t } = useLanguage();
   const { logout } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handleLogout = () => {
     logout();
