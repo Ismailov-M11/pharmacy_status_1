@@ -258,18 +258,25 @@ export async function updatePharmacyStatusLocal(
 export async function getStatusHistory(
   pharmacyId: number
 ): Promise<StatusHistoryRecord[]> {
-  const response = await fetch(`${STATUS_API_BASE_URL}/history/${pharmacyId}`, {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  });
+  try {
+    const response = await fetch(`${STATUS_API_BASE_URL}/history/${pharmacyId}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
 
-  if (!response.ok) {
-    throw new Error('Failed to fetch status history');
+    if (!response.ok) {
+      console.warn(`Status history API returned ${response.status} for pharmacy ${pharmacyId}`);
+      throw new Error('Failed to fetch status history');
+    }
+
+    return response.json();
+  } catch (error) {
+    // If backend is unavailable, return empty history
+    console.warn(`Failed to fetch status history for pharmacy ${pharmacyId}:`, error);
+    return [];
   }
-
-  return response.json();
 }
 
 export async function deleteHistoryRecord(id: number): Promise<void> {
