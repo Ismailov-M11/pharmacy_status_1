@@ -14,7 +14,6 @@ import {
   StatusHistoryRecord,
 } from "@/lib/api";
 import { Button } from "@/components/ui/button";
-import { Maximize2 } from "lucide-react";
 import { toast } from "sonner";
 
 // Tashkent city coordinates
