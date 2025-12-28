@@ -11,6 +11,7 @@ import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import Login from "./pages/Login";
 import AgentPanel from "./pages/AgentPanel";
 import AdminPanel from "./pages/AdminPanel";
+import PharmacyMaps from "./pages/PharmacyMaps";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
