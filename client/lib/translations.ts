@@ -29,7 +29,7 @@ export const translations = {
     leadPhone: "Телефон ответственного",
     leadStatus: "Статус ответственного",
     contactPerson: "Контактное лицо",
-    brandedPacket: "Фирменный пакет",
+    brandedPacket: "Пакет",
     training: "Обучение",
     status: "Статус",
     registrationDate: "Дата регистрации",
