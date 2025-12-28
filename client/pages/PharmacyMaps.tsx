@@ -213,10 +213,7 @@ export default function PharmacyMaps() {
           `,
         },
         {
-          iconLayout: "default#image",
-          iconImageHref: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48Y2lyY2xlIGN4PSIxMiIgY3k9IjEyIiByPSIxMiIgZmlsbD0iIzdFMjJDRSIgc3Ryb2tlPSIjZmZmZmZmIiBzdHJva2Utd2lkdGg9IjIiLz48L3N2Zz4=",
-          iconImageSize: [24, 24],
-          iconImageOffset: [-12, -12],
+          preset: "islands#purpleDotIcon",
         },
       );
 
