@@ -484,53 +484,57 @@ export default function PharmacyMaps() {
           </div>
 
           {/* Search and Filter Controls */}
-          <div className="px-4 sm:px-6 py-4 border-b border-gray-200 space-y-3 flex-shrink-0">
-            <Input
-              type="text"
-              placeholder={`${t.pharmacyName || "Название"} / ${t.address || "Адрес"}...`}
-              value={searchQuery}
-              onChange={(e) => handleSearchChange(e.target.value)}
-              className="w-full"
-            />
-            <div className="flex gap-2">
-              <Button
-                onClick={() => handleFilterChange("all")}
-                className={`flex-1 text-xs sm:text-sm ${
-                  activeFilter === "all"
-                    ? "bg-purple-700 hover:bg-purple-800 text-white"
-                    : "bg-white border border-gray-300 text-gray-700 hover:bg-gray-50"
-                }`}
-              >
-                {t.all || "Все"} ({pharmacies.length})
-              </Button>
-              <Button
-                onClick={() => handleFilterChange("active")}
-                className={`flex-1 text-xs sm:text-sm ${
-                  activeFilter === "active"
-                    ? "bg-green-600 hover:bg-green-700 text-white"
-                    : "bg-white border border-gray-300 text-gray-700 hover:bg-gray-50"
-                }`}
-              >
-                {t.active || "Активные"} (
-                {pharmacies.filter((p) => p.active).length})
-              </Button>
-              <Button
-                onClick={() => handleFilterChange("inactive")}
-                className={`flex-1 text-xs sm:text-sm ${
-                  activeFilter === "inactive"
-                    ? "bg-red-600 hover:bg-red-700 text-white"
-                    : "bg-white border border-gray-300 text-gray-700 hover:bg-gray-50"
-                }`}
-              >
-                {t.inactive || "Неактивные"} (
-                {pharmacies.filter((p) => !p.active).length})
-              </Button>
+          <div className="px-4 sm:px-6 py-4 border-b border-gray-200 flex-shrink-0">
+            <div className="flex gap-2 items-center">
+              <Input
+                type="text"
+                placeholder={`${t.pharmacyName || "Название"} / ${t.address || "Адрес"}...`}
+                value={searchQuery}
+                onChange={(e) => handleSearchChange(e.target.value)}
+                className="flex-1"
+              />
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" size="sm" className="gap-1 flex-shrink-0">
+                    {activeFilter === "all" && "Все"}
+                    {activeFilter === "active" && "Активные"}
+                    {activeFilter === "inactive" && "Неактивные"}
+                    <ChevronDown className="w-4 h-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuRadioGroup
+                    value={activeFilter}
+                    onValueChange={(val) =>
+                      handleFilterChange(val as "all" | "active" | "inactive")
+                    }
+                  >
+                    <DropdownMenuRadioItem value="all">
+                      {t.all || "Все"} ({pharmacies.length})
+                    </DropdownMenuRadioItem>
+                    <DropdownMenuRadioItem
+                      value="active"
+                      className="bg-emerald-50"
+                    >
+                      {t.active || "Активные"} (
+                      {pharmacies.filter((p) => p.active).length})
+                    </DropdownMenuRadioItem>
+                    <DropdownMenuRadioItem
+                      value="inactive"
+                      className="bg-amber-50"
+                    >
+                      {t.inactive || "Неактивные"} (
+                      {pharmacies.filter((p) => !p.active).length})
+                    </DropdownMenuRadioItem>
+                  </DropdownMenuRadioGroup>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           </div>
 
-          {/* Pharmacy List with Scrollbar */}
-          <div className="flex-1 overflow-hidden flex flex-col bg-white">
-            <div className="px-4 sm:px-6 py-3 border-b border-gray-200 bg-gray-50 flex-shrink-0">
+          {/* Pharmacy List Window with Scrollbar */}
+          <div className="flex-1 overflow-hidden flex flex-col mx-4 sm:mx-6 my-4 rounded-lg border border-gray-200 shadow-sm bg-white">
+            <div className="px-4 py-3 border-b border-gray-200 bg-gray-50 rounded-t-lg flex-shrink-0">
               <h2 className="text-xs font-semibold text-gray-700 uppercase tracking-wider">
                 {t.pharmacies || "Аптеки"} ({filteredPharmacies.length})
               </h2>
@@ -538,7 +542,7 @@ export default function PharmacyMaps() {
 
             <div className="flex-1 overflow-y-auto">
               {filteredPharmacies.length === 0 ? (
-                <div className="px-4 sm:px-6 py-8 text-center text-gray-500 text-sm">
+                <div className="px-4 py-8 text-center text-gray-500 text-sm">
                   {t.noData || "Нет данных"}
                 </div>
               ) : (
@@ -546,7 +550,7 @@ export default function PharmacyMaps() {
                   {filteredPharmacies.map((pharmacy, index) => (
                     <div
                       key={pharmacy.id}
-                      className="px-4 sm:px-6 py-3 hover:bg-purple-50 transition-colors cursor-pointer border-b border-gray-100 last:border-b-0"
+                      className="px-4 py-3 hover:bg-purple-50 transition-colors cursor-pointer border-b border-gray-100 last:border-b-0"
                       onClick={() => handlePharmacyClick(pharmacy)}
                     >
                       <div className="flex justify-between items-start gap-2">
