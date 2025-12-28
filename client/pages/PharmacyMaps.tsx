@@ -17,11 +17,8 @@ import { Button } from "@/components/ui/button";
 import { Maximize2 } from "lucide-react";
 import { toast } from "sonner";
 
-interface GeoObject {
-  geometry: {
-    getCoordinates: () => [number, number];
-  };
-}
+// Tashkent city coordinates
+const TASHKENT_CENTER = [41.2995, 69.2401];
 
 declare global {
   interface Window {
@@ -37,6 +34,7 @@ export default function PharmacyMaps() {
   const [pharmacies, setPharmacies] = useState<Pharmacy[]>([]);
   const [filteredPharmacies, setFilteredPharmacies] = useState<Pharmacy[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [mapReady, setMapReady] = useState(false);
   const [activeFilter, setActiveFilter] = useState<"all" | "active" | "inactive">("all");
   const [selectedPharmacy, setSelectedPharmacy] = useState<Pharmacy | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -46,57 +44,66 @@ export default function PharmacyMaps() {
   
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<any>(null);
-  const markersRef = useRef<any[]>([]);
+  const markersRef = useRef<Map<number, any>>(new Map());
 
-  // Yandex Maps API loading
+  // Load Yandex Maps API
   useEffect(() => {
-    const loadYandexMaps = () => {
-      if (!window.ymaps) {
-        const script = document.createElement("script");
-        // Use public Yandex Maps API without API key parameter
-        script.src = "https://api-maps.yandex.ru/2.1/?lang=ru_RU";
-        script.type = "text/javascript";
-        script.async = true;
-        script.onerror = () => {
-          console.error("Failed to load Yandex Maps API");
-          toast.error("Не удалось загрузить карты");
-        };
-        script.onload = () => {
-          if (window.ymaps) {
-            window.ymaps.ready(initMap);
-          }
-        };
-        document.head.appendChild(script);
-      } else if (window.ymaps && window.ymaps.ready) {
-        window.ymaps.ready(initMap);
-      }
-    };
-
     if (authLoading) return;
-
     if (!token) {
       navigate("/login");
       return;
     }
 
-    loadYandexMaps();
+    // Check if ymaps is already loaded
+    if (window.ymaps) {
+      window.ymaps.ready(() => {
+        initializeMap();
+      });
+    } else {
+      // Load the script
+      const script = document.createElement("script");
+      script.src = "https://api-maps.yandex.ru/2.1/?lang=ru_RU";
+      script.type = "text/javascript";
+      script.async = true;
+      
+      script.onload = () => {
+        console.log("Yandex Maps API loaded");
+        if (window.ymaps) {
+          window.ymaps.ready(() => {
+            initializeMap();
+          });
+        }
+      };
+      
+      script.onerror = () => {
+        console.error("Failed to load Yandex Maps API");
+        toast.error("Не удалось загрузить карты Яндекса");
+      };
+      
+      document.head.appendChild(script);
+    }
   }, [token, authLoading, navigate]);
 
-  const initMap = () => {
-    if (!mapRef.current || !window.ymaps) {
-      console.error("Map container or ymaps not available");
+  const initializeMap = () => {
+    if (!mapRef.current) {
+      console.error("Map container not found");
       return;
     }
 
     try {
+      console.log("Initializing Yandex Map...");
       const map = new window.ymaps.Map(mapRef.current, {
-        center: [41.2995, 69.2401], // Tashkent coordinates
+        center: TASHKENT_CENTER,
         zoom: 11,
-        controls: ["zoomControl", "fullscreenControl"]
+        controls: ["zoomControl", "fullscreenControl"],
+        behaviors: ["default", "scrollZoom"]
       });
 
       mapInstanceRef.current = map;
+      setMapReady(true);
       console.log("Map initialized successfully");
+      
+      // Fetch pharmacies after map is ready
       fetchPharmacies();
     } catch (error) {
       console.error("Failed to initialize map:", error);
@@ -107,10 +114,13 @@ export default function PharmacyMaps() {
   const fetchPharmacies = async () => {
     try {
       setIsLoading(true);
+      console.log("Fetching pharmacies...");
+      
       const response = await getPharmacyList(token!, "", 0, null);
       const pharmacyList = response.payload?.list || [];
+      console.log(`Fetched ${pharmacyList.length} pharmacies`);
 
-      // Fetch statuses from local backend for all pharmacies
+      // Fetch statuses from local backend
       const pharmaciesWithStatuses = await Promise.all(
         pharmacyList.map(async (pharmacy) => {
           try {
@@ -121,7 +131,7 @@ export default function PharmacyMaps() {
               brandedPacket: status.brandedPacket
             };
           } catch (error) {
-            console.warn(`Failed to fetch status for pharmacy ${pharmacy.id}:`, error);
+            console.warn(`Failed to fetch status for pharmacy ${pharmacy.id}`);
             return {
               ...pharmacy,
               training: false,
@@ -133,13 +143,11 @@ export default function PharmacyMaps() {
 
       setPharmacies(pharmaciesWithStatuses);
       applyFilter(pharmaciesWithStatuses, activeFilter);
-
-      // Geocode and place markers with delay
-      pharmaciesWithStatuses.forEach((pharmacy, index) => {
-        setTimeout(() => {
-          geocodeAndPlaceMarker(pharmacy);
-        }, (index + 1) * 100);
-      });
+      
+      // Place markers on map
+      if (mapInstanceRef.current) {
+        placeAllMarkers(pharmaciesWithStatuses);
+      }
     } catch (error) {
       console.error("Failed to fetch pharmacies:", error);
       toast.error(t.error);
@@ -148,84 +156,108 @@ export default function PharmacyMaps() {
     }
   };
 
-  const geocodeAndPlaceMarker = (pharmacy: Pharmacy, retryCount = 0) => {
-    if (!window.ymaps || !mapInstanceRef.current) return;
+  const placeAllMarkers = (pharmaciesToPlace: Pharmacy[]) => {
+    console.log(`Placing ${pharmaciesToPlace.length} markers on map`);
+    
+    // Clear existing markers
+    markersRef.current.forEach((marker) => {
+      try {
+        mapInstanceRef.current?.geoObjects.remove(marker);
+      } catch (e) {
+        console.warn("Error removing marker:", e);
+      }
+    });
+    markersRef.current.clear();
 
-    // Try to geocode the address
-    const geocodeRequest = window.ymaps.geocode(pharmacy.address, {
-      results: 1,
-      boundedBy: [[39.5, 68.5], [42.5, 70.5]] // Tashkent region bounds
+    // Place all markers at default location first
+    pharmaciesToPlace.forEach((pharmacy) => {
+      placeMarker(pharmacy, TASHKENT_CENTER);
     });
 
-    geocodeRequest
-      .then((result: any) => {
-        try {
-          if (result && result.geoObjects && result.geoObjects.getLength && result.geoObjects.getLength() > 0) {
-            const firstGeoObject = result.geoObjects.get(0);
-            if (firstGeoObject && firstGeoObject.geometry) {
-              const coords = firstGeoObject.geometry.getCoordinates();
-              if (coords && coords.length === 2) {
-                placeMarker(pharmacy, coords);
-                console.log(`✓ Successfully geocoded: ${pharmacy.name}`);
-                return;
-              }
-            }
-          }
-
-          // If geocoding didn't find anything, place at default Tashkent location
-          console.warn(`No geocoding result for: ${pharmacy.name}, using default location`);
-          placeMarker(pharmacy, [41.2995, 69.2401]);
-        } catch (parseError) {
-          console.error(`Error parsing geocode result for ${pharmacy.name}:`, parseError);
-          placeMarker(pharmacy, [41.2995, 69.2401]);
-        }
-      })
-      .catch((error: any) => {
-        console.error(`Geocoding failed for "${pharmacy.name}" (${pharmacy.address}):`, error?.message || error);
-        // Retry once if it fails
-        if (retryCount < 1) {
-          console.log(`Retrying geocode for: ${pharmacy.name}`);
-          setTimeout(() => {
-            geocodeAndPlaceMarker(pharmacy, retryCount + 1);
-          }, 500);
-        } else {
-          // Place at default location after retry fails
-          placeMarker(pharmacy, [41.2995, 69.2401]);
-        }
-      });
+    // Then try to geocode and update locations
+    pharmaciesToPlace.forEach((pharmacy, index) => {
+      setTimeout(() => {
+        geocodeAndUpdateMarker(pharmacy);
+      }, index * 200);
+    });
   };
 
   const placeMarker = (pharmacy: Pharmacy, coords: [number, number]) => {
-    if (!window.ymaps || !mapInstanceRef.current) {
-      console.warn("Cannot place marker: map or ymaps not available");
+    if (!mapInstanceRef.current || !window.ymaps) {
+      console.warn("Map not ready, cannot place marker");
       return;
     }
 
     try {
-      const placemark = new window.ymaps.Placemark(coords, {
-        balloonContent: `
-          <div style="padding: 10px; font-family: Arial, sans-serif;">
-            <div style="font-weight: bold; margin-bottom: 5px;">${pharmacy.name}</div>
-            <div style="font-size: 12px; margin-bottom: 3px;"><strong>Код:</strong> ${pharmacy.code}</div>
-            <div style="font-size: 12px; margin-bottom: 3px;"><strong>Адрес:</strong> ${pharmacy.address}</div>
-            <div style="font-size: 12px; margin-bottom: 3px;"><strong>Статус:</strong> ${pharmacy.active ? "Активна" : "Неактивна"}</div>
-            ${pharmacy.phone ? `<div style="font-size: 12px; margin-bottom: 3px;"><strong>Телефон:</strong> ${pharmacy.phone}</div>` : ""}
-          </div>
-        `
-      }, {
-        preset: "islands#violetDotIcon",
-        iconColor: "7E22CE" // Purple color: rgb(126, 34, 206)
-      });
+      const placemark = new window.ymaps.Placemark(
+        coords,
+        {
+          balloonContent: `
+            <div style="padding: 12px; font-family: Arial, sans-serif; max-width: 300px;">
+              <div style="font-weight: bold; font-size: 14px; margin-bottom: 8px; color: #1f2937;">${pharmacy.name}</div>
+              <div style="font-size: 12px; margin-bottom: 4px;"><strong>Код:</strong> ${pharmacy.code}</div>
+              <div style="font-size: 12px; margin-bottom: 4px;"><strong>Адрес:</strong> ${pharmacy.address}</div>
+              <div style="font-size: 12px; margin-bottom: 4px;"><strong>Статус:</strong> <span style="color: ${pharmacy.active ? '#059669' : '#d97706'}">${pharmacy.active ? "Активна" : "Неактивна"}</span></div>
+              ${pharmacy.phone ? `<div style="font-size: 12px;"><strong>Телефон:</strong> ${pharmacy.phone}</div>` : ""}
+            </div>
+          `
+        },
+        {
+          preset: "islands#violetDotIcon",
+          iconColor: "7E22CE"
+        }
+      );
 
+      // Click event to open modal
       placemark.events.add("click", () => {
         handlePharmacyClick(pharmacy);
       });
 
       mapInstanceRef.current.geoObjects.add(placemark);
-      markersRef.current.push(placemark);
+      markersRef.current.set(pharmacy.id, placemark);
+      console.log(`Placed marker for: ${pharmacy.name}`);
     } catch (error) {
       console.error(`Failed to create marker for ${pharmacy.name}:`, error);
     }
+  };
+
+  const geocodeAndUpdateMarker = (pharmacy: Pharmacy) => {
+    if (!window.ymaps) {
+      console.warn("ymaps not available for geocoding");
+      return;
+    }
+
+    window.ymaps
+      .geocode(pharmacy.address, {
+        results: 1,
+        boundedBy: [[39.0, 68.0], [43.0, 71.0]] // Extended Tashkent region
+      })
+      .then((result: any) => {
+        try {
+          if (result?.geoObjects?.getLength?.() > 0) {
+            const geoObject = result.geoObjects.get(0);
+            const coords = geoObject.geometry.getCoordinates();
+            
+            if (coords && Array.isArray(coords) && coords.length === 2) {
+              // Remove old marker and place new one with correct coordinates
+              const oldMarker = markersRef.current.get(pharmacy.id);
+              if (oldMarker) {
+                mapInstanceRef.current?.geoObjects.remove(oldMarker);
+              }
+              
+              placeMarker(pharmacy, coords);
+              console.log(`✓ Geocoded: ${pharmacy.name} → [${coords[0]}, ${coords[1]}]`);
+            }
+          } else {
+            console.log(`No geocoding result for: ${pharmacy.name}`);
+          }
+        } catch (parseError) {
+          console.error(`Error processing geocode result for ${pharmacy.name}:`, parseError);
+        }
+      })
+      .catch((error: any) => {
+        console.error(`Geocoding error for "${pharmacy.name}":`, error?.message || error);
+      });
   };
 
   const handlePharmacyClick = async (pharmacy: Pharmacy) => {
@@ -239,7 +271,6 @@ export default function PharmacyMaps() {
         getStatusHistory(pharmacy.id)
       ]);
 
-      // Update pharmacy with backend status
       setSelectedPharmacy(prev => prev ? {
         ...prev,
         training: status.training,
@@ -248,7 +279,7 @@ export default function PharmacyMaps() {
 
       setChangeHistory(history);
     } catch (error) {
-      console.error("Failed to fetch pharmacy status/history:", error);
+      console.error("Failed to fetch pharmacy details:", error);
       setChangeHistory([]);
     } finally {
       setIsLoadingHistory(false);
@@ -262,7 +293,13 @@ export default function PharmacyMaps() {
     comment: string
   ) => {
     try {
-      await updatePharmacyStatusLocal(pharmacyId, field, value, comment, user?.username || "User");
+      await updatePharmacyStatusLocal(
+        pharmacyId,
+        field,
+        value,
+        comment,
+        user?.username || "User"
+      );
 
       const history = await getStatusHistory(pharmacyId);
       setChangeHistory(history);
@@ -319,29 +356,6 @@ export default function PharmacyMaps() {
   const handleFilterChange = (filter: "all" | "active" | "inactive") => {
     setActiveFilter(filter);
     applyFilter(pharmacies, filter);
-    refreshMarkers();
-  };
-
-  const refreshMarkers = () => {
-    if (!mapInstanceRef.current) return;
-
-    markersRef.current.forEach(marker => {
-      mapInstanceRef.current?.geoObjects.remove(marker);
-    });
-    markersRef.current = [];
-
-    const markersToShow = activeFilter === "all"
-      ? pharmacies
-      : activeFilter === "active"
-        ? pharmacies.filter(p => p.active)
-        : pharmacies.filter(p => !p.active);
-
-    // Add small delay between geocoding requests to avoid rate limiting
-    markersToShow.forEach((pharmacy, index) => {
-      setTimeout(() => {
-        geocodeAndPlaceMarker(pharmacy);
-      }, index * 100);
-    });
   };
 
   const toggleFullscreen = async () => {
@@ -349,7 +363,6 @@ export default function PharmacyMaps() {
 
     try {
       if (!isFullscreen) {
-        // Request fullscreen
         if (mapRef.current.requestFullscreen) {
           await mapRef.current.requestFullscreen();
           setIsFullscreen(true);
@@ -358,7 +371,6 @@ export default function PharmacyMaps() {
           setIsFullscreen(true);
         }
       } else {
-        // Exit fullscreen
         if (document.fullscreenElement) {
           await document.exitFullscreen();
           setIsFullscreen(false);
@@ -369,7 +381,6 @@ export default function PharmacyMaps() {
       }
     } catch (error) {
       console.error("Fullscreen toggle failed:", error);
-      toast.error("Не удалось переключить полноэкранный режим");
     }
   };
 
@@ -427,32 +438,39 @@ export default function PharmacyMaps() {
           </div>
 
           {/* Map Container */}
-          <div className="relative bg-white rounded-lg shadow-sm overflow-hidden">
+          <div className="relative bg-white rounded-lg shadow-sm overflow-hidden border border-gray-200">
             <div
               ref={mapRef}
-              className="w-full"
-              style={{ height: isFullscreen ? "100vh" : "600px" }}
+              className="w-full bg-gray-100"
+              style={{ 
+                height: isFullscreen ? "100vh" : "600px",
+                minHeight: "400px"
+              }}
             />
             
             {/* Fullscreen Button */}
             <button
               onClick={toggleFullscreen}
-              className="absolute top-4 right-4 bg-white border border-gray-300 rounded-lg p-2 hover:bg-gray-50 z-10"
+              className="absolute top-4 right-4 bg-white border border-gray-300 rounded-lg p-2 hover:bg-gray-50 z-10 shadow-md"
               title={isFullscreen ? "Exit fullscreen" : "Enter fullscreen"}
             >
               <Maximize2 className="w-5 h-5 text-gray-700" />
             </button>
 
-            {isLoading && (
-              <div className="absolute inset-0 bg-white bg-opacity-50 flex items-center justify-center">
-                <span className="text-gray-500">{t.loadingPharmacies}</span>
+            {/* Loading Overlay */}
+            {(isLoading || !mapReady) && (
+              <div className="absolute inset-0 bg-white bg-opacity-60 flex flex-col items-center justify-center z-20">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-700 mb-4"></div>
+                <span className="text-gray-700 font-medium">
+                  {!mapReady ? "Загрузка карты..." : "Загрузка аптек..."}
+                </span>
               </div>
             )}
           </div>
 
           {/* Pharmacy List */}
-          <div className="bg-white rounded-lg shadow-sm overflow-hidden">
-            <div className="px-4 sm:px-6 py-4 border-b border-gray-200">
+          <div className="bg-white rounded-lg shadow-sm overflow-hidden border border-gray-200">
+            <div className="px-4 sm:px-6 py-4 border-b border-gray-200 bg-gray-50">
               <h2 className="text-lg font-semibold text-gray-900">
                 {t.pharmacies || "Аптеки"} ({filteredPharmacies.length})
               </h2>
@@ -481,7 +499,7 @@ export default function PharmacyMaps() {
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
                   {filteredPharmacies.map((pharmacy, index) => (
-                    <tr key={pharmacy.id} className="hover:bg-gray-50 cursor-pointer" onClick={() => handlePharmacyClick(pharmacy)}>
+                    <tr key={pharmacy.id} className="hover:bg-gray-50 transition-colors">
                       <td className="px-4 sm:px-6 py-3 text-xs sm:text-sm text-gray-500">
                         {index + 1}
                       </td>
@@ -504,10 +522,7 @@ export default function PharmacyMaps() {
                       </td>
                       <td className="px-4 sm:px-6 py-3 text-xs sm:text-sm">
                         <Button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handlePharmacyClick(pharmacy);
-                          }}
+                          onClick={() => handlePharmacyClick(pharmacy)}
                           className="bg-purple-700 hover:bg-purple-800 text-white h-8 text-xs"
                         >
                           {t.details || "Подробнее"}
