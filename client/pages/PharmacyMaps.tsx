@@ -51,7 +51,7 @@ export default function PharmacyMaps() {
   const [isLoading, setIsLoading] = useState(true);
   const [activeFilter, setActiveFilter] = useState<
     "all" | "active" | "inactive"
-  >("all");
+  >("active");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedPharmacy, setSelectedPharmacy] =
     useState<PharmacyWithCoords | null>(null);
