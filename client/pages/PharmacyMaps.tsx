@@ -120,12 +120,12 @@ export default function PharmacyMaps() {
       setPharmacies(pharmaciesWithStatuses);
       applyFilter(pharmaciesWithStatuses, activeFilter);
 
-      // Geocode and place markers
-      setTimeout(() => {
-        pharmaciesWithStatuses.forEach((pharmacy) => {
+      // Geocode and place markers with delay
+      pharmaciesWithStatuses.forEach((pharmacy, index) => {
+        setTimeout(() => {
           geocodeAndPlaceMarker(pharmacy);
-        });
-      }, 100);
+        }, (index + 1) * 100);
+      });
     } catch (error) {
       console.error("Failed to fetch pharmacies:", error);
       toast.error(t.error);
