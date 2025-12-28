@@ -58,6 +58,11 @@ export const translations = {
     agentPanel: "Панель Агента",
     operatorPanel: "Панель оператора колл-центра",
     adminPanel: "Панель Администратора",
+    maps: "Карты",
+    pharmacyMap: "Отображение аптек на карте",
+    pharmacies: "Аптеки",
+    all: "Все",
+    action: "Действие",
 
     // Actions
     edit: "Редактировать",
@@ -158,6 +163,11 @@ export const translations = {
     agentPanel: "Agent paneli",
     operatorPanel: "Call-markaz operatori paneli",
     adminPanel: "Admin paneli",
+    maps: "Xaritalar",
+    pharmacyMap: "Dorixonalarni xaritada ko'rsatish",
+    pharmacies: "Dorixonalar",
+    all: "Barchasi",
+    action: "Harakat",
 
     // Actions
     edit: "Tahrirlash",
@@ -196,7 +206,8 @@ export const translations = {
     deleteSelected: "Tanlanganlarni o'chirish",
     clear: "Tozalash",
     deleteWarning: "Bu yozuv qaytarib bo'lmaydigan tarzda o'chiriladi.",
-    deleteWarningMultiple: "Tanlangan yozuvlar qaytarib bo'lmaydigan tarzda o'chiriladi.",
+    deleteWarningMultiple:
+      "Tanlangan yozuvlar qaytarib bo'lmaydigan tarzda o'chiriladi.",
     year: "yil",
     confirmYes: "HA",
     confirmNo: "YO'Q",

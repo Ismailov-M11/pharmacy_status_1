@@ -11,6 +11,7 @@ import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import Login from "./pages/Login";
 import AgentPanel from "./pages/AgentPanel";
 import AdminPanel from "./pages/AdminPanel";
+import PharmacyMaps from "./pages/PharmacyMaps";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -70,7 +71,9 @@ const App = () => (
               <Route
                 path="/agent"
                 element={
-                  <RoleBasedRoute allowedRoles={["ROLE_AGENT", "ROLE_OPERATOR"]}>
+                  <RoleBasedRoute
+                    allowedRoles={["ROLE_AGENT", "ROLE_OPERATOR"]}
+                  >
                     <AgentPanel />
                   </RoleBasedRoute>
                 }
@@ -80,6 +83,14 @@ const App = () => (
                 element={
                   <RoleBasedRoute allowedRoles={["ROLE_ADMIN"]}>
                     <AdminPanel />
+                  </RoleBasedRoute>
+                }
+              />
+              <Route
+                path="/maps"
+                element={
+                  <RoleBasedRoute allowedRoles={["ROLE_ADMIN"]}>
+                    <PharmacyMaps />
                   </RoleBasedRoute>
                 }
               />
