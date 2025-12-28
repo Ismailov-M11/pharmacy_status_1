@@ -298,13 +298,32 @@ export default function PharmacyMaps() {
     });
   };
 
-  const toggleFullscreen = () => {
-    if (!isFullscreen) {
-      mapRef.current?.requestFullscreen?.();
-      setIsFullscreen(true);
-    } else {
-      document.exitFullscreen?.();
-      setIsFullscreen(false);
+  const toggleFullscreen = async () => {
+    if (!mapRef.current) return;
+
+    try {
+      if (!isFullscreen) {
+        // Request fullscreen
+        if (mapRef.current.requestFullscreen) {
+          await mapRef.current.requestFullscreen();
+          setIsFullscreen(true);
+        } else if ((mapRef.current as any).webkitRequestFullscreen) {
+          await (mapRef.current as any).webkitRequestFullscreen();
+          setIsFullscreen(true);
+        }
+      } else {
+        // Exit fullscreen
+        if (document.fullscreenElement) {
+          await document.exitFullscreen();
+          setIsFullscreen(false);
+        } else if ((document as any).webkitFullscreenElement) {
+          await (document as any).webkitExitFullscreen();
+          setIsFullscreen(false);
+        }
+      }
+    } catch (error) {
+      console.error("Fullscreen toggle failed:", error);
+      toast.error("Не удалось переключить полноэкранный режим");
     }
   };
 
