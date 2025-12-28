@@ -49,9 +49,13 @@ export default function PharmacyMaps() {
     PharmacyWithCoords[]
   >([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [activeFilter, setActiveFilter] = useState<
-    "all" | "active" | "inactive"
-  >("active");
+
+  // Advanced Filter States
+  const [filterTelegram, setFilterTelegram] = useState<"all" | "yes" | "no">("all");
+  const [filterPacket, setFilterPacket] = useState<"all" | "yes" | "no">("all");
+  const [filterTraining, setFilterTraining] = useState<"all" | "yes" | "no">("all");
+  const [filterStatus, setFilterStatus] = useState<"all" | "active" | "inactive">("all");
+
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedPharmacy, setSelectedPharmacy] =
     useState<PharmacyWithCoords | null>(null);
@@ -138,23 +142,36 @@ export default function PharmacyMaps() {
 
       const response = await getPharmacyList(token!, "", 0, null);
       const pharmacyList = response.payload?.list || [];
-      console.log(`Fetched ${pharmacyList.length} pharmacies`);
+      console.log(`Fetched ${pharmacyList.length} pharmacies, loading statuses...`);
 
-      // Don't wait for statuses - just show pharmacies on map
-      // Statuses will be loaded when user clicks on a pharmacy
-      const pharmaciesWithDefaults = pharmacyList.map((pharmacy) => ({
-        ...pharmacy,
-        training: false,
-        brandedPacket: false,
-      }));
+      // Fetch status for ALL pharmacies to validation filters
+      // We chunk requests to avoid overwhelming the browser/server if list is huge
+      const pharmaciesWithStatus = await Promise.all(
+        pharmacyList.map(async (pharmacy) => {
+          try {
+            const status = await getPharmacyStatus(pharmacy.id);
+            return {
+              ...pharmacy,
+              training: status.training,
+              brandedPacket: status.brandedPacket,
+            };
+          } catch {
+            return {
+              ...pharmacy,
+              training: false,
+              brandedPacket: false,
+            };
+          }
+        })
+      );
 
-      setPharmacies(pharmaciesWithDefaults);
-      applyFilter(pharmaciesWithDefaults, activeFilter);
-
-      // Map will be updated by the useEffect that watches filteredPharmacies
+      setPharmacies(pharmaciesWithStatus);
+      // Initial apply - pass empty/default for everything, but applyFilter uses state
+      // We need to call applyFilter with the new list
+      setFilteredPharmacies(pharmaciesWithStatus);
 
       console.log(
-        `Successfully loaded ${pharmaciesWithDefaults.length} pharmacies on map`,
+        `Successfully loaded ${pharmaciesWithStatus.length} pharmacies with status`,
       );
     } catch (error) {
       console.error("Failed to fetch pharmacies:", error);
@@ -200,6 +217,11 @@ export default function PharmacyMaps() {
                 <div style="font-size: 12px; margin-bottom: 4px;"><strong>Адрес:</strong> ${pharmacy.address}</div>
                 <div style="font-size: 12px; margin-bottom: 4px;"><strong>Статус:</strong> <span style="color: ${pharmacy.active ? "#059669" : "#d97706"}">${pharmacy.active ? "Активна" : "Неактивна"}</span></div>
                 ${pharmacy.phone ? `<div style="font-size: 12px;"><strong>Телефон:</strong> <a href="tel:${pharmacy.phone}" style="color: #2563eb;">${pharmacy.phone}</a></div>` : ""}
+                 <div style="margin-top: 8px; border-top: 1px solid #eee; padding-top: 8px; display: flex; gap: 8px; flex-wrap: wrap;">
+                    ${pharmacy.marketChats?.length ? '<span style="background: #e0f2fe; color: #0284c7; padding: 2px 6px; border-radius: 4px; font-size: 10px;">Telegram</span>' : ''}
+                    ${pharmacy.brandedPacket ? '<span style="background: #fdf4ff; color: #9333ea; padding: 2px 6px; border-radius: 4px; font-size: 10px;">Пакет</span>' : ''}
+                    ${pharmacy.training ? '<span style="background: #f0fdf4; color: #16a34a; padding: 2px 6px; border-radius: 4px; font-size: 10px;">Обучение</span>' : ''}
+                 </div>
               </div>
             `,
           },
@@ -208,9 +230,7 @@ export default function PharmacyMaps() {
           }
         );
 
-        placemark.events.add("click", () => {
-          handlePharmacyClick(pharmacy);
-        });
+        // Click listener removed - balloon will open automatically
 
         collection.add(placemark);
       });
@@ -408,21 +428,12 @@ export default function PharmacyMaps() {
 
   const applyFilter = (
     pharmaciesToFilter: PharmacyWithCoords[],
-    filter: "all" | "active" | "inactive",
-    search: string = searchQuery,
   ) => {
     let filtered = pharmaciesToFilter;
 
-    // Apply status filter
-    if (filter === "active") {
-      filtered = pharmaciesToFilter.filter((p) => p.active);
-    } else if (filter === "inactive") {
-      filtered = pharmaciesToFilter.filter((p) => !p.active);
-    }
-
-    // Apply search filter
-    if (search.trim()) {
-      const query = search.toLowerCase();
+    // Filter: Search
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
       filtered = filtered.filter(
         (p) =>
           p.name.toLowerCase().includes(query) ||
@@ -432,17 +443,81 @@ export default function PharmacyMaps() {
       );
     }
 
+    // Filter: Status
+    if (filterStatus === "active") {
+      filtered = filtered.filter((p) => p.active);
+    } else if (filterStatus === "inactive") {
+      filtered = filtered.filter((p) => !p.active);
+    }
+
+    // Filter: Telegram Bot
+    if (filterTelegram === "yes") {
+      filtered = filtered.filter((p) => p.marketChats && p.marketChats.length > 0);
+    } else if (filterTelegram === "no") {
+      filtered = filtered.filter((p) => !p.marketChats || p.marketChats.length === 0);
+    }
+
+    // Filter: Packet
+    if (filterPacket === "yes") {
+      filtered = filtered.filter((p) => p.brandedPacket);
+    } else if (filterPacket === "no") {
+      filtered = filtered.filter((p) => !p.brandedPacket);
+    }
+
+    // Filter: Training
+    if (filterTraining === "yes") {
+      filtered = filtered.filter((p) => p.training);
+    } else if (filterTraining === "no") {
+      filtered = filtered.filter((p) => !p.training);
+    }
+
     setFilteredPharmacies(filtered);
   };
 
-  const handleFilterChange = (filter: "all" | "active" | "inactive") => {
-    setActiveFilter(filter);
-    applyFilter(pharmacies, filter, searchQuery);
-  };
+  // Effect to re-apply filters when any filter state changes
+  useEffect(() => {
+    applyFilter(pharmacies);
+  }, [pharmacies, filterStatus, filterTelegram, filterPacket, filterTraining, searchQuery]);
 
-  const handleSearchChange = (query: string) => {
-    setSearchQuery(query);
-    applyFilter(pharmacies, activeFilter, query);
+
+  // Helper component for Filter Cell
+  const FilterCell = ({
+    title,
+    value,
+    onChange
+  }: {
+    title: string;
+    value: "all" | "yes" | "no" | "active" | "inactive";
+    onChange: (v: any) => void
+  }) => {
+    // Logic for Status (3 options) vs others
+    const isStatus = title === "Статус";
+
+    return (
+      <div className="flex flex-col gap-1 min-w-[100px]">
+        <span className="text-[10px] uppercase font-bold text-gray-400 tracking-wider pl-1">{title}</span>
+        <div className="flex flex-col gap-0.5">
+          <button
+            onClick={() => onChange("all")}
+            className={`text-xs px-2 py-1 rounded text-left transition-colors ${value === "all" ? "bg-gray-100 text-gray-900 font-medium" : "text-gray-500 hover:bg-gray-50"}`}
+          >
+            {t.all || "Все"}
+          </button>
+          <button
+            onClick={() => onChange(isStatus ? "active" : "yes")}
+            className={`text-xs px-2 py-1 rounded text-left transition-colors ${value === (isStatus ? "active" : "yes") ? "bg-emerald-50 text-emerald-700 font-medium" : "text-gray-500 hover:bg-gray-50"}`}
+          >
+            {isStatus ? (t.active || "Активные") : (t.yes || "Есть")}
+          </button>
+          <button
+            onClick={() => onChange(isStatus ? "inactive" : "no")}
+            className={`text-xs px-2 py-1 rounded text-left transition-colors ${value === (isStatus ? "inactive" : "no") ? "bg-amber-50 text-amber-700 font-medium" : "text-gray-500 hover:bg-gray-50"}`}
+          >
+            {isStatus ? (t.inactive || "Неактивные") : (t.no || "Нет")}
+          </button>
+        </div>
+      </div>
+    );
   };
 
   // Update map when filter or search changes
@@ -477,33 +552,36 @@ export default function PharmacyMaps() {
             </p>
           </div>
 
-          {/* Search & Filter */}
-          <div className="p-4 border-b border-gray-200 bg-gray-50 shrink-0 gap-2 flex flex-col">
-            <div className="flex gap-2">
-              <Input
-                placeholder={`${t.pharmacyName || "Поиск"}...`}
-                value={searchQuery}
-                onChange={(e) => handleSearchChange(e.target.value)}
-                className="flex-1 bg-white"
-              />
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="outline" size="icon" className="shrink-0 bg-white">
-                    <ChevronDown className="h-4 w-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuRadioGroup value={activeFilter} onValueChange={(v: any) => handleFilterChange(v)}>
-                    <DropdownMenuRadioItem value="all">{t.all || "Все"}</DropdownMenuRadioItem>
-                    <DropdownMenuRadioItem value="active">{t.active || "Активные"}</DropdownMenuRadioItem>
-                    <DropdownMenuRadioItem value="inactive">{t.inactive || "Неактивные"}</DropdownMenuRadioItem>
-                  </DropdownMenuRadioGroup>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
+          {/* Search & Filter Grid */}
+          <div className="p-4 border-b border-gray-200 bg-white shrink-0 gap-4 flex flex-col shadow-sm z-20">
+            <Input
+              placeholder={`${t.pharmacyName || "Поиск аптеки"}...`}
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)} // State update triggers effect
+              className="w-full bg-gray-50 border-gray-200 focus:bg-white transition-colors"
+            />
 
-            <div className="flex gap-2 text-xs">
-              {/* Filter buttons removed as per request */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2 border-t border-gray-100">
+              <FilterCell
+                title="Telegram Bot"
+                value={filterTelegram}
+                onChange={setFilterTelegram}
+              />
+              <FilterCell
+                title="Пакет"
+                value={filterPacket}
+                onChange={setFilterPacket}
+              />
+              <FilterCell
+                title="Обучение"
+                value={filterTraining}
+                onChange={setFilterTraining}
+              />
+              <FilterCell
+                title="Статус"
+                value={filterStatus}
+                onChange={setFilterStatus}
+              />
             </div>
           </div>
 
@@ -540,13 +618,14 @@ export default function PharmacyMaps() {
         </div>
 
         {/* Right Panel - Map */}
-        <div className="flex-1 relative bg-gray-200 h-full min-h-0">
+        <div className="flex-1 relative bg-gray-100 min-h-[400px] lg:h-full lg:min-h-0 order-last lg:order-none">
           <div ref={containerRef} className="absolute inset-0 w-full h-full" />
           {isLoading && (
             <div className="absolute inset-0 bg-white/80 z-20 flex items-center justify-center backdrop-blur-sm">
               <div className="flex flex-col items-center">
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600 mb-2"></div>
                 <span className="text-sm font-medium text-gray-600">Загрузка карты...</span>
+                <span className="text-xs text-gray-400 mt-1">Получение статусов...</span>
               </div>
             </div>
           )}
