@@ -163,6 +163,11 @@ export const translations = {
     agentPanel: "Agent paneli",
     operatorPanel: "Call-markaz operatori paneli",
     adminPanel: "Admin paneli",
+    maps: "Xaritalar",
+    pharmacyMap: "Dorixonalarni xaritada ko'rsatish",
+    pharmacies: "Dorixonalar",
+    all: "Barchasi",
+    action: "Harakat",
 
     // Actions
     edit: "Tahrirlash",
