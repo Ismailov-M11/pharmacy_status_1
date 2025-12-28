@@ -212,51 +212,61 @@ export default function PharmacyMaps() {
       return;
     }
 
-    window.ymaps
-      .geocode(pharmacy.address, {
-        results: 1,
-        boundedBy: [[39.5, 68.5], [42.5, 70.5]], // Tashkent region bounds
-        format: "json"
-      })
-      .then((result: any) => {
-        try {
-          if (result && result.geoObjects && result.geoObjects.getLength && result.geoObjects.getLength() > 0) {
-            const geoObject = result.geoObjects.get(0);
-            const coords = geoObject.geometry.getCoordinates();
-            
-            if (coords && Array.isArray(coords) && coords.length === 2) {
-              const updatedPharmacy: PharmacyWithCoords = {
-                ...pharmacy,
-                latitude: coords[0],
-                longitude: coords[1]
-              };
+    try {
+      window.ymaps
+        .geocode(pharmacy.address, {
+          results: 1,
+          boundedBy: [[39.5, 68.5], [42.5, 70.5]], // Tashkent region bounds
+          format: "json"
+        })
+        .then((result: any) => {
+          try {
+            if (result && result.geoObjects && result.geoObjects.getLength && result.geoObjects.getLength() > 0) {
+              const geoObject = result.geoObjects.get(0);
+              const coords = geoObject.geometry.getCoordinates();
 
-              // Update pharmacy with coordinates
-              setPharmacies((prev) =>
-                prev.map((p) => (p.id === pharmacy.id ? updatedPharmacy : p))
-              );
-              setFilteredPharmacies((prev) =>
-                prev.map((p) => (p.id === pharmacy.id ? updatedPharmacy : p))
-              );
+              if (coords && Array.isArray(coords) && coords.length === 2) {
+                const updatedPharmacy: PharmacyWithCoords = {
+                  ...pharmacy,
+                  latitude: coords[0],
+                  longitude: coords[1]
+                };
 
-              // Remove old placemark and add new one
-              mapRef.current.geoObjects.removeAll();
-              addPlacemarks(
-                pharmacies.map((p) => (p.id === pharmacy.id ? updatedPharmacy : p))
-              );
+                // Update pharmacy with coordinates
+                setPharmacies((prev) =>
+                  prev.map((p) => (p.id === pharmacy.id ? updatedPharmacy : p))
+                );
+                setFilteredPharmacies((prev) =>
+                  prev.map((p) => (p.id === pharmacy.id ? updatedPharmacy : p))
+                );
 
-              console.log(`✓ Geocoded: ${pharmacy.name} → [${coords[0].toFixed(4)}, ${coords[1].toFixed(4)}]`);
+                // Rebuild all placemarks with updated coordinates
+                if (mapRef.current) {
+                  mapRef.current.geoObjects.removeAll();
+                  setPharmacies((prevPharmacies) => {
+                    const updated = prevPharmacies.map((p) =>
+                      p.id === pharmacy.id ? updatedPharmacy : p
+                    );
+                    addPlacemarks(updated);
+                    return updated;
+                  });
+                }
+
+                console.log(`✓ Geocoded: ${pharmacy.name} → [${coords[0].toFixed(4)}, ${coords[1].toFixed(4)}]`);
+              }
+            } else {
+              console.log(`⚠ No geocoding result for: ${pharmacy.name}`);
             }
-          } else {
-            console.log(`No geocoding result for: ${pharmacy.name}`);
+          } catch (parseError) {
+            console.warn(`Error parsing geocode result for ${pharmacy.name}:`, parseError);
           }
-        } catch (parseError) {
-          console.error(`Error parsing geocode result for ${pharmacy.name}:`, parseError);
-        }
-      })
-      .catch((error: any) => {
-        console.warn(`Geocoding failed for "${pharmacy.name}":`, error?.message || error);
-      });
+        })
+        .catch((error: any) => {
+          console.warn(`Geocoding skipped for "${pharmacy.name}" - using default location`);
+        });
+    } catch (error) {
+      console.warn(`Geocoding unavailable for "${pharmacy.name}":`, error);
+    }
   };
 
   const handlePharmacyClick = async (pharmacy: PharmacyWithCoords) => {
