@@ -189,10 +189,22 @@ export default function PharmacyMaps() {
 
     try {
       setIsLoadingHistory(true);
-      const history = await getStatusHistory(pharmacy.id);
+      const [status, history] = await Promise.all([
+        getPharmacyStatus(pharmacy.id),
+        getStatusHistory(pharmacy.id)
+      ]);
+
+      // Update pharmacy with backend status
+      setSelectedPharmacy(prev => prev ? {
+        ...prev,
+        training: status.training,
+        brandedPacket: status.brandedPacket
+      } : null);
+
       setChangeHistory(history);
     } catch (error) {
-      console.error("Failed to fetch history:", error);
+      console.error("Failed to fetch pharmacy status/history:", error);
+      setChangeHistory([]);
     } finally {
       setIsLoadingHistory(false);
     }
