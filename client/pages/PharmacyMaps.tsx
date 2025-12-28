@@ -134,24 +134,23 @@ export default function PharmacyMaps() {
     }
   };
 
-  const geocodeAndPlaceMarker = async (pharmacy: Pharmacy) => {
+  const geocodeAndPlaceMarker = (pharmacy: Pharmacy) => {
     if (!window.ymaps || !mapInstanceRef.current) return;
 
-    try {
-      const geocoder = window.ymaps.geocode(pharmacy.address);
-      const result = await geocoder;
-
+    window.ymaps.geocode(pharmacy.address, { results: 1 }).then((result: any) => {
       if (result.geoObjects.length > 0) {
-        const firstGeoObject = result.geoObjects.get(0) as GeoObject;
-        const coords = firstGeoObject.geometry.getCoordinates() as [number, number];
-        
+        const firstGeoObject = result.geoObjects.get(0);
+        const coords = firstGeoObject.geometry.getCoordinates();
         placeMarker(pharmacy, coords);
+      } else {
+        // Place marker at default location if geocoding fails
+        placeMarker(pharmacy, [41.2995, 69.2401]);
       }
-    } catch (error) {
+    }).catch((error: Error) => {
       console.error(`Failed to geocode address for ${pharmacy.name}:`, error);
       // Place marker at default location if geocoding fails
       placeMarker(pharmacy, [41.2995, 69.2401]);
-    }
+    });
   };
 
   const placeMarker = (pharmacy: Pharmacy, coords: [number, number]) => {
