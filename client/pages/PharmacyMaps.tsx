@@ -284,14 +284,17 @@ export default function PharmacyMaps() {
     });
     markersRef.current = [];
 
-    const markersToShow = activeFilter === "all" 
-      ? pharmacies 
-      : activeFilter === "active" 
+    const markersToShow = activeFilter === "all"
+      ? pharmacies
+      : activeFilter === "active"
         ? pharmacies.filter(p => p.active)
         : pharmacies.filter(p => !p.active);
 
-    markersToShow.forEach(pharmacy => {
-      geocodeAndPlaceMarker(pharmacy);
+    // Add small delay between geocoding requests to avoid rate limiting
+    markersToShow.forEach((pharmacy, index) => {
+      setTimeout(() => {
+        geocodeAndPlaceMarker(pharmacy);
+      }, index * 100);
     });
   };
 
