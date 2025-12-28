@@ -412,13 +412,27 @@ export default function PharmacyMaps() {
   const applyFilter = (
     pharmaciesToFilter: PharmacyWithCoords[],
     filter: "all" | "active" | "inactive",
+    search: string = searchQuery,
   ) => {
     let filtered = pharmaciesToFilter;
 
+    // Apply status filter
     if (filter === "active") {
       filtered = pharmaciesToFilter.filter((p) => p.active);
     } else if (filter === "inactive") {
       filtered = pharmaciesToFilter.filter((p) => !p.active);
+    }
+
+    // Apply search filter
+    if (search.trim()) {
+      const query = search.toLowerCase();
+      filtered = filtered.filter(
+        (p) =>
+          p.name.toLowerCase().includes(query) ||
+          p.address.toLowerCase().includes(query) ||
+          p.code.toLowerCase().includes(query) ||
+          (p.phone && p.phone.includes(query)),
+      );
     }
 
     setFilteredPharmacies(filtered);
@@ -426,7 +440,12 @@ export default function PharmacyMaps() {
 
   const handleFilterChange = (filter: "all" | "active" | "inactive") => {
     setActiveFilter(filter);
-    applyFilter(pharmacies, filter);
+    applyFilter(pharmacies, filter, searchQuery);
+  };
+
+  const handleSearchChange = (query: string) => {
+    setSearchQuery(query);
+    applyFilter(pharmacies, activeFilter, query);
   };
 
 
