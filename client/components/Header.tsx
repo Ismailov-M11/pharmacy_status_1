@@ -2,7 +2,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useNavigate, useLocation } from "react-router-dom";
-import { ChevronDown, Globe, Map, Headset, UserCog, LayoutDashboard, LogOut } from "lucide-react";
+import { ChevronDown, Globe, Map, Headset, UserCog, LayoutDashboard, LogOut, User } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
