@@ -33,7 +33,35 @@ export function Header() {
           </div>
         </div>
 
-        <div className="flex items-center gap-6">
+        <div className="flex items-center gap-3 sm:gap-6">
+          {(location.pathname === '/admin' || location.pathname === '/maps') && (
+            <div className="flex items-center gap-2">
+              <Button
+                onClick={() => navigate('/admin')}
+                variant={location.pathname === '/admin' ? 'default' : 'outline'}
+                className={`text-sm ${
+                  location.pathname === '/admin'
+                    ? 'bg-purple-700 hover:bg-purple-800 text-white'
+                    : 'text-purple-700 border-purple-700 hover:bg-purple-50'
+                }`}
+              >
+                {t.adminPanel || "Админ"}
+              </Button>
+              <Button
+                onClick={() => navigate('/maps')}
+                variant={location.pathname === '/maps' ? 'default' : 'outline'}
+                className={`text-sm gap-2 ${
+                  location.pathname === '/maps'
+                    ? 'bg-purple-700 hover:bg-purple-800 text-white'
+                    : 'text-purple-700 border-purple-700 hover:bg-purple-50'
+                }`}
+              >
+                <Map className="h-4 w-4" />
+                {t.maps || "Карты"}
+              </Button>
+            </div>
+          )}
+
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="icon" className="text-gray-600 hover:text-purple-700">
@@ -53,7 +81,7 @@ export function Header() {
           <Button
             onClick={handleLogout}
             variant="outline"
-            className="text-purple-700 border-purple-700 hover:bg-purple-50 hover:text-purple-700"
+            className="text-purple-700 border-purple-700 hover:bg-purple-50 hover:text-purple-700 text-sm"
           >
             {t.logout}
           </Button>
