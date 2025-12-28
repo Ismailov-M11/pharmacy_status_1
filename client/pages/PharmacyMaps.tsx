@@ -225,7 +225,12 @@ export default function PharmacyMaps() {
     // Use OpenStreetMap Nominatim API (free, no authentication required)
     const query = encodeURIComponent(`${pharmacy.address}, Tashkent, Uzbekistan`);
 
-    fetch(`https://nominatim.openstreetmap.org/search?q=${query}&format=json&limit=1`)
+    fetch(`https://nominatim.openstreetmap.org/search?q=${query}&format=json&limit=1`, {
+      headers: {
+        'Accept': 'application/json',
+        'User-Agent': 'PharmacyMap/1.0'
+      }
+    })
       .then((response) => {
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
@@ -235,9 +240,12 @@ export default function PharmacyMaps() {
       .then((data: any) => {
         if (Array.isArray(data) && data.length > 0) {
           const result = data[0];
-          const coords: [number, number] = [parseFloat(result.lat), parseFloat(result.lon)];
+          const lat = parseFloat(result.lat);
+          const lon = parseFloat(result.lon);
 
-          if (coords && coords.length === 2 && !isNaN(coords[0]) && !isNaN(coords[1])) {
+          if (!isNaN(lat) && !isNaN(lon)) {
+            const coords: [number, number] = [lat, lon];
+
             // Remove old marker and place new one with correct coordinates
             const oldMarker = markersRef.current.get(pharmacy.id);
             if (oldMarker) {
@@ -249,14 +257,14 @@ export default function PharmacyMaps() {
             }
 
             placeMarker(pharmacy, coords);
-            console.log(`✓ Geocoded: ${pharmacy.name} → [${coords[0].toFixed(4)}, ${coords[1].toFixed(4)}]`);
+            console.log(`✓ Geocoded: ${pharmacy.name} → [${lat.toFixed(4)}, ${lon.toFixed(4)}]`);
           }
         } else {
-          console.log(`No geocoding result found for: ${pharmacy.name}`);
+          console.log(`⚠ No location found for: ${pharmacy.name}`);
         }
       })
       .catch((error: any) => {
-        console.warn(`Geocoding failed for "${pharmacy.name}" (${pharmacy.address}):`, error?.message || error);
+        console.warn(`Geocoding unavailable for "${pharmacy.name}":`, error?.message || error);
         // Marker remains at default location - this is acceptable
       });
   };
