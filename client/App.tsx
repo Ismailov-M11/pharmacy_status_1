@@ -12,6 +12,8 @@ import Login from "./pages/Login";
 import AgentPanel from "./pages/AgentPanel";
 import AdminPanel from "./pages/AdminPanel";
 import PharmacyMaps from "./pages/PharmacyMaps";
+import PharmaciesActivity from "./pages/PharmaciesActivity";
+import NewPharmacies from "./pages/NewPharmacies";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
