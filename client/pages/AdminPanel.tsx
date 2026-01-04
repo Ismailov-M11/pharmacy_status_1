@@ -126,22 +126,12 @@ export default function AdminPanel() {
       // Fetch statuses from local backend for all pharmacies
       const pharmaciesWithStatuses = await Promise.all(
         pharmacyList.map(async (pharmacy) => {
-          try {
-            const status = await getPharmacyStatus(pharmacy.id);
-            return {
-              ...pharmacy,
-              training: status.training,
-              brandedPacket: status.brandedPacket
-            };
-          } catch (error) {
-            // If status not found, use defaults
-            console.warn(`Failed to fetch status for pharmacy ${pharmacy.id}:`, error);
-            return {
-              ...pharmacy,
-              training: false,
-              brandedPacket: false
-            };
-          }
+          const status = await getPharmacyStatus(pharmacy.id);
+          return {
+            ...pharmacy,
+            training: status.training,
+            brandedPacket: status.brandedPacket
+          };
         })
       );
 
