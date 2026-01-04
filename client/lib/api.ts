@@ -181,48 +181,27 @@ export async function getPharmacyStatus(
   pharmacyId: number,
 ): Promise<PharmacyStatus> {
   try {
-    // Set timeout for request (5 seconds for status endpoint)
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 5000);
+    const response = await fetch(`${STATUS_API_BASE_URL}/${pharmacyId}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
 
-    try {
-      const response = await fetch(`${STATUS_API_BASE_URL}/${pharmacyId}`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        signal: controller.signal,
-      });
-
-      clearTimeout(timeoutId);
-
-      if (!response.ok) {
-        console.warn(
-          `Status API returned ${response.status} for pharmacy ${pharmacyId}`,
-        );
-        // Return default values instead of throwing
-        return {
-          pharmacy_id: String(pharmacyId),
-          training: false,
-          brandedPacket: false,
-          updated_at: new Date().toISOString(),
-        };
-      }
-
-      return response.json();
-    } catch (error) {
-      clearTimeout(timeoutId);
-      throw error;
-    }
-  } catch (error) {
-    // If backend is unavailable or timeout, return default values silently
-    const errorMsg = error instanceof Error ? error.message : String(error);
-    if (errorMsg !== "AbortError") {
-      console.debug(
-        `Backend status service unavailable for pharmacy ${pharmacyId}:`,
-        error,
+    if (!response.ok) {
+      console.warn(
+        `Status API returned ${response.status} for pharmacy ${pharmacyId}`,
       );
+      throw new Error("Failed to fetch pharmacy status");
     }
+
+    return response.json();
+  } catch (error) {
+    // If backend is unavailable, return default values
+    console.warn(
+      `Backend status service unavailable for pharmacy ${pharmacyId}:`,
+      error,
+    );
     return {
       pharmacy_id: String(pharmacyId),
       training: false,
