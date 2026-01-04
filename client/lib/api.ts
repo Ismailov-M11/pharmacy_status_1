@@ -298,30 +298,18 @@ export async function getStatusHistory(
 
 export async function deleteHistoryRecord(id: number): Promise<void> {
   try {
-    // Set timeout for request (5 seconds)
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 5000);
+    const response = await fetch(`${STATUS_API_BASE_URL}/history/${id}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
 
-    try {
-      const response = await fetch(`${STATUS_API_BASE_URL}/history/${id}`, {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        signal: controller.signal,
-      });
-
-      clearTimeout(timeoutId);
-
-      if (!response.ok) {
-        console.warn(
-          `Failed to delete history record ${id}, status: ${response.status}`,
-        );
-        throw new Error("Failed to delete history record");
-      }
-    } catch (error) {
-      clearTimeout(timeoutId);
-      throw error;
+    if (!response.ok) {
+      console.warn(
+        `Failed to delete history record ${id}, status: ${response.status}`,
+      );
+      throw new Error("Failed to delete history record");
     }
   } catch (error) {
     // Log the error but don't crash
