@@ -301,30 +301,45 @@ export async function getStatusHistory(
   pharmacyId: number,
 ): Promise<StatusHistoryRecord[]> {
   try {
-    const response = await fetch(
-      `${STATUS_API_BASE_URL}/history/${pharmacyId}`,
-      {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
+    // Set timeout for request (5 seconds for status endpoint)
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000);
+
+    try {
+      const response = await fetch(
+        `${STATUS_API_BASE_URL}/history/${pharmacyId}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          signal: controller.signal,
         },
-      },
-    );
-
-    if (!response.ok) {
-      console.warn(
-        `Status history API returned ${response.status} for pharmacy ${pharmacyId}`,
       );
-      throw new Error("Failed to fetch status history");
-    }
 
-    return response.json();
+      clearTimeout(timeoutId);
+
+      if (!response.ok) {
+        console.debug(
+          `Status history API returned ${response.status} for pharmacy ${pharmacyId}`,
+        );
+        return [];
+      }
+
+      return response.json();
+    } catch (error) {
+      clearTimeout(timeoutId);
+      throw error;
+    }
   } catch (error) {
     // If backend is unavailable, return empty history
-    console.warn(
-      `Failed to fetch status history for pharmacy ${pharmacyId}:`,
-      error,
-    );
+    const errorMsg = error instanceof Error ? error.message : String(error);
+    if (errorMsg !== "AbortError") {
+      console.debug(
+        `Failed to fetch status history for pharmacy ${pharmacyId}:`,
+        error,
+      );
+    }
     return [];
   }
 }
