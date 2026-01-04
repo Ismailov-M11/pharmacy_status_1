@@ -217,7 +217,7 @@ export interface NewPharmaciesResponse {
 function filterActivityByDateRange(
   events: ActivityEvent[],
   fromDate: Date,
-  toDate: Date
+  toDate: Date,
 ): ActivityEvent[] {
   return events.filter((event) => {
     const eventDate = new Date(event.time);
@@ -228,7 +228,7 @@ function filterActivityByDateRange(
 function filterNewPharmaciesByDateRange(
   items: NewPharmacy[],
   fromDate: Date,
-  toDate: Date
+  toDate: Date,
 ): NewPharmacy[] {
   return items.filter((item) => {
     const itemDate = new Date(item.onboardedAt);
@@ -239,7 +239,7 @@ function filterNewPharmaciesByDateRange(
 // Fetch activity data
 export async function fetchActivityData(
   fromDate: Date,
-  toDate: Date
+  toDate: Date,
 ): Promise<ActivityResponse> {
   const apiUrl = import.meta.env.VITE_API_URL;
 
@@ -248,7 +248,7 @@ export async function fetchActivityData(
       const from = fromDate.toISOString().split("T")[0];
       const to = toDate.toISOString().split("T")[0];
       const response = await fetch(
-        `${apiUrl}/reports/activity?from=${from}&to=${to}`
+        `${apiUrl}/reports/activity?from=${from}&to=${to}`,
       );
       if (!response.ok) throw new Error("API failed");
       return response.json();
@@ -261,7 +261,7 @@ export async function fetchActivityData(
   const filteredEvents = filterActivityByDateRange(
     mockActivityData.events,
     fromDate,
-    toDate
+    toDate,
   );
 
   const summary = {
@@ -278,7 +278,7 @@ export async function fetchActivityData(
 // Fetch new pharmacies data
 export async function fetchNewPharmaciesData(
   fromDate: Date,
-  toDate: Date
+  toDate: Date,
 ): Promise<NewPharmaciesResponse> {
   const apiUrl = import.meta.env.VITE_API_URL;
 
@@ -287,7 +287,7 @@ export async function fetchNewPharmaciesData(
       const from = fromDate.toISOString().split("T")[0];
       const to = toDate.toISOString().split("T")[0];
       const response = await fetch(
-        `${apiUrl}/reports/new-pharmacies?from=${from}&to=${to}`
+        `${apiUrl}/reports/new-pharmacies?from=${from}&to=${to}`,
       );
       if (!response.ok) throw new Error("API failed");
       return response.json();
@@ -300,7 +300,7 @@ export async function fetchNewPharmaciesData(
   const filteredItems = filterNewPharmaciesByDateRange(
     mockNewPharmaciesData.items,
     fromDate,
-    toDate
+    toDate,
   );
 
   return {

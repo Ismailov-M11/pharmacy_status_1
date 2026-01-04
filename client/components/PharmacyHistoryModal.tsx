@@ -62,9 +62,7 @@ export function PharmacyHistoryModal({
                 <div className="relative flex-shrink-0 w-8 h-8 flex items-center justify-center">
                   <div
                     className={`w-3 h-3 rounded-full ${
-                      event.type === "ACTIVATED"
-                        ? "bg-green-500"
-                        : "bg-red-500"
+                      event.type === "ACTIVATED" ? "bg-green-500" : "bg-red-500"
                     }`}
                   ></div>
                 </div>

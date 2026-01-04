@@ -20,11 +20,11 @@ export default function PharmaciesActivity() {
 
   const [isLoading, setIsLoading] = useState(true);
   const [data, setData] = useState<ActivityResponse | null>(null);
-  const [selectedEvent, setSelectedEvent] = useState<ActivityEvent | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [fromDate, setFromDate] = useState<Date>(
-    startOfWeek(new Date())
+  const [selectedEvent, setSelectedEvent] = useState<ActivityEvent | null>(
+    null,
   );
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [fromDate, setFromDate] = useState<Date>(startOfWeek(new Date()));
   const [toDate, setToDate] = useState<Date>(endOfDay(new Date()));
 
   useEffect(() => {
@@ -72,7 +72,7 @@ export default function PharmaciesActivity() {
 
   const pharmacyEvents = selectedEvent
     ? data?.events.filter(
-        (e) => e.pharmacyName === selectedEvent.pharmacyName
+        (e) => e.pharmacyName === selectedEvent.pharmacyName,
       ) || []
     : [];
 

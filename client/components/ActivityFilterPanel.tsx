@@ -28,10 +28,10 @@ export function ActivityFilterPanel({
 
   const [preset, setPreset] = useState<DatePreset>("week");
   const [fromDate, setFromDate] = useState<string>(
-    startOfWeek(today).toISOString().split("T")[0]
+    startOfWeek(today).toISOString().split("T")[0],
   );
   const [toDate, setToDate] = useState<string>(
-    endOfDay(today).toISOString().split("T")[0]
+    endOfDay(today).toISOString().split("T")[0],
   );
 
   const getPresetDates = (p: DatePreset): [Date, Date] => {

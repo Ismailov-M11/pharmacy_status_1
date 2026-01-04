@@ -12,7 +12,7 @@ import {
   updatePharmacyStatusLocal,
   getStatusHistory,
   deleteHistoryRecord,
-  StatusHistoryRecord
+  StatusHistoryRecord,
 } from "@/lib/api";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
@@ -131,18 +131,21 @@ export default function AdminPanel() {
             return {
               ...pharmacy,
               training: status.training,
-              brandedPacket: status.brandedPacket
+              brandedPacket: status.brandedPacket,
             };
           } catch (error) {
             // If status not found, use defaults
-            console.warn(`Failed to fetch status for pharmacy ${pharmacy.id}:`, error);
+            console.warn(
+              `Failed to fetch status for pharmacy ${pharmacy.id}:`,
+              error,
+            );
             return {
               ...pharmacy,
               training: false,
-              brandedPacket: false
+              brandedPacket: false,
             };
           }
-        })
+        }),
       );
 
       setPharmacies(pharmaciesWithStatuses);
@@ -164,15 +167,19 @@ export default function AdminPanel() {
     try {
       const [status, history] = await Promise.all([
         getPharmacyStatus(pharmacy.id),
-        getStatusHistory(pharmacy.id)
+        getStatusHistory(pharmacy.id),
       ]);
 
       // Update pharmacy with backend status
-      setSelectedPharmacy(prev => prev ? {
-        ...prev,
-        training: status.training,
-        brandedPacket: status.brandedPacket
-      } : null);
+      setSelectedPharmacy((prev) =>
+        prev
+          ? {
+              ...prev,
+              training: status.training,
+              brandedPacket: status.brandedPacket,
+            }
+          : null,
+      );
 
       setChangeHistory(history);
     } catch (error) {
@@ -204,7 +211,7 @@ export default function AdminPanel() {
         field,
         value,
         comment,
-        user.username
+        user.username,
       );
 
       // Refresh history
@@ -217,7 +224,7 @@ export default function AdminPanel() {
           return {
             ...p,
             training: updatedStatus.training,
-            brandedPacket: updatedStatus.brandedPacket
+            brandedPacket: updatedStatus.brandedPacket,
           };
         }
         return p;
@@ -227,11 +234,13 @@ export default function AdminPanel() {
       setFilteredPharmacies((prev) => prev.map(updatePharmacy));
 
       setSelectedPharmacy((prev) =>
-        prev ? {
-          ...prev,
-          training: updatedStatus.training,
-          brandedPacket: updatedStatus.brandedPacket
-        } : null,
+        prev
+          ? {
+              ...prev,
+              training: updatedStatus.training,
+              brandedPacket: updatedStatus.brandedPacket,
+            }
+          : null,
       );
 
       toast.success(t.saved);
@@ -239,8 +248,10 @@ export default function AdminPanel() {
       console.error("Failed to update pharmacy:", error);
 
       // Check if backend is sleeping (cold start)
-      if (error instanceof Error && error.message === 'BACKEND_SLEEPING') {
-        toast.error("Сервер запускается. Пожалуйста, попробуйте еще раз через 1-2 минуты.");
+      if (error instanceof Error && error.message === "BACKEND_SLEEPING") {
+        toast.error(
+          "Сервер запускается. Пожалуйста, попробуйте еще раз через 1-2 минуты.",
+        );
       } else {
         toast.error(t.error);
       }
@@ -250,10 +261,12 @@ export default function AdminPanel() {
   const handleDeleteHistory = async (ids: number[]) => {
     try {
       // Delete all selected records
-      await Promise.all(ids.map(id => deleteHistoryRecord(id)));
+      await Promise.all(ids.map((id) => deleteHistoryRecord(id)));
 
       // Remove deleted records from state
-      setChangeHistory(prev => prev.filter(record => !ids.includes(record.id)));
+      setChangeHistory((prev) =>
+        prev.filter((record) => !ids.includes(record.id)),
+      );
 
       toast.success(t.deleted || "Deleted");
     } catch (error) {

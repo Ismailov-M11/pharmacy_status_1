@@ -160,7 +160,9 @@ export function ActivityEventsTable({
                         : "bg-red-100 text-red-800"
                     }
                   >
-                    {event.type === "ACTIVATED" ? "✅ Активирована" : "⛔ Деактивирована"}
+                    {event.type === "ACTIVATED"
+                      ? "✅ Активирована"
+                      : "⛔ Деактивирована"}
                   </Badge>
                 </TableCell>
                 <TableCell>{event.district}</TableCell>

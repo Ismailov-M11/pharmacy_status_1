@@ -20,11 +20,9 @@ export default function NewPharmacies() {
   const [isLoading, setIsLoading] = useState(true);
   const [data, setData] = useState<NewPharmaciesResponse | null>(null);
   const [filteredPharmacies, setFilteredPharmacies] = useState<NewPharmacy[]>(
-    []
+    [],
   );
-  const [fromDate, setFromDate] = useState<Date>(
-    startOfMonth(new Date())
-  );
+  const [fromDate, setFromDate] = useState<Date>(startOfMonth(new Date()));
   const [toDate, setToDate] = useState<Date>(endOfMonth(new Date()));
 
   useEffect(() => {
@@ -75,7 +73,7 @@ export default function NewPharmacies() {
         acc[pharmacy.district] = (acc[pharmacy.district] || 0) + 1;
         return acc;
       },
-      {} as Record<string, number>
+      {} as Record<string, number>,
     );
 
     return Object.entries(districtCounts)

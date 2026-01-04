@@ -25,18 +25,18 @@ export function NewPharmaciesFilterPanel({
   const today = new Date();
   const [mode, setMode] = useState<"month" | "range">("month");
   const [selectedMonth, setSelectedMonth] = useState<string>(
-    today.toISOString().slice(0, 7)
+    today.toISOString().slice(0, 7),
   );
   const [compareMonth, setCompareMonth] = useState<string>(
     new Date(today.getFullYear(), today.getMonth() - 1)
       .toISOString()
-      .slice(0, 7)
+      .slice(0, 7),
   );
   const [fromDate, setFromDate] = useState<string>(
-    today.toISOString().split("T")[0]
+    today.toISOString().split("T")[0],
   );
   const [toDate, setToDate] = useState<string>(
-    today.toISOString().split("T")[0]
+    today.toISOString().split("T")[0],
   );
 
   const months = useMemo(() => {
@@ -75,7 +75,7 @@ export function NewPharmaciesFilterPanel({
     setCompareMonth(
       new Date(today.getFullYear(), today.getMonth() - 1)
         .toISOString()
-        .slice(0, 7)
+        .slice(0, 7),
     );
     setFromDate(today.toISOString().split("T")[0]);
     setToDate(today.toISOString().split("T")[0]);
