@@ -155,9 +155,21 @@ export async function updatePharmacyStatus(
 // LOCAL BACKEND API
 // ============================================
 
-// Use environment variable for backend URL, fallback to localhost for development
-const STATUS_API_BASE_URL =
-  import.meta.env.VITE_BACKEND_URL || "http://localhost:5000/api/status";
+// Use environment variable for backend URL, fallback to relative path for development
+const getStatusApiBaseUrl = () => {
+  const backendUrl = import.meta.env.VITE_BACKEND_URL;
+  if (backendUrl) {
+    return backendUrl;
+  }
+  // In development, try localhost first; in production, use relative path
+  if (typeof window !== 'undefined' && window.location.hostname === 'localhost') {
+    return "http://localhost:5000/api/status";
+  }
+  // Fallback to relative path for production
+  return "/api/status";
+};
+
+const STATUS_API_BASE_URL = getStatusApiBaseUrl();
 
 export interface PharmacyStatus {
   pharmacy_id: string;
