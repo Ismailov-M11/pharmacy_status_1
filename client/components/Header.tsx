@@ -147,6 +147,38 @@ export function Header() {
                 </span>
               </Button>
             )}
+
+            {/* Pharmacies Activity Link */}
+            {role === "ROLE_ADMIN" && (
+              <Button
+                onClick={() => navigate("/pharmacies-activity")}
+                variant={location.pathname === "/pharmacies-activity" ? "default" : "outline"}
+                className={`h-10 w-full md:w-auto md:h-9 md:px-3 text-sm justify-center flex-1 md:flex-none transition-colors ${location.pathname === "/pharmacies-activity"
+                  ? "bg-purple-700 hover:bg-purple-800 text-white"
+                  : "text-purple-700 border-purple-700 hover:bg-purple-50 hover:text-purple-700"
+                  }`}
+              >
+                <Activity className="h-5 w-5 md:mr-2 md:h-4 md:w-4" />
+                <span className="hidden md:block">Активности</span>
+                <span className="block md:hidden ml-2">Активности</span>
+              </Button>
+            )}
+
+            {/* New Pharmacies Link */}
+            {role === "ROLE_ADMIN" && (
+              <Button
+                onClick={() => navigate("/new-pharmacies")}
+                variant={location.pathname === "/new-pharmacies" ? "default" : "outline"}
+                className={`h-10 w-full md:w-auto md:h-9 md:px-3 text-sm justify-center flex-1 md:flex-none transition-colors ${location.pathname === "/new-pharmacies"
+                  ? "bg-purple-700 hover:bg-purple-800 text-white"
+                  : "text-purple-700 border-purple-700 hover:bg-purple-50 hover:text-purple-700"
+                  }`}
+              >
+                <Store className="h-5 w-5 md:mr-2 md:h-4 md:w-4" />
+                <span className="hidden md:block">Новые аптеки</span>
+                <span className="block md:hidden ml-2">Новые</span>
+              </Button>
+            )}
           </div>
         </div>
       </div>
