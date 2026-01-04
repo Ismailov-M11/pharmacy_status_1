@@ -98,6 +98,22 @@ const App = () => (
                   </RoleBasedRoute>
                 }
               />
+              <Route
+                path="/pharmacies-activity"
+                element={
+                  <RoleBasedRoute allowedRoles={["ROLE_ADMIN"]}>
+                    <PharmaciesActivity />
+                  </RoleBasedRoute>
+                }
+              />
+              <Route
+                path="/new-pharmacies"
+                element={
+                  <RoleBasedRoute allowedRoles={["ROLE_ADMIN"]}>
+                    <NewPharmacies />
+                  </RoleBasedRoute>
+                }
+              />
               <Route path="/" element={<Navigate to="/login" replace />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
