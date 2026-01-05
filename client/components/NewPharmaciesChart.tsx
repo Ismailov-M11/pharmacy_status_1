@@ -93,6 +93,10 @@ export function NewPharmaciesChart({
   const handleBarClick = (data: ChartDataPoint) => {
     setSelectedDate(data.fullDate);
     onDateClick?.();
+    // Scroll to the selected day panel after a brief delay
+    setTimeout(() => {
+      selectedDayPanelRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+    }, 100);
   };
 
   const handleClosePanel = () => {
