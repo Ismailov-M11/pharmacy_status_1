@@ -184,8 +184,6 @@ export function ActivityEventsTable({
             {sortedEvents.map((event, index) => (
               <TableRow
                 key={event.id}
-                onClick={() => onRowClick?.(event)}
-                className={onRowClick ? "cursor-pointer hover:bg-gray-50" : ""}
               >
                 <TableCell className="text-center text-sm text-gray-500 w-12">
                   {index + 1}
