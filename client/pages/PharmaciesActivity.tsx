@@ -1,11 +1,13 @@
 import { useState, useEffect, useRef, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { Header } from "@/components/Header";
 import { ActivityFilterPanelDropdown } from "@/components/ActivityFilterPanelDropdown";
 import { ActivityChart } from "@/components/ActivityChart";
 import { ActivityEventsTable } from "@/components/ActivityEventsTable";
 import { StatusFilterPanel } from "@/components/StatusFilterPanel";
+import { KpiCard } from "@/components/KpiCard";
 import {
   fetchActivityData,
   ActivityEvent,
@@ -20,6 +22,7 @@ import { format } from "date-fns";
 
 export default function PharmaciesActivity() {
   const { isAuthenticated, isLoading: authLoading } = useAuth();
+  const { t } = useLanguage();
   const navigate = useNavigate();
   const selectedDayRef = useRef<HTMLDivElement>(null);
 
@@ -118,10 +121,10 @@ export default function PharmaciesActivity() {
       <main className="w-full">
         {/* Header Section */}
         <div className="mb-4 sm:mb-8 px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
-          <h1 className="text-3xl font-bold text-gray-900">Активности аптек</h1>
-          <p className="text-gray-600 mt-2">
-            Просмотр активации и деактивации аптек
-          </p>
+          <h1 className="text-3xl font-bold text-gray-900">
+            {t.activitiesTitle}
+          </h1>
+          <p className="text-gray-600 mt-2">{t.activitiesDescription}</p>
         </div>
 
         <div className="px-4 sm:px-6 lg:px-8 pb-8">
@@ -149,6 +152,26 @@ export default function PharmaciesActivity() {
             isLoading={isLoading}
           />
 
+          {/* KPI Cards */}
+          {data && !error && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+              <KpiCard
+                label={`✅ ${t.activated}`}
+                value={
+                  filteredEvents.filter((e) => e.type === "ACTIVATED").length
+                }
+                variant="success"
+              />
+              <KpiCard
+                label={`⛔ ${t.deactivated}`}
+                value={
+                  filteredEvents.filter((e) => e.type === "DEACTIVATED").length
+                }
+                variant="danger"
+              />
+            </div>
+          )}
+
           {/* Status Filter Panel */}
           <StatusFilterPanel
             events={data?.events || []}
@@ -157,10 +180,7 @@ export default function PharmaciesActivity() {
           />
 
           {/* Events Table - Full Month Data */}
-          <ActivityEventsTable
-            events={filteredEvents}
-            isLoading={isLoading}
-          />
+          <ActivityEventsTable events={filteredEvents} isLoading={isLoading} />
 
           {/* Selected Day Events Modal - Centralized Display */}
           {selectedDateFilter && selectedDayEvents.length > 0 && (
@@ -177,7 +197,8 @@ export default function PharmaciesActivity() {
                 >
                   <div className="flex items-center justify-between p-6 border-b border-blue-200 bg-blue-50">
                     <h3 className="text-lg font-semibold text-gray-900">
-                      События {format(new Date(selectedDateFilter), "dd.MM.yyyy")}
+                      {t.eventsLabel}{" "}
+                      {format(new Date(selectedDateFilter), "dd.MM.yyyy")}
                     </h3>
                     <button
                       onClick={() => setSelectedDateFilter(null)}
@@ -194,22 +215,22 @@ export default function PharmaciesActivity() {
                       <thead>
                         <tr className="border-b border-blue-200">
                           <th className="text-left py-3 px-3 font-semibold text-gray-700">
-                            №
+                            {t.number}
                           </th>
                           <th className="text-left py-3 px-3 font-semibold text-gray-700">
-                            Код
+                            {t.code}
                           </th>
                           <th className="text-left py-3 px-3 font-semibold text-gray-700">
-                            Название
+                            {t.pharmacyName}
                           </th>
                           <th className="text-left py-3 px-3 font-semibold text-gray-700">
-                            Адрес
+                            {t.address}
                           </th>
                           <th className="text-left py-3 px-3 font-semibold text-gray-700">
-                            Статус
+                            {t.status}
                           </th>
                           <th className="text-left py-3 px-3 font-semibold text-gray-700">
-                            Время
+                            {t.timeLabel}
                           </th>
                         </tr>
                       </thead>

@@ -15,6 +15,7 @@ import { NewPharmacy } from "@/lib/reportsApi";
 import { format, getDaysInMonth, startOfMonth } from "date-fns";
 import { X } from "lucide-react";
 import { ru } from "date-fns/locale";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface NewPharmaciesChartProps {
   pharmacies: NewPharmacy[];
@@ -38,10 +39,12 @@ export function NewPharmaciesChart({
   onDateClick,
   selectedDate = null,
 }: NewPharmaciesChartProps) {
-  // Get month name in Russian
+  const { t, language } = useLanguage();
+  // Get month name in Russian or Uzbek
   const monthName = useMemo(() => {
-    return format(startOfMonth(fromDate), "LLLL yyyy", { locale: ru });
-  }, [fromDate]);
+    const locale = language === "uz" ? undefined : ru;
+    return format(startOfMonth(fromDate), "LLLL yyyy", { locale });
+  }, [fromDate, language]);
 
   const chartData = useMemo(() => {
     // Group pharmacies by date
@@ -124,7 +127,7 @@ export function NewPharmaciesChart({
     return (
       <Card className="p-6 mb-8">
         <h2 className="text-lg font-semibold text-gray-900 mb-4">
-          График новых аптек — {monthName}
+          {t.newPharmaciesChart} — {monthName}
         </h2>
         <div className="flex items-center justify-center h-64">
           <div className="animate-pulse w-full">
@@ -139,10 +142,10 @@ export function NewPharmaciesChart({
     return (
       <Card className="p-6 mb-8">
         <h2 className="text-lg font-semibold text-gray-900 mb-4">
-          График новых аптек — {monthName}
+          {t.newPharmaciesChart} — {monthName}
         </h2>
         <div className="flex items-center justify-center h-64">
-          <span className="text-gray-500">Нет новых аптек за период</span>
+          <span className="text-gray-500">{t.noNewPharmacies}</span>
         </div>
       </Card>
     );
@@ -152,7 +155,7 @@ export function NewPharmaciesChart({
     <div className="mb-8">
       <Card className="p-6">
         <h2 className="text-lg font-semibold text-gray-900 mb-6">
-          График новых аптек — {monthName}
+          {t.newPharmaciesChart} — {monthName}
         </h2>
         <ResponsiveContainer width="100%" height={400}>
           <BarChart
@@ -181,7 +184,7 @@ export function NewPharmaciesChart({
               allowDecimals={false}
               type="number"
               label={{
-                value: "Количество аптек",
+                value: t.graphLabel,
                 angle: -90,
                 position: "insideLeft",
                 offset: 10,
@@ -200,7 +203,7 @@ export function NewPharmaciesChart({
             <Bar
               dataKey="count"
               fill="#a855f7"
-              name="Новые аптеки"
+              name={t.newPharmaciesTitle}
               radius={[4, 4, 0, 0]}
               onClick={(data) => handleBarClick(data as ChartDataPoint)}
             >
@@ -232,7 +235,7 @@ export function NewPharmaciesChart({
             >
               <div className="flex items-center justify-between p-6 border-b border-blue-200 bg-blue-50">
                 <h3 className="text-lg font-semibold text-gray-900">
-                  Аптеки добавлены{" "}
+                  {t.pharmaciesAdded}{" "}
                   {format(new Date(selectedDate), "dd.MM.yyyy")}
                 </h3>
                 <button
@@ -250,22 +253,22 @@ export function NewPharmaciesChart({
                   <thead>
                     <tr className="border-b border-blue-200">
                       <th className="text-left py-3 px-3 font-semibold text-gray-700">
-                        №
+                        {t.number}
                       </th>
                       <th className="text-left py-3 px-3 font-semibold text-gray-700">
-                        Код
+                        {t.code}
                       </th>
                       <th className="text-left py-3 px-3 font-semibold text-gray-700">
-                        Название
+                        {t.pharmacyName}
                       </th>
                       <th className="text-left py-3 px-3 font-semibold text-gray-700">
-                        Адрес
+                        {t.address}
                       </th>
                       <th className="text-left py-3 px-3 font-semibold text-gray-700">
-                        Телефон
+                        {t.phone}
                       </th>
                       <th className="text-left py-3 px-3 font-semibold text-gray-700">
-                        Время
+                        {t.timeLabel}
                       </th>
                     </tr>
                   </thead>

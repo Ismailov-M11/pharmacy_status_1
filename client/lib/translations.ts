@@ -113,6 +113,13 @@ export const translations = {
     year: "Год",
     custom: "Произвольный",
     graphLabel: "Количество аптек",
+    landmark: "Ориентир",
+    onboardedAt: "Дата ввода",
+    noNewPharmaciesSelected: "Нет новых аптек за выбранный период",
+    noActivitiesSelected: "Нет событий за выбранный период",
+    noEvents: "Нет событий",
+    loading_action: "Загрузка...",
+    apply_action: "Применить",
 
     // Actions
     edit: "Редактировать",
@@ -279,6 +286,13 @@ export const translations = {
     year: "Yil",
     custom: "Maxsus",
     graphLabel: "Dorixona soni",
+    landmark: "Mo'ljal",
+    onboardedAt: "Kiritilgan sana",
+    noNewPharmaciesSelected: "Tanlangan davr uchun yangi dorixonalar yo'q",
+    noActivitiesSelected: "Tanlangan davr uchun voqealar yo'q",
+    noEvents: "Voqealar yo'q",
+    loading_action: "Yuklanmoqda...",
+    apply_action: "Qo'llash",
 
     // Actions
     edit: "Tahrirlash",

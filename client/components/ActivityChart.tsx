@@ -13,6 +13,7 @@ import {
 } from "recharts";
 import { ActivityEvent } from "@/lib/reportsApi";
 import { format, parse } from "date-fns";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface ActivityChartProps {
   events: ActivityEvent[];
@@ -38,6 +39,7 @@ export function ActivityChart({
   toDate,
   selectedDate = null,
 }: ActivityChartProps) {
+  const { t } = useLanguage();
 
   const chartData = useMemo(() => {
     // Group events by date
@@ -71,7 +73,9 @@ export function ActivityChart({
     }
 
     // Convert to array - include all days if date range provided
-    const dataArray = (allDays.length > 0 ? allDays : Object.keys(groupedByDate))
+    const dataArray = (
+      allDays.length > 0 ? allDays : Object.keys(groupedByDate)
+    )
       .map((dateStr) => {
         try {
           const dateObj = parse(dateStr, "yyyy-MM-dd", new Date());
@@ -99,7 +103,6 @@ export function ActivityChart({
 
     return dataArray;
   }, [events, fromDate, toDate]);
-
 
   // Calculate smart Y-axis domain based on max value
   const yAxisDomain = useMemo(() => {
@@ -139,7 +142,7 @@ export function ActivityChart({
     return (
       <Card className="p-6 mb-8">
         <h2 className="text-lg font-semibold text-gray-900 mb-4">
-          График активности аптек
+          {t.activitiesChart}
         </h2>
         <div className="flex items-center justify-center h-64">
           <div className="animate-pulse w-full">
@@ -154,10 +157,10 @@ export function ActivityChart({
     return (
       <Card className="p-6 mb-8">
         <h2 className="text-lg font-semibold text-gray-900 mb-4">
-          График активности аптек
+          {t.activitiesChart}
         </h2>
         <div className="flex items-center justify-center h-64">
-          <span className="text-gray-500">Нет событий за выбранный период</span>
+          <span className="text-gray-500">{t.noActivities}</span>
         </div>
       </Card>
     );
@@ -167,7 +170,7 @@ export function ActivityChart({
     <div className="mb-8">
       <Card className="p-6">
         <h2 className="text-lg font-semibold text-gray-900 mb-6">
-          График активности аптек
+          {t.activitiesChart}
           {fromDate && (
             <span className="text-sm font-normal text-gray-600 ml-2">
               ({format(fromDate, "LLLL yyyy")})
@@ -201,7 +204,7 @@ export function ActivityChart({
               allowDecimals={false}
               type="number"
               label={{
-                value: "Количество событий",
+                value: t.eventCount,
                 angle: -90,
                 position: "insideLeft",
                 offset: 10,
@@ -221,7 +224,7 @@ export function ActivityChart({
             <Bar
               dataKey="activated"
               fill="#10b981"
-              name="Активировано"
+              name={t.activated}
               radius={[4, 4, 0, 0]}
               onClick={(data) => handleBarClick(data as ChartDataPoint)}
               style={{ cursor: "pointer" }}
@@ -236,7 +239,7 @@ export function ActivityChart({
             <Bar
               dataKey="deactivated"
               fill="#ef4444"
-              name="Деактивировано"
+              name={t.deactivated}
               radius={[4, 4, 0, 0]}
               onClick={(data) => handleBarClick(data as ChartDataPoint)}
               style={{ cursor: "pointer" }}
@@ -251,7 +254,6 @@ export function ActivityChart({
           </BarChart>
         </ResponsiveContainer>
       </Card>
-
     </div>
   );
 }

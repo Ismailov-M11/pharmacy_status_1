@@ -11,6 +11,7 @@ import { Card } from "@/components/ui/card";
 import { NewPharmacy } from "@/lib/reportsApi";
 import { format } from "date-fns";
 import { ChevronDown, ChevronUp } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface NewPharmaciesTableProps {
   pharmacies: NewPharmacy[];
@@ -31,6 +32,7 @@ export function NewPharmaciesTable({
   pharmacies,
   isLoading = false,
 }: NewPharmaciesTableProps) {
+  const { t } = useLanguage();
   const [sortField, setSortField] = useState<SortField>("code");
   const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
 
@@ -94,7 +96,7 @@ export function NewPharmaciesTable({
     return (
       <Card className="p-6">
         <div className="text-center py-8">
-          <p className="text-gray-500">Нет новых аптек за выбранный период</p>
+          <p className="text-gray-500">{t.noNewPharmaciesSelected}</p>
         </div>
       </Card>
     );
@@ -107,14 +109,14 @@ export function NewPharmaciesTable({
           <TableHeader>
             <TableRow className="bg-gray-50">
               <TableHead className="text-center w-12">
-                <div className="font-semibold text-gray-700">№</div>
+                <div className="font-semibold text-gray-700">{t.number}</div>
               </TableHead>
               <TableHead
                 className="cursor-pointer hover:bg-gray-100"
                 onClick={() => handleSort("code")}
               >
                 <button className="flex items-center font-semibold text-gray-700">
-                  Код
+                  {t.code}
                   <SortIcon field="code" />
                 </button>
               </TableHead>
@@ -123,7 +125,7 @@ export function NewPharmaciesTable({
                 onClick={() => handleSort("pharmacyName")}
               >
                 <button className="flex items-center font-semibold text-gray-700">
-                  Название аптеки
+                  {t.pharmacyName}
                   <SortIcon field="pharmacyName" />
                 </button>
               </TableHead>
@@ -132,7 +134,7 @@ export function NewPharmaciesTable({
                 onClick={() => handleSort("address")}
               >
                 <button className="flex items-center font-semibold text-gray-700">
-                  Адрес
+                  {t.address}
                   <SortIcon field="address" />
                 </button>
               </TableHead>
@@ -141,7 +143,7 @@ export function NewPharmaciesTable({
                 onClick={() => handleSort("landmark")}
               >
                 <button className="flex items-center font-semibold text-gray-700">
-                  Ориентир
+                  {t.landmark}
                   <SortIcon field="landmark" />
                 </button>
               </TableHead>
@@ -150,7 +152,7 @@ export function NewPharmaciesTable({
                 onClick={() => handleSort("phone")}
               >
                 <button className="flex items-center font-semibold text-gray-700">
-                  Телефон аптеки
+                  {t.pharmacyPhone}
                   <SortIcon field="phone" />
                 </button>
               </TableHead>
@@ -159,7 +161,7 @@ export function NewPharmaciesTable({
                 onClick={() => handleSort("responsiblePhone")}
               >
                 <button className="flex items-center font-semibold text-gray-700">
-                  Телефон ответственного
+                  {t.leadPhone}
                   <SortIcon field="responsiblePhone" />
                 </button>
               </TableHead>
@@ -168,7 +170,7 @@ export function NewPharmaciesTable({
                 onClick={() => handleSort("onboardedAt")}
               >
                 <button className="flex items-center font-semibold text-gray-700">
-                  Дата ввода
+                  {t.onboardedAt}
                   <SortIcon field="onboardedAt" />
                 </button>
               </TableHead>

@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { startOfMonth, endOfMonth } from "date-fns";
 import { toast } from "sonner";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface NewPharmaciesFilterPanelDropdownProps {
   onFiltersChange: (
@@ -28,6 +29,7 @@ export function NewPharmaciesFilterPanelDropdown({
   onReset,
   isLoading = false,
 }: NewPharmaciesFilterPanelDropdownProps) {
+  const { t } = useLanguage();
   const today = new Date();
   const [mode, setMode] = useState<"months" | "range">("months");
   const [selectedMonth, setSelectedMonth] = useState<string>(
@@ -127,7 +129,7 @@ export function NewPharmaciesFilterPanelDropdown({
     <Card className="p-4 md:p-6 mb-6">
       <div className="mb-4">
         <label className="text-sm font-medium text-gray-700 block mb-2">
-          Режим фильтра:
+          {t.filterMode}
         </label>
         <Select
           value={mode}
@@ -140,8 +142,8 @@ export function NewPharmaciesFilterPanelDropdown({
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="months">По месяцам</SelectItem>
-            <SelectItem value="range">По периоду</SelectItem>
+            <SelectItem value="months">{t.byMonths}</SelectItem>
+            <SelectItem value="range">{t.byPeriod}</SelectItem>
           </SelectContent>
         </Select>
       </div>
@@ -150,7 +152,7 @@ export function NewPharmaciesFilterPanelDropdown({
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
           <div>
             <label className="text-sm font-medium text-gray-700 block mb-2">
-              Текущий месяц:
+              {t.currentMonth}
             </label>
             <Select value={selectedMonth} onValueChange={setSelectedMonth}>
               <SelectTrigger>
@@ -168,7 +170,7 @@ export function NewPharmaciesFilterPanelDropdown({
 
           <div>
             <label className="text-sm font-medium text-gray-700 block mb-2">
-              Сравнить с:
+              {t.compareTo}
             </label>
             <Select value={compareMonth} onValueChange={setCompareMonth}>
               <SelectTrigger>
@@ -188,7 +190,7 @@ export function NewPharmaciesFilterPanelDropdown({
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
           <div>
             <label className="text-sm font-medium text-gray-700 block mb-2">
-              С:
+              {t.from}
             </label>
             <Input
               type="date"
@@ -202,7 +204,7 @@ export function NewPharmaciesFilterPanelDropdown({
           </div>
           <div>
             <label className="text-sm font-medium text-gray-700 block mb-2">
-              По:
+              {t.to}
             </label>
             <Input
               type="date"
@@ -229,14 +231,14 @@ export function NewPharmaciesFilterPanelDropdown({
           disabled={isLoading || !!validationError}
           className="bg-purple-700 hover:bg-purple-800 text-white flex-1 sm:flex-none"
         >
-          {isLoading ? "Загрузка..." : "Применить"}
+          {isLoading ? t.loading_action : t.apply_action}
         </Button>
         <Button
           onClick={handleReset}
           variant="outline"
           className="border-purple-700 text-purple-700 hover:bg-purple-50 flex-1 sm:flex-none"
         >
-          Сброс
+          {t.reset}
         </Button>
       </div>
     </Card>

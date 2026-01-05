@@ -1,6 +1,7 @@
 import React, { useMemo } from "react";
 import { Card } from "@/components/ui/card";
 import { ActivityEvent } from "@/lib/reportsApi";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface StatusFilterPanelProps {
   events: ActivityEvent[];
@@ -13,6 +14,7 @@ export function StatusFilterPanel({
   selectedStatus,
   onStatusChange,
 }: StatusFilterPanelProps) {
+  const { t } = useLanguage();
   const statusCounts = useMemo(() => {
     return {
       activated: events.filter((e) => e.type === "ACTIVATED").length,
@@ -37,7 +39,7 @@ export function StatusFilterPanel({
       >
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-sm font-medium text-gray-600">Активирована</p>
+            <p className="text-sm font-medium text-gray-600">{t.activated}</p>
             <p className="text-2xl font-bold text-green-700">
               {statusCounts.activated}
             </p>
@@ -57,7 +59,7 @@ export function StatusFilterPanel({
       >
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-sm font-medium text-gray-600">Деактивирована</p>
+            <p className="text-sm font-medium text-gray-600">{t.deactivated}</p>
             <p className="text-2xl font-bold text-red-700">
               {statusCounts.deactivated}
             </p>

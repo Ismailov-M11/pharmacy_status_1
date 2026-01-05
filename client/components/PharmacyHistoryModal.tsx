@@ -8,6 +8,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { ActivityEvent } from "@/lib/reportsApi";
 import { format } from "date-fns";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface PharmacyHistoryModalProps {
   isOpen: boolean;
@@ -25,6 +26,7 @@ export function PharmacyHistoryModal({
   pharmacy,
   events,
 }: PharmacyHistoryModalProps) {
+  const { t } = useLanguage();
   const formatDateTime = (dateString: string) => {
     try {
       return format(new Date(dateString), "dd.MM.yyyy HH:mm");
@@ -37,19 +39,21 @@ export function PharmacyHistoryModal({
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-md max-h-[80vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>История аптеки</DialogTitle>
+          <DialogTitle>{t.history}</DialogTitle>
         </DialogHeader>
 
         {pharmacy && (
           <div className="mb-6">
             <h3 className="font-semibold text-lg">{pharmacy.name}</h3>
-            <p className="text-sm text-gray-600">Район: {pharmacy.district}</p>
+            <p className="text-sm text-gray-600">
+              {t.landmark}: {pharmacy.district}
+            </p>
           </div>
         )}
 
         <div className="space-y-4">
           {events.length === 0 ? (
-            <p className="text-center text-gray-500">Нет событий</p>
+            <p className="text-center text-gray-500">{t.noEvents}</p>
           ) : (
             events.map((event, index) => (
               <div key={event.id} className="relative flex gap-4">
@@ -81,15 +85,12 @@ export function PharmacyHistoryModal({
                       }
                     >
                       {event.type === "ACTIVATED"
-                        ? "✅ Активирована"
-                        : "⛔ Деактивирована"}
+                        ? `✅ ${t.activated}`
+                        : `⛔ ${t.deactivated}`}
                     </Badge>
                   </div>
                   <p className="text-sm text-gray-600">
-                    {formatDateTime(event.time)}
-                  </p>
-                  <p className="text-xs text-gray-500 mt-1">
-                    Источник: {event.source}
+                    {formatDateTime(event.changeDatetime)}
                   </p>
                 </div>
               </div>
