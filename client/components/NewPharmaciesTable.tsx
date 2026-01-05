@@ -32,6 +32,7 @@ export function NewPharmaciesTable({
   pharmacies,
   isLoading = false,
 }: NewPharmaciesTableProps) {
+  const { t } = useLanguage();
   const [sortField, setSortField] = useState<SortField>("code");
   const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
 
