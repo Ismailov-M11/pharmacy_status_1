@@ -35,6 +35,7 @@ export function ActivityEventsTable({
   events,
   isLoading = false,
 }: ActivityEventsTableProps) {
+  const { t } = useLanguage();
   const [sortField, setSortField] = useState<SortField>("changeDatetime");
   const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
 
