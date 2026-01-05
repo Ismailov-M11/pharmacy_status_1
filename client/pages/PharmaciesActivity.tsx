@@ -3,7 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Header } from "@/components/Header";
 import { KpiCard } from "@/components/KpiCard";
-import { ActivityFilterPanel } from "@/components/ActivityFilterPanel";
+import { ActivityFilterPanelDropdown } from "@/components/ActivityFilterPanelDropdown";
+import { ActivityChart } from "@/components/ActivityChart";
 import { ActivityEventsTable } from "@/components/ActivityEventsTable";
 import { PharmacyHistoryModal } from "@/components/PharmacyHistoryModal";
 import {
