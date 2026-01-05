@@ -28,8 +28,9 @@ export function ActivityEventsTable({
   events,
   isLoading = false,
   onRowClick,
+  onDateClick,
 }: ActivityEventsTableProps) {
-  const [sortField, setSortField] = useState<SortField>("time");
+  const [sortField, setSortField] = useState<SortField>("changeDatetime");
   const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
 
   const handleSort = (field: SortField) => {
