@@ -235,7 +235,7 @@ export function NewPharmaciesChart({
             >
               <div className="flex items-center justify-between p-6 border-b border-blue-200 bg-blue-50">
                 <h3 className="text-lg font-semibold text-gray-900">
-                  Аптеки добавлены{" "}
+                  {t.pharmaciesAdded}{" "}
                   {format(new Date(selectedDate), "dd.MM.yyyy")}
                 </h3>
                 <button
