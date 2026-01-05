@@ -12,7 +12,7 @@ import {
   Cell,
 } from "recharts";
 import { ActivityEvent } from "@/lib/reportsApi";
-import { format } from "date-fns";
+import { format, parse } from "date-fns";
 import { X } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
@@ -44,7 +44,7 @@ export function ActivityChart({
     > = {};
 
     events.forEach((event) => {
-      const dateKey = format(new Date(event.time), "yyyy-MM-dd");
+      const dateKey = format(new Date(event.changeDatetime), "yyyy-MM-dd");
 
       if (!groupedByDate[dateKey]) {
         groupedByDate[dateKey] = { activated: 0, deactivated: 0 };
@@ -59,12 +59,25 @@ export function ActivityChart({
 
     // Convert to array and sort by date
     const dataArray = Object.entries(groupedByDate)
-      .map(([date, data]) => ({
-        date: format(new Date(date), "dd MMM", { locale: undefined }),
-        fullDate: date,
-        activated: data.activated,
-        deactivated: data.deactivated,
-      }))
+      .map(([dateStr, data]) => {
+        try {
+          const dateObj = parse(dateStr, "yyyy-MM-dd", new Date());
+          return {
+            date: format(dateObj, "dd MMM", { locale: undefined }),
+            fullDate: dateStr,
+            activated: data.activated,
+            deactivated: data.deactivated,
+          };
+        } catch (err) {
+          console.error("Error parsing date:", dateStr, err);
+          return {
+            date: dateStr,
+            fullDate: dateStr,
+            activated: data.activated,
+            deactivated: data.deactivated,
+          };
+        }
+      })
       .sort((a, b) => a.fullDate.localeCompare(b.fullDate));
 
     return dataArray;
