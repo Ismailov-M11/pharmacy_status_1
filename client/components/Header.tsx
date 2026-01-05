@@ -12,6 +12,7 @@ import {
   User,
   Activity,
   Store,
+  Menu,
 } from "lucide-react";
 import {
   DropdownMenu,
