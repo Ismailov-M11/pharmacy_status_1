@@ -157,13 +157,34 @@ export default function PharmaciesActivity() {
           )}
 
           {/* Activity Chart */}
-          <ActivityChart events={data?.events || []} isLoading={isLoading} />
+          <ActivityChart
+            events={data?.events || []}
+            isLoading={isLoading}
+            onDateClick={handleDateClick}
+          />
+
+          {/* Date Filter Info */}
+          {selectedDateFilter && (
+            <div className="mb-4 p-4 bg-blue-50 border border-blue-200 rounded-lg flex items-center justify-between">
+              <p className="text-blue-900 font-medium">
+                Фильтр активирован: показаны события за{" "}
+                {new Date(selectedDateFilter).toLocaleDateString("ru-RU")}
+              </p>
+              <button
+                onClick={() => setSelectedDateFilter(null)}
+                className="text-blue-600 hover:text-blue-800 font-medium text-sm"
+              >
+                Очистить фильтр
+              </button>
+            </div>
+          )}
 
           {/* Events Table */}
           <ActivityEventsTable
-            events={data?.events || []}
+            events={filteredEvents}
             isLoading={isLoading}
             onRowClick={handleRowClick}
+            onDateClick={handleDateClick}
           />
         </div>
       </main>
