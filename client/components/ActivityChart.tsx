@@ -82,14 +82,6 @@ export function ActivityChart({
     return dataArray;
   }, [events]);
 
-  // Get pharmacies for the selected date
-  const selectedDayEvents = useMemo(() => {
-    if (!selectedDate) return [];
-    return events.filter((e) => {
-      const dateKey = format(new Date(e.changeDatetime), "yyyy-MM-dd");
-      return dateKey === selectedDate;
-    });
-  }, [selectedDate, events]);
 
   // Calculate smart Y-axis domain based on max value
   const yAxisDomain = useMemo(() => {
