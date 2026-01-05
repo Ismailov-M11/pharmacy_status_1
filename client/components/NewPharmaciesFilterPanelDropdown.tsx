@@ -129,7 +129,7 @@ export function NewPharmaciesFilterPanelDropdown({
     <Card className="p-4 md:p-6 mb-6">
       <div className="mb-4">
         <label className="text-sm font-medium text-gray-700 block mb-2">
-          Режим фильтра:
+          {t.filterMode}
         </label>
         <Select
           value={mode}
@@ -142,8 +142,8 @@ export function NewPharmaciesFilterPanelDropdown({
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="months">По месяцам</SelectItem>
-            <SelectItem value="range">По периоду</SelectItem>
+            <SelectItem value="months">{t.byMonths}</SelectItem>
+            <SelectItem value="range">{t.byPeriod}</SelectItem>
           </SelectContent>
         </Select>
       </div>
@@ -152,7 +152,7 @@ export function NewPharmaciesFilterPanelDropdown({
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
           <div>
             <label className="text-sm font-medium text-gray-700 block mb-2">
-              Текущий месяц:
+              {t.currentMonth}
             </label>
             <Select value={selectedMonth} onValueChange={setSelectedMonth}>
               <SelectTrigger>
