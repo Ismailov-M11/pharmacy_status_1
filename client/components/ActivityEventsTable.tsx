@@ -105,13 +105,16 @@ export function ActivityEventsTable({
         <Table>
           <TableHeader>
             <TableRow className="bg-gray-50">
+              <TableHead className="text-center w-12">
+                <div className="font-semibold text-gray-700">№</div>
+              </TableHead>
               <TableHead
                 className="cursor-pointer hover:bg-gray-100"
-                onClick={() => handleSort("time")}
+                onClick={() => handleSort("code")}
               >
                 <button className="flex items-center font-semibold text-gray-700">
-                  Дата/время
-                  <SortIcon field="time" />
+                  Код
+                  <SortIcon field="code" />
                 </button>
               </TableHead>
               <TableHead
@@ -119,8 +122,53 @@ export function ActivityEventsTable({
                 onClick={() => handleSort("pharmacyName")}
               >
                 <button className="flex items-center font-semibold text-gray-700">
-                  Аптека
+                  Название аптеки
                   <SortIcon field="pharmacyName" />
+                </button>
+              </TableHead>
+              <TableHead
+                className="cursor-pointer hover:bg-gray-100"
+                onClick={() => handleSort("address")}
+              >
+                <button className="flex items-center font-semibold text-gray-700">
+                  Адрес
+                  <SortIcon field="address" />
+                </button>
+              </TableHead>
+              <TableHead
+                className="cursor-pointer hover:bg-gray-100"
+                onClick={() => handleSort("landmark")}
+              >
+                <button className="flex items-center font-semibold text-gray-700">
+                  Ориентир
+                  <SortIcon field="landmark" />
+                </button>
+              </TableHead>
+              <TableHead
+                className="cursor-pointer hover:bg-gray-100"
+                onClick={() => handleSort("phone")}
+              >
+                <button className="flex items-center font-semibold text-gray-700">
+                  Телефон аптеки
+                  <SortIcon field="phone" />
+                </button>
+              </TableHead>
+              <TableHead
+                className="cursor-pointer hover:bg-gray-100"
+                onClick={() => handleSort("responsiblePhone")}
+              >
+                <button className="flex items-center font-semibold text-gray-700">
+                  Телефон ответственного
+                  <SortIcon field="responsiblePhone" />
+                </button>
+              </TableHead>
+              <TableHead
+                className="cursor-pointer hover:bg-gray-100"
+                onClick={() => handleSort("changeDatetime")}
+              >
+                <button className="flex items-center font-semibold text-gray-700">
+                  Дата/время изменения
+                  <SortIcon field="changeDatetime" />
                 </button>
               </TableHead>
               <TableHead
@@ -128,21 +176,9 @@ export function ActivityEventsTable({
                 onClick={() => handleSort("type")}
               >
                 <button className="flex items-center font-semibold text-gray-700">
-                  Событие
+                  Статус изменен на
                   <SortIcon field="type" />
                 </button>
-              </TableHead>
-              <TableHead
-                className="cursor-pointer hover:bg-gray-100"
-                onClick={() => handleSort("district")}
-              >
-                <button className="flex items-center font-semibold text-gray-700">
-                  Район
-                  <SortIcon field="district" />
-                </button>
-              </TableHead>
-              <TableHead className="font-semibold text-gray-700">
-                Источник
               </TableHead>
             </TableRow>
           </TableHeader>
