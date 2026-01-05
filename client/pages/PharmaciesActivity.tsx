@@ -78,11 +78,22 @@ export default function PharmaciesActivity() {
     setIsModalOpen(true);
   };
 
+  const handleDateClick = (date: string) => {
+    setSelectedDateFilter(date);
+  };
+
   const pharmacyEvents = selectedEvent
     ? data?.events.filter(
         (e) => e.pharmacyName === selectedEvent.pharmacyName,
       ) || []
     : [];
+
+  const filteredEvents = selectedDateFilter
+    ? data?.events.filter((e) => {
+        const dateKey = e.changeDatetime.split("T")[0];
+        return dateKey === selectedDateFilter;
+      }) || []
+    : data?.events || [];
 
   if (authLoading) {
     return (
