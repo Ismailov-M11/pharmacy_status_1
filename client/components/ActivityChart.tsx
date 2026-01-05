@@ -80,7 +80,7 @@ export function ActivityChart({
             deactivated: 0,
           };
           return {
-            date: format(dateObj, "dd", { locale: undefined }),
+            date: format(dateObj, "dd"),
             fullDate: dateStr,
             activated: data.activated,
             deactivated: data.deactivated,
