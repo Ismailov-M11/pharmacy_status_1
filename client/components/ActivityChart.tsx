@@ -73,7 +73,9 @@ export function ActivityChart({
     }
 
     // Convert to array - include all days if date range provided
-    const dataArray = (allDays.length > 0 ? allDays : Object.keys(groupedByDate))
+    const dataArray = (
+      allDays.length > 0 ? allDays : Object.keys(groupedByDate)
+    )
       .map((dateStr) => {
         try {
           const dateObj = parse(dateStr, "yyyy-MM-dd", new Date());
@@ -101,7 +103,6 @@ export function ActivityChart({
 
     return dataArray;
   }, [events, fromDate, toDate]);
-
 
   // Calculate smart Y-axis domain based on max value
   const yAxisDomain = useMemo(() => {
@@ -253,7 +254,6 @@ export function ActivityChart({
           </BarChart>
         </ResponsiveContainer>
       </Card>
-
     </div>
   );
 }

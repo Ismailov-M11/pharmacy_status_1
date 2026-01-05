@@ -45,7 +45,9 @@ export function PharmacyHistoryModal({
         {pharmacy && (
           <div className="mb-6">
             <h3 className="font-semibold text-lg">{pharmacy.name}</h3>
-            <p className="text-sm text-gray-600">{t.landmark}: {pharmacy.district}</p>
+            <p className="text-sm text-gray-600">
+              {t.landmark}: {pharmacy.district}
+            </p>
           </div>
         )}
 

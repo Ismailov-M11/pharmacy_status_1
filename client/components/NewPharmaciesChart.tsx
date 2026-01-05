@@ -42,7 +42,7 @@ export function NewPharmaciesChart({
   const { t, language } = useLanguage();
   // Get month name in Russian or Uzbek
   const monthName = useMemo(() => {
-    const locale = language === 'uz' ? undefined : ru;
+    const locale = language === "uz" ? undefined : ru;
     return format(startOfMonth(fromDate), "LLLL yyyy", { locale });
   }, [fromDate, language]);
 

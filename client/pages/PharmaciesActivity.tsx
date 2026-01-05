@@ -121,10 +121,10 @@ export default function PharmaciesActivity() {
       <main className="w-full">
         {/* Header Section */}
         <div className="mb-4 sm:mb-8 px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
-          <h1 className="text-3xl font-bold text-gray-900">{t.activitiesTitle}</h1>
-          <p className="text-gray-600 mt-2">
-            {t.activitiesDescription}
-          </p>
+          <h1 className="text-3xl font-bold text-gray-900">
+            {t.activitiesTitle}
+          </h1>
+          <p className="text-gray-600 mt-2">{t.activitiesDescription}</p>
         </div>
 
         <div className="px-4 sm:px-6 lg:px-8 pb-8">
@@ -157,12 +157,16 @@ export default function PharmaciesActivity() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
               <KpiCard
                 label={`✅ ${t.activated}`}
-                value={filteredEvents.filter((e) => e.type === "ACTIVATED").length}
+                value={
+                  filteredEvents.filter((e) => e.type === "ACTIVATED").length
+                }
                 variant="success"
               />
               <KpiCard
                 label={`⛔ ${t.deactivated}`}
-                value={filteredEvents.filter((e) => e.type === "DEACTIVATED").length}
+                value={
+                  filteredEvents.filter((e) => e.type === "DEACTIVATED").length
+                }
                 variant="danger"
               />
             </div>
@@ -176,10 +180,7 @@ export default function PharmaciesActivity() {
           />
 
           {/* Events Table - Full Month Data */}
-          <ActivityEventsTable
-            events={filteredEvents}
-            isLoading={isLoading}
-          />
+          <ActivityEventsTable events={filteredEvents} isLoading={isLoading} />
 
           {/* Selected Day Events Modal - Centralized Display */}
           {selectedDateFilter && selectedDayEvents.length > 0 && (
@@ -196,7 +197,8 @@ export default function PharmaciesActivity() {
                 >
                   <div className="flex items-center justify-between p-6 border-b border-blue-200 bg-blue-50">
                     <h3 className="text-lg font-semibold text-gray-900">
-                      {t.eventsLabel} {format(new Date(selectedDateFilter), "dd.MM.yyyy")}
+                      {t.eventsLabel}{" "}
+                      {format(new Date(selectedDateFilter), "dd.MM.yyyy")}
                     </h3>
                     <button
                       onClick={() => setSelectedDateFilter(null)}
