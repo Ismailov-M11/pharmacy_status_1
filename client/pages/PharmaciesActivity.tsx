@@ -42,12 +42,15 @@ export default function PharmaciesActivity() {
 
   const loadData = async (from: Date, to: Date) => {
     setIsLoading(true);
+    setError(null);
     try {
       const response = await fetchActivityData(from, to);
       setData(response);
-    } catch (error) {
-      console.error("Failed to fetch activity data:", error);
-      toast.error("Ошибка при загрузке данных");
+    } catch (err) {
+      console.error("Failed to fetch activity data:", err);
+      const errorMsg = "Ошибка при загрузке данных";
+      setError(errorMsg);
+      toast.error(errorMsg);
     } finally {
       setIsLoading(false);
     }
