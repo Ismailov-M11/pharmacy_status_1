@@ -94,13 +94,14 @@ export default function PharmaciesActivity() {
     }, 100);
   };
 
-  // Get events for the selected day (independent from main table filter)
-  const selectedDayEvents = selectedDateFilter
-    ? data?.events.filter((e) => {
-        const dateKey = e.changeDatetime.split("T")[0];
-        return dateKey === selectedDateFilter;
-      }) || []
-    : [];
+  // Get events for the selected day
+  const selectedDayEvents = useMemo(() => {
+    if (!selectedDateFilter) return [];
+    return filteredEvents.filter((e) => {
+      const dateKey = e.changeDatetime.split("T")[0];
+      return dateKey === selectedDateFilter;
+    });
+  }, [selectedDateFilter, filteredEvents]);
 
   if (authLoading) {
     return (
