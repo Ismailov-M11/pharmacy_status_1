@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { startOfMonth, endOfMonth } from "date-fns";
 import { toast } from "sonner";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface NewPharmaciesFilterPanelDropdownProps {
   onFiltersChange: (
