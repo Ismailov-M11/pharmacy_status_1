@@ -8,6 +8,14 @@ export const translations = {
     logout: "Выход",
     language: "Язык",
     siteTitle: "Состояние аптек",
+    emptyPlaceholder: "—",
+    close: "Закрыть",
+    apply: "Применить",
+    reset: "Сброс",
+
+    // Navigation
+    activities: "Активности",
+    newPharmacies: "Новые аптеки",
 
     // Login Page
     login: "Логин",
@@ -45,6 +53,9 @@ export const translations = {
     active: "Активна",
     inactive: "Неактивна",
     allPharmacies: "Все аптеки",
+    dateTime: "Дата/время изменения",
+    phone: "Телефон",
+    timeLabel: "Время",
 
     // Status Values
     yes: "ЕСТЬ",
@@ -53,6 +64,8 @@ export const translations = {
     noTraining: "НЕТ",
     available: "Доступно",
     unavailable: "Недоступно",
+    statusActivated: "✅",
+    statusDeactivated: "⛔",
 
     // Panel Titles
     agentPanel: "Панель Агента",
@@ -63,6 +76,43 @@ export const translations = {
     pharmacies: "Аптеки",
     all: "Все",
     action: "Действие",
+
+    // New Pharmacies Page
+    newPharmaciesTitle: "Новые аптеки",
+    newPharmaciesDescription: "Аптеки, активированные впервые после обучения",
+    newPharmaciesChart: "График новых аптек",
+    newPharmaciesCount: "Новых в периоде",
+    comparisonPeriod: "Период сравнения",
+    difference: "Разница",
+    noNewPharmacies: "Нет новых аптек за период",
+    pharmaciesAdded: "Аптеки добавлены",
+
+    // Pharmacy Activities Page
+    activitiesTitle: "Активности аптек",
+    activitiesDescription: "Просмотр активации и деактивации аптек",
+    activitiesChart: "График активности аптек",
+    noActivities: "Нет событий за выбранный период",
+    eventsLabel: "События",
+    activated: "Активировано",
+    deactivated: "Деактивировано",
+    eventCount: "Количество событий",
+    statusChangedTo: "Статус изменен на",
+
+    // Filter Panel
+    filterMode: "Режим фильтра:",
+    byMonths: "По месяцам",
+    byPeriod: "По периоду",
+    currentMonth: "Текущий месяц:",
+    compareTo: "Сравнить с:",
+    from: "С:",
+    to: "По:",
+    period: "Период:",
+    day: "День",
+    week: "Неделя",
+    month: "Месяц",
+    year: "Год",
+    custom: "Произвольный",
+    graphLabel: "Количество аптек",
 
     // Actions
     edit: "Редактировать",
@@ -75,8 +125,14 @@ export const translations = {
 
     // Loading and Empty States
     loading: "Загрузка...",
+    loadingData: "Загрузка...",
     noData: "Нет данных",
     loadingPharmacies: "Загрузка аптек...",
+    dataLoadError: "Ошибка при загрузке данных",
+
+    // Validation
+    invalidDateRange: 'Дата "С" не может быть позже даты "По"',
+    periodTooLarge: "⚠️ Период больше 366 дней. Показаны данные, но это может быть слишком большой диапазон.",
 
     // Filters
     filter: "Фильтр",
@@ -102,21 +158,27 @@ export const translations = {
     clear: "Очистить",
     deleteWarning: "Эта запись будет удалена безвозвратно.",
     deleteWarningMultiple: "Выбранные записи будут удалены безвозвратно.",
-    year: "год",
+    yearUnit: "год",
     confirmYes: "ДА",
     confirmNo: "НЕТ",
     shown: "Показано",
-    from: "из",
   },
   uz: {
     // Common
     shown: "Ko'rsatildi",
-    from: "dan",
     save: "Saqlandi",
     error: "Xatolik",
     logout: "Chiqish",
     language: "Til",
     siteTitle: "Aptekalar holati",
+    emptyPlaceholder: "—",
+    close: "Yopish",
+    apply: "Qo'llash",
+    reset: "Tozalash",
+
+    // Navigation
+    activities: "Faoliyyatlar",
+    newPharmacies: "Yangi dorixonalar",
 
     // Login Page
     login: "Login",
@@ -154,6 +216,9 @@ export const translations = {
     active: "Faol",
     inactive: "Nofaol",
     allPharmacies: "Barcha dorixonalar",
+    dateTime: "O'zgarish sanasi/vaqti",
+    phone: "Telefon",
+    timeLabel: "Vaqt",
 
     // Status Values
     yes: "BOR",
@@ -162,6 +227,8 @@ export const translations = {
     noTraining: "YO'Q",
     available: "Mavjud",
     unavailable: "Mavjud emas",
+    statusActivated: "✅",
+    statusDeactivated: "⛔",
 
     // Panel Titles
     agentPanel: "Agent paneli",
@@ -172,6 +239,43 @@ export const translations = {
     pharmacies: "Dorixonalar",
     all: "Barchasi",
     action: "Harakat",
+
+    // New Pharmacies Page
+    newPharmaciesTitle: "Yangi dorixonalar",
+    newPharmaciesDescription: "O'qitishdan so'ng birinchi marta faollashtirilgan dorixonalar",
+    newPharmaciesChart: "Yangi dorixonalar grafigi",
+    newPharmaciesCount: "Davrda yangi",
+    comparisonPeriod: "Taqqoslash davri",
+    difference: "Farq",
+    noNewPharmacies: "Davr uchun yangi dorixonalar yo'q",
+    pharmaciesAdded: "Dorixonalar qo'shildi",
+
+    // Pharmacy Activities Page
+    activitiesTitle: "Dorixonalar faoliyyati",
+    activitiesDescription: "Dorixonalarni faollashtirish va o'chirishni ko'rish",
+    activitiesChart: "Dorixona faoliyyati grafigi",
+    noActivities: "Tanlangan davr uchun voqealar yo'q",
+    eventsLabel: "Voqealar",
+    activated: "Faollashtirildi",
+    deactivated: "O'chirildi",
+    eventCount: "Voqealar soni",
+    statusChangedTo: "Holati o'zgartirildi",
+
+    // Filter Panel
+    filterMode: "Filtr rejimi:",
+    byMonths: "Oylar bo'yicha",
+    byPeriod: "Davr bo'yicha",
+    currentMonth: "Joriy oy:",
+    compareTo: "Bilan solishtirish:",
+    from: "Dan:",
+    to: "Gacha:",
+    period: "Davr:",
+    day: "Kun",
+    week: "Hafta",
+    month: "Oy",
+    year: "Yil",
+    custom: "Maxsus",
+    graphLabel: "Dorixona soni",
 
     // Actions
     edit: "Tahrirlash",
@@ -184,8 +288,14 @@ export const translations = {
 
     // Loading and Empty States
     loading: "Yuklanmoqda...",
+    loadingData: "Yuklanmoqda...",
     noData: "Ma'lumot yo'q",
     loadingPharmacies: "Dorixonalar yuklanmoqda...",
+    dataLoadError: "Ma'lumotlarni yuklashda xato",
+
+    // Validation
+    invalidDateRange: 'Sana "Dan" sana "Gacha"dan keyin bo\'lishi mumkin emas',
+    periodTooLarge: "⚠️ Davr 366 kundan ko'p. Ma'lumotlar ko'rsatildi, lekin bu juda katta oraliq bo'lishi mumkin.",
 
     // Filters
     filter: "Filtr",
@@ -212,7 +322,7 @@ export const translations = {
     deleteWarning: "Bu yozuv qaytarib bo'lmaydigan tarzda o'chiriladi.",
     deleteWarningMultiple:
       "Tanlangan yozuvlar qaytarib bo'lmaydigan tarzda o'chiriladi.",
-    year: "yil",
+    yearUnit: "yil",
     confirmYes: "HA",
     confirmNo: "YO'Q",
   },
