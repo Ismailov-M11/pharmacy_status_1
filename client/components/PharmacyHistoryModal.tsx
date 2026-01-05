@@ -8,6 +8,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { ActivityEvent } from "@/lib/reportsApi";
 import { format } from "date-fns";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface PharmacyHistoryModalProps {
   isOpen: boolean;
