@@ -183,16 +183,39 @@ export function ActivityEventsTable({
             </TableRow>
           </TableHeader>
           <TableBody>
-            {sortedEvents.map((event) => (
+            {sortedEvents.map((event, index) => (
               <TableRow
                 key={event.id}
                 onClick={() => onRowClick?.(event)}
                 className={onRowClick ? "cursor-pointer hover:bg-gray-50" : ""}
               >
-                <TableCell className="font-medium">
-                  {formatDateTime(event.time)}
+                <TableCell className="text-center text-sm text-gray-500 w-12">
+                  {index + 1}
                 </TableCell>
-                <TableCell>{event.pharmacyName}</TableCell>
+                <TableCell className="font-medium text-sm">
+                  {event.code}
+                </TableCell>
+                <TableCell className="font-medium">
+                  {event.pharmacyName}
+                </TableCell>
+                <TableCell className="text-sm text-gray-600">
+                  {event.address || "—"}
+                </TableCell>
+                <TableCell className="text-sm text-gray-600">
+                  {event.landmark || "—"}
+                </TableCell>
+                <TableCell className="text-sm text-gray-600">
+                  {event.phone || "—"}
+                </TableCell>
+                <TableCell className="text-sm text-gray-600">
+                  {event.responsiblePhone || "—"}
+                </TableCell>
+                <TableCell
+                  className="text-sm font-medium cursor-pointer hover:text-blue-600"
+                  onClick={() => onDateClick?.(event.changeDatetime)}
+                >
+                  {formatDateTime(event.changeDatetime)}
+                </TableCell>
                 <TableCell>
                   <Badge
                     variant={
@@ -208,10 +231,6 @@ export function ActivityEventsTable({
                       ? "✅ Активирована"
                       : "⛔ Деактивирована"}
                   </Badge>
-                </TableCell>
-                <TableCell>{event.district}</TableCell>
-                <TableCell className="text-gray-600 text-sm">
-                  {event.source}
                 </TableCell>
               </TableRow>
             ))}
