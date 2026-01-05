@@ -156,10 +156,10 @@ export function ActivityChart({
     return (
       <Card className="p-6 mb-8">
         <h2 className="text-lg font-semibold text-gray-900 mb-4">
-          График активности аптек
+          {t.activitiesChart}
         </h2>
         <div className="flex items-center justify-center h-64">
-          <span className="text-gray-500">Нет событий за выбранный период</span>
+          <span className="text-gray-500">{t.noActivities}</span>
         </div>
       </Card>
     );
