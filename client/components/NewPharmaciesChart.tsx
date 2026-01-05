@@ -174,8 +174,10 @@ export function NewPharmaciesChart({
               tick={{ fontSize: 12 }}
             />
             <YAxis
+              domain={yAxisDomain}
               tick={{ fontSize: 12 }}
               allowDecimals={false}
+              type="number"
               label={{
                 value: "Количество аптек",
                 angle: -90,
