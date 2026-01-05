@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { Header } from "@/components/Header";
 import { KpiCard } from "@/components/KpiCard";
 import { NewPharmaciesFilterPanelDropdown } from "@/components/NewPharmaciesFilterPanelDropdown";
@@ -16,6 +17,7 @@ import { toast } from "sonner";
 
 export default function NewPharmacies() {
   const { isAuthenticated, isLoading: authLoading } = useAuth();
+  const { t } = useLanguage();
   const navigate = useNavigate();
 
   const [isLoading, setIsLoading] = useState(true);
@@ -62,9 +64,8 @@ export default function NewPharmacies() {
       setFilteredPharmacies(response.items);
     } catch (err) {
       console.error("Failed to fetch new pharmacies data:", err);
-      const errorMsg = "Ошибка при загрузке данных";
-      setError(errorMsg);
-      toast.error(errorMsg);
+      setError(t.dataLoadError);
+      toast.error(t.dataLoadError);
     } finally {
       setIsLoading(false);
     }
