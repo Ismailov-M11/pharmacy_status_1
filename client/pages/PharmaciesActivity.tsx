@@ -134,9 +134,16 @@ export default function PharmaciesActivity() {
 
           {/* Activity Chart - Moved to Top */}
           <ActivityChart
-            events={data?.events || []}
+            events={filteredEvents}
             isLoading={isLoading}
             onDateClick={handleDateClick}
+          />
+
+          {/* Status Filter Panel */}
+          <StatusFilterPanel
+            events={data?.events || []}
+            selectedStatus={selectedStatus}
+            onStatusChange={setSelectedStatus}
           />
 
           {/* Filter Panel - After Chart */}
@@ -148,7 +155,7 @@ export default function PharmaciesActivity() {
 
           {/* Events Table - Full Month Data */}
           <ActivityEventsTable
-            events={data?.events || []}
+            events={filteredEvents}
             isLoading={isLoading}
           />
 
