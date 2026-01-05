@@ -65,20 +65,20 @@ export default function PharmaciesActivity() {
   };
 
   const handleReset = () => {
-    const from = startOfWeek(new Date());
-    const to = endOfDay(new Date());
+    const from = startOfMonth(new Date());
+    const to = endOfMonth(new Date());
     setFromDate(from);
     setToDate(to);
+    setSelectedDateFilter(null);
     loadData(from, to);
-  };
-
-  const handleRowClick = (event: ActivityEvent) => {
-    setSelectedEvent(event);
-    setIsModalOpen(true);
   };
 
   const handleDateClick = (date: string) => {
     setSelectedDateFilter(date);
+    // Scroll to the selected day section after a brief delay
+    setTimeout(() => {
+      selectedDayRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+    }, 100);
   };
 
   const pharmacyEvents = selectedEvent
