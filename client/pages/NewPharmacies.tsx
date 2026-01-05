@@ -137,6 +137,7 @@ export default function NewPharmacies() {
             pharmacies={filteredPharmacies}
             isLoading={isLoading}
             fromDate={fromDate}
+            onDateClick={handleDateClick}
           />
 
           {/* Filter Panel */}
