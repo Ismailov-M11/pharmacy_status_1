@@ -17,7 +17,7 @@ interface NewPharmaciesTableProps {
   isLoading?: boolean;
 }
 
-type SortField = "onboardedAt" | "pharmacyName" | "district";
+type SortField = "onboardedAt" | "pharmacyName" | "district" | "address" | "phone";
 type SortDirection = "asc" | "desc";
 
 export function NewPharmaciesTable({
