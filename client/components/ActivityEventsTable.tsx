@@ -18,9 +18,10 @@ interface ActivityEventsTableProps {
   events: ActivityEvent[];
   isLoading?: boolean;
   onRowClick?: (event: ActivityEvent) => void;
+  onDateClick?: (date: string) => void;
 }
 
-type SortField = "time" | "pharmacyName" | "type" | "district";
+type SortField = "code" | "pharmacyName" | "address" | "landmark" | "phone" | "responsiblePhone" | "changeDatetime" | "type";
 type SortDirection = "asc" | "desc";
 
 export function ActivityEventsTable({
