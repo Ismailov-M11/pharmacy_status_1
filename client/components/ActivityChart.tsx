@@ -13,6 +13,7 @@ import {
 } from "recharts";
 import { ActivityEvent } from "@/lib/reportsApi";
 import { format, parse } from "date-fns";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface ActivityChartProps {
   events: ActivityEvent[];
