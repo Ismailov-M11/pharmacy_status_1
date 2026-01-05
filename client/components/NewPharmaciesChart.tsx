@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useRef } from "react";
+import React, { useMemo } from "react";
 import { Card } from "@/components/ui/card";
 import {
   BarChart,
