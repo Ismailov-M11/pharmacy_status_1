@@ -137,6 +137,9 @@ export default function PharmaciesActivity() {
             events={filteredEvents}
             isLoading={isLoading}
             onDateClick={handleDateClick}
+            fromDate={fromDate}
+            toDate={toDate}
+            selectedDate={selectedDateFilter}
           />
 
           {/* Filter Panel - After Chart */}
