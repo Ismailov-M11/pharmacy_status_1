@@ -115,18 +115,18 @@ export function ActivityFilterPanelDropdown({
     <Card className="p-4 md:p-6 mb-6">
       <div className="mb-4">
         <label className="text-sm font-medium text-gray-700 block mb-2">
-          Период:
+          {t.period}
         </label>
         <Select value={preset} onValueChange={handlePresetChange}>
           <SelectTrigger>
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="day">День</SelectItem>
-            <SelectItem value="week">Неделя</SelectItem>
-            <SelectItem value="month">Месяц</SelectItem>
-            <SelectItem value="year">Год</SelectItem>
-            <SelectItem value="custom">Произвольный</SelectItem>
+            <SelectItem value="day">{t.day}</SelectItem>
+            <SelectItem value="week">{t.week}</SelectItem>
+            <SelectItem value="month">{t.month}</SelectItem>
+            <SelectItem value="year">{t.year}</SelectItem>
+            <SelectItem value="custom">{t.custom}</SelectItem>
           </SelectContent>
         </Select>
       </div>
@@ -135,7 +135,7 @@ export function ActivityFilterPanelDropdown({
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
           <div>
             <label className="text-sm font-medium text-gray-700 block mb-2">
-              С:
+              {t.from}
             </label>
             <Input
               type="date"
