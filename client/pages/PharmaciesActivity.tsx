@@ -139,18 +139,18 @@ export default function PharmaciesActivity() {
             onDateClick={handleDateClick}
           />
 
-          {/* Status Filter Panel */}
-          <StatusFilterPanel
-            events={data?.events || []}
-            selectedStatus={selectedStatus}
-            onStatusChange={setSelectedStatus}
-          />
-
           {/* Filter Panel - After Chart */}
           <ActivityFilterPanelDropdown
             onFiltersChange={handleFiltersChange}
             onReset={handleReset}
             isLoading={isLoading}
+          />
+
+          {/* Status Filter Panel */}
+          <StatusFilterPanel
+            events={data?.events || []}
+            selectedStatus={selectedStatus}
+            onStatusChange={setSelectedStatus}
           />
 
           {/* Events Table - Full Month Data */}
