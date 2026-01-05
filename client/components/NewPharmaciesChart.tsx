@@ -91,19 +91,7 @@ export function NewPharmaciesChart({
   }, [selectedDate, pharmacies]);
 
   const handleBarClick = (data: ChartDataPoint) => {
-    setSelectedDate(data.fullDate);
-    onDateClick?.();
-    // Scroll to the selected day panel after a brief delay
-    setTimeout(() => {
-      selectedDayPanelRef.current?.scrollIntoView({
-        behavior: "smooth",
-        block: "center",
-      });
-    }, 100);
-  };
-
-  const handleClosePanel = () => {
-    setSelectedDate(null);
+    onDateClick?.(data.fullDate);
   };
 
   // Calculate smart Y-axis domain based on max value
