@@ -31,6 +31,7 @@ export default function PharmaciesActivity() {
   const [selectedDateFilter, setSelectedDateFilter] = useState<string | null>(
     null,
   );
+  const [selectedStatus, setSelectedStatus] = useState<string | null>(null);
 
   useEffect(() => {
     if (authLoading) return;
