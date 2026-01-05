@@ -279,6 +279,8 @@ export async function fetchActivityData(
 export async function fetchNewPharmaciesData(
   fromDate: Date,
   toDate: Date,
+  compareFromDate?: Date,
+  compareToDate?: Date,
 ): Promise<NewPharmaciesResponse> {
   const apiUrl = import.meta.env.VITE_API_URL;
 
@@ -286,9 +288,10 @@ export async function fetchNewPharmaciesData(
     try {
       const from = fromDate.toISOString().split("T")[0];
       const to = toDate.toISOString().split("T")[0];
-      const response = await fetch(
-        `${apiUrl}/reports/new-pharmacies?from=${from}&to=${to}`,
-      );
+      const query = compareFromDate && compareToDate
+        ? `from=${from}&to=${to}&compareFrom=${compareFromDate.toISOString().split("T")[0]}&compareTo=${compareToDate.toISOString().split("T")[0]}`
+        : `from=${from}&to=${to}`;
+      const response = await fetch(`${apiUrl}/reports/new-pharmacies?${query}`);
       if (!response.ok) throw new Error("API failed");
       return response.json();
     } catch (error) {
@@ -297,16 +300,41 @@ export async function fetchNewPharmaciesData(
   }
 
   // Use mock data
-  const filteredItems = filterNewPharmaciesByDateRange(
+  const filteredItemsA = filterNewPharmaciesByDateRange(
     mockNewPharmaciesData.items,
     fromDate,
     toDate,
   );
 
+  let filteredItemsB: NewPharmacy[] = [];
+  if (compareFromDate && compareToDate) {
+    filteredItemsB = filterNewPharmaciesByDateRange(
+      mockNewPharmaciesData.items,
+      compareFromDate,
+      compareToDate,
+    );
+  }
+
+  const countA = filteredItemsA.length;
+  const countB = filteredItemsB.length;
+  const diff = countA - countB;
+  const percent = countB > 0 ? (diff / countB) * 100 : 0;
+
   return {
-    periodA: mockNewPharmaciesData.periodA,
-    periodB: mockNewPharmaciesData.periodB,
-    diff: mockNewPharmaciesData.diff,
-    items: filteredItems,
+    periodA: {
+      label: `Период А (${fromDate.toLocaleDateString("ru-RU")})`,
+      count: countA,
+    },
+    periodB: {
+      label: compareFromDate && compareToDate
+        ? `Период B (${compareFromDate.toLocaleDateString("ru-RU")})`
+        : "Период B",
+      count: countB,
+    },
+    diff: {
+      value: diff,
+      percent: percent,
+    },
+    items: filteredItemsA,
   };
 }
