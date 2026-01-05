@@ -106,7 +106,7 @@ export default function NewPharmacies() {
 
         <div className="px-4 sm:px-6 lg:px-8 pb-8">
           {/* Filter Panel */}
-          <NewPharmaciesFilterPanel
+          <NewPharmaciesFilterPanelDropdown
             onFiltersChange={handleFiltersChange}
             onReset={handleReset}
             isLoading={isLoading}
