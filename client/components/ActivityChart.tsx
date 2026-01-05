@@ -89,7 +89,11 @@ export function ActivityChart({ events, isLoading = false }: ActivityChartProps)
             height={80}
             tick={{ fontSize: 12 }}
           />
-          <YAxis tick={{ fontSize: 12 }} />
+          <YAxis
+            tick={{ fontSize: 12 }}
+            allowDecimals={false}
+            label={{ value: "Количество событий", angle: -90, position: "insideLeft", offset: 10 }}
+          />
           <Tooltip
             contentStyle={{
               backgroundColor: "white",
