@@ -167,6 +167,11 @@ export function ActivityChart({
       <Card className="p-6">
         <h2 className="text-lg font-semibold text-gray-900 mb-6">
           График активности аптек
+          {fromDate && toDate && (
+            <span className="text-sm font-normal text-gray-600 ml-2">
+              ({format(fromDate, "LLLL yyyy", { locale: undefined })})
+            </span>
+          )}
         </h2>
         <ResponsiveContainer width="100%" height={400}>
           <BarChart
