@@ -42,7 +42,7 @@ export function Header() {
       { label: t.adminPanel || "Админ", path: "/admin", icon: User },
       { label: t.maps || "Карты", path: "/maps", icon: Map },
       { label: "Активности", path: "/pharmacies-activity", icon: Activity },
-      { label: "Новые аптеки", path: "/new-pharmacies", icon: Store }
+      { label: "Новые аптеки", path: "/new-pharmacies", icon: Store },
     );
   } else if (role === "ROLE_AGENT" || role === "ROLE_OPERATOR") {
     const agentLabel =
@@ -51,8 +51,12 @@ export function Header() {
         : t.agentPanel || "Панель агента";
     const agentIcon = role === "ROLE_OPERATOR" ? Headset : UserCog;
     navigationItems.push(
-      { label: agentLabel, path: role === "ROLE_OPERATOR" ? "/operator" : "/agent", icon: agentIcon },
-      { label: t.maps || "Карты", path: "/maps", icon: Map }
+      {
+        label: agentLabel,
+        path: role === "ROLE_OPERATOR" ? "/operator" : "/agent",
+        icon: agentIcon,
+      },
+      { label: t.maps || "Карты", path: "/maps", icon: Map },
     );
   }
 
@@ -148,7 +152,6 @@ export function Header() {
             <span className="hidden md:block">{t.logout}</span>
           </Button>
         </div>
-
       </div>
     </header>
   );
