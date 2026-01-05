@@ -9,6 +9,7 @@ import {
   Tooltip,
   Legend,
   ResponsiveContainer,
+  Cell,
 } from "recharts";
 import { NewPharmacy } from "@/lib/reportsApi";
 import { format, getDaysInMonth, startOfMonth } from "date-fns";
