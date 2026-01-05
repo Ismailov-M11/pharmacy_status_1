@@ -113,51 +113,131 @@ export function NewPharmaciesChart({
   }
 
   return (
-    <Card className="p-6 mb-8">
-      <h2 className="text-lg font-semibold text-gray-900 mb-4">
-        График новых аптек
-      </h2>
-      <ResponsiveContainer width="100%" height={300}>
-        <BarChart
-          data={chartData}
-          margin={{ top: 20, right: 30, left: 0, bottom: 60 }}
-        >
-          <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-          <XAxis
-            dataKey="date"
-            angle={-45}
-            textAnchor="end"
-            height={80}
-            tick={{ fontSize: 12 }}
-          />
-          <YAxis
-            tick={{ fontSize: 12 }}
-            allowDecimals={false}
-            label={{
-              value: "Количество аптек",
-              angle: -90,
-              position: "insideLeft",
-              offset: 10,
+    <div className="mb-8">
+      <Card className="p-6">
+        <h2 className="text-lg font-semibold text-gray-900 mb-4">
+          График новых аптек
+        </h2>
+        <ResponsiveContainer width="100%" height={300}>
+          <BarChart
+            data={chartData}
+            margin={{ top: 20, right: 30, left: 0, bottom: 60 }}
+            onClick={(state) => {
+              if (state && state.activeTooltipIndex !== undefined) {
+                const data = chartData[state.activeTooltipIndex];
+                if (data) {
+                  handleBarClick(data);
+                }
+              }
             }}
-          />
-          <Tooltip
-            contentStyle={{
-              backgroundColor: "white",
-              border: "1px solid #e5e7eb",
-              borderRadius: "0.5rem",
-            }}
-            cursor={{ fill: "rgba(168, 85, 247, 0.05)" }}
-            formatter={(value) => value}
-            labelFormatter={(label) => `${label}`}
-          />
-          <Bar
-            dataKey="count"
-            fill="#a855f7"
-            name="Новые аптеки"
-            radius={[4, 4, 0, 0]}
-          />
-        </BarChart>
-      </ResponsiveContainer>
-    </Card>
+          >
+            <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+            <XAxis
+              dataKey="date"
+              angle={-45}
+              textAnchor="end"
+              height={80}
+              tick={{ fontSize: 12 }}
+            />
+            <YAxis
+              tick={{ fontSize: 12 }}
+              allowDecimals={false}
+              label={{
+                value: "Количество аптек",
+                angle: -90,
+                position: "insideLeft",
+                offset: 10,
+              }}
+            />
+            <Tooltip
+              contentStyle={{
+                backgroundColor: "white",
+                border: "1px solid #e5e7eb",
+                borderRadius: "0.5rem",
+              }}
+              cursor={{ fill: "rgba(168, 85, 247, 0.05)" }}
+              formatter={(value) => value}
+              labelFormatter={(label) => `${label}`}
+            />
+            <Bar
+              dataKey="count"
+              fill="#a855f7"
+              name="Новые аптеки"
+              radius={[4, 4, 0, 0]}
+              onClick={(data) => handleBarClick(data as ChartDataPoint)}
+            />
+          </BarChart>
+        </ResponsiveContainer>
+      </Card>
+
+      {/* Selected Day Panel */}
+      {selectedDate && selectedDayPharmacies.length > 0 && (
+        <Card className="p-6 mt-4 border-blue-200 bg-blue-50">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold text-gray-900">
+              Аптеки добавлены {format(new Date(selectedDate), "dd.MM.yyyy")}
+            </h3>
+            <button
+              onClick={handleClosePanel}
+              className="inline-flex items-center justify-center w-8 h-8 rounded-full text-gray-500 hover:bg-blue-100 hover:text-gray-700 transition-colors"
+              aria-label="Закрыть"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-blue-200">
+                  <th className="text-left py-2 px-3 font-semibold text-gray-700">
+                    №
+                  </th>
+                  <th className="text-left py-2 px-3 font-semibold text-gray-700">
+                    Код
+                  </th>
+                  <th className="text-left py-2 px-3 font-semibold text-gray-700">
+                    Название
+                  </th>
+                  <th className="text-left py-2 px-3 font-semibold text-gray-700">
+                    Адрес
+                  </th>
+                  <th className="text-left py-2 px-3 font-semibold text-gray-700">
+                    Телефон
+                  </th>
+                  <th className="text-left py-2 px-3 font-semibold text-gray-700">
+                    Время
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {selectedDayPharmacies.map((pharmacy, index) => (
+                  <tr
+                    key={pharmacy.id}
+                    className="border-b border-blue-100 hover:bg-blue-100 transition-colors"
+                  >
+                    <td className="py-2 px-3 text-gray-600">{index + 1}</td>
+                    <td className="py-2 px-3 font-medium text-gray-900">
+                      {pharmacy.code}
+                    </td>
+                    <td className="py-2 px-3 text-gray-900">
+                      {pharmacy.pharmacyName}
+                    </td>
+                    <td className="py-2 px-3 text-gray-600">
+                      {pharmacy.address || "—"}
+                    </td>
+                    <td className="py-2 px-3 text-gray-600">
+                      {pharmacy.phone || "—"}
+                    </td>
+                    <td className="py-2 px-3 text-gray-600">
+                      {format(new Date(pharmacy.onboardedAt), "HH:mm")}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </Card>
+      )}
+    </div>
   );
 }
