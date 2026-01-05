@@ -36,6 +36,11 @@ export function NewPharmaciesChart({
 }: NewPharmaciesChartProps) {
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
 
+  // Get month name in Russian
+  const monthName = useMemo(() => {
+    return format(startOfMonth(fromDate), "LLLL yyyy", { locale: ru });
+  }, [fromDate]);
+
   const chartData = useMemo(() => {
     // Group pharmacies by date
     const groupedByDate: Record<string, NewPharmacy[]> = {};
