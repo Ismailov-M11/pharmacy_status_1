@@ -113,6 +113,15 @@ export const translations = {
     year: "Год",
     custom: "Произвольный",
     graphLabel: "Количество аптек",
+    landmark: "Ориентир",
+    onboardedAt: "Дата ввода",
+    noNewPharmaciesSelected: "Нет новых аптек за выбранный период",
+    noActivitiesSelected: "Нет событий за выбранный период",
+    noEvents: "Нет событий",
+    activated: "Активирована",
+    deactivated: "Деактивирована",
+    loading_action: "Загрузка...",
+    apply_action: "Применить",
 
     // Actions
     edit: "Редактировать",
