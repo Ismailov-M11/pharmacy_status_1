@@ -17,6 +17,7 @@ import { toast } from "sonner";
 
 export default function NewPharmacies() {
   const { isAuthenticated, isLoading: authLoading } = useAuth();
+  const { t } = useLanguage();
   const navigate = useNavigate();
 
   const [isLoading, setIsLoading] = useState(true);
