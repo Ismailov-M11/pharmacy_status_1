@@ -193,6 +193,8 @@ export interface NewPharmacy {
   onboardedAt: string;
   pharmacyName: string;
   district: string;
+  address?: string;
+  phone?: string;
   currentStatus: "active" | "inactive";
 }
 
