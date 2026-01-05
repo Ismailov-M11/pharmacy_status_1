@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo } from "react";
 import { Card } from "@/components/ui/card";
 import {
   BarChart,
@@ -9,12 +9,9 @@ import {
   Tooltip,
   Legend,
   ResponsiveContainer,
-  Cell,
 } from "recharts";
 import { ActivityEvent } from "@/lib/reportsApi";
 import { format, parse } from "date-fns";
-import { X } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
 
 interface ActivityChartProps {
   events: ActivityEvent[];
