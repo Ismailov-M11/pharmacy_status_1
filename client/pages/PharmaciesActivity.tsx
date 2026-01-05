@@ -28,6 +28,9 @@ export default function PharmaciesActivity() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [fromDate, setFromDate] = useState<Date>(startOfWeek(new Date()));
   const [toDate, setToDate] = useState<Date>(endOfDay(new Date()));
+  const [selectedDateFilter, setSelectedDateFilter] = useState<string | null>(
+    null,
+  );
 
   useEffect(() => {
     if (authLoading) return;
