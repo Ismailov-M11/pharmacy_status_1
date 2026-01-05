@@ -1,33 +1,35 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Header } from "@/components/Header";
-import { KpiCard } from "@/components/KpiCard";
 import { ActivityFilterPanelDropdown } from "@/components/ActivityFilterPanelDropdown";
 import { ActivityChart } from "@/components/ActivityChart";
 import { ActivityEventsTable } from "@/components/ActivityEventsTable";
-import { PharmacyHistoryModal } from "@/components/PharmacyHistoryModal";
 import {
   fetchActivityData,
   ActivityEvent,
   ActivityResponse,
 } from "@/lib/reportsApi";
-import { startOfWeek, endOfDay } from "date-fns";
+import { startOfMonth, endOfMonth } from "date-fns";
 import { toast } from "sonner";
+import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { X } from "lucide-react";
+import { format } from "date-fns";
 
 export default function PharmaciesActivity() {
   const { isAuthenticated, isLoading: authLoading } = useAuth();
   const navigate = useNavigate();
+  const selectedDayRef = useRef<HTMLDivElement>(null);
 
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [data, setData] = useState<ActivityResponse | null>(null);
-  const [selectedEvent, setSelectedEvent] = useState<ActivityEvent | null>(
+  const [fromDate, setFromDate] = useState<Date>(startOfMonth(new Date()));
+  const [toDate, setToDate] = useState<Date>(endOfMonth(new Date()));
+  const [selectedDateFilter, setSelectedDateFilter] = useState<string | null>(
     null,
   );
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [fromDate, setFromDate] = useState<Date>(startOfWeek(new Date()));
-  const [toDate, setToDate] = useState<Date>(endOfDay(new Date()));
 
   useEffect(() => {
     if (authLoading) return;
@@ -63,22 +65,31 @@ export default function PharmaciesActivity() {
   };
 
   const handleReset = () => {
-    const from = startOfWeek(new Date());
-    const to = endOfDay(new Date());
+    const from = startOfMonth(new Date());
+    const to = endOfMonth(new Date());
     setFromDate(from);
     setToDate(to);
+    setSelectedDateFilter(null);
     loadData(from, to);
   };
 
-  const handleRowClick = (event: ActivityEvent) => {
-    setSelectedEvent(event);
-    setIsModalOpen(true);
+  const handleDateClick = (date: string) => {
+    setSelectedDateFilter(date);
+    // Scroll to the selected day section after a brief delay
+    setTimeout(() => {
+      selectedDayRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+      });
+    }, 100);
   };
 
-  const pharmacyEvents = selectedEvent
-    ? data?.events.filter(
-        (e) => e.pharmacyName === selectedEvent.pharmacyName,
-      ) || []
+  // Get events for the selected day (independent from main table filter)
+  const selectedDayEvents = selectedDateFilter
+    ? data?.events.filter((e) => {
+        const dateKey = e.changeDatetime.split("T")[0];
+        return dateKey === selectedDateFilter;
+      }) || []
     : [];
 
   if (authLoading) {
@@ -110,67 +121,111 @@ export default function PharmaciesActivity() {
             </div>
           )}
 
-          {/* Filter Panel */}
+          {/* Activity Chart - Moved to Top */}
+          <ActivityChart
+            events={data?.events || []}
+            isLoading={isLoading}
+            onDateClick={handleDateClick}
+          />
+
+          {/* Filter Panel - After Chart */}
           <ActivityFilterPanelDropdown
             onFiltersChange={handleFiltersChange}
             onReset={handleReset}
             isLoading={isLoading}
           />
 
-          {/* KPI Cards */}
-          {data && (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-              <KpiCard
-                label="✅ Активировано"
-                value={data.summary.activated}
-                variant="success"
-              />
-              <KpiCard
-                label="⛔ Деактивировано"
-                value={data.summary.deactivated}
-                variant="danger"
-              />
-              <KpiCard
-                label="🔄 Чистое изменение"
-                value={data.summary.activated - data.summary.deactivated}
-                variant={
-                  data.summary.activated - data.summary.deactivated >= 0
-                    ? "success"
-                    : "danger"
-                }
-              />
-            </div>
-          )}
-
-          {/* Activity Chart */}
-          <ActivityChart events={data?.events || []} isLoading={isLoading} />
-
-          {/* Events Table */}
+          {/* Events Table - Full Month Data */}
           <ActivityEventsTable
             events={data?.events || []}
             isLoading={isLoading}
-            onRowClick={handleRowClick}
+            onDateClick={handleDateClick}
           />
+
+          {/* Selected Day Events Section - Independent */}
+          {selectedDateFilter && selectedDayEvents.length > 0 && (
+            <div ref={selectedDayRef} className="mt-8 scroll-mt-20">
+              <Card className="p-6 border-blue-200 bg-blue-50">
+                <div className="flex items-center justify-between mb-6">
+                  <h3 className="text-lg font-semibold text-gray-900">
+                    События {format(new Date(selectedDateFilter), "dd.MM.yyyy")}
+                  </h3>
+                  <button
+                    onClick={() => setSelectedDateFilter(null)}
+                    className="inline-flex items-center justify-center w-8 h-8 rounded-full text-gray-500 hover:bg-blue-100 hover:text-gray-700 transition-colors"
+                    aria-label="Закрыть"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="border-b border-blue-200">
+                        <th className="text-left py-3 px-3 font-semibold text-gray-700">
+                          №
+                        </th>
+                        <th className="text-left py-3 px-3 font-semibold text-gray-700">
+                          Код
+                        </th>
+                        <th className="text-left py-3 px-3 font-semibold text-gray-700">
+                          Название
+                        </th>
+                        <th className="text-left py-3 px-3 font-semibold text-gray-700">
+                          Адрес
+                        </th>
+                        <th className="text-left py-3 px-3 font-semibold text-gray-700">
+                          Статус
+                        </th>
+                        <th className="text-left py-3 px-3 font-semibold text-gray-700">
+                          Время
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {selectedDayEvents.map((event, index) => (
+                        <tr
+                          key={event.id}
+                          className="border-b border-blue-100 hover:bg-blue-100 transition-colors"
+                        >
+                          <td className="py-3 px-3 text-gray-600">
+                            {index + 1}
+                          </td>
+                          <td className="py-3 px-3 font-medium text-gray-900">
+                            {event.code}
+                          </td>
+                          <td className="py-3 px-3 text-gray-900">
+                            {event.pharmacyName}
+                          </td>
+                          <td className="py-3 px-3 text-gray-600">
+                            {event.address || "—"}
+                          </td>
+                          <td className="py-3 px-3">
+                            <Badge
+                              className={
+                                event.type === "ACTIVATED"
+                                  ? "bg-green-100 text-green-800"
+                                  : "bg-red-100 text-red-800"
+                              }
+                            >
+                              {event.type === "ACTIVATED"
+                                ? "✅ Активирована"
+                                : "⛔ Деактивирована"}
+                            </Badge>
+                          </td>
+                          <td className="py-3 px-3 text-gray-600">
+                            {format(new Date(event.changeDatetime), "HH:mm")}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </Card>
+            </div>
+          )}
         </div>
       </main>
-
-      {/* Pharmacy History Modal */}
-      <PharmacyHistoryModal
-        isOpen={isModalOpen}
-        onClose={() => {
-          setIsModalOpen(false);
-          setSelectedEvent(null);
-        }}
-        pharmacy={
-          selectedEvent
-            ? {
-                name: selectedEvent.pharmacyName,
-                district: selectedEvent.district,
-              }
-            : undefined
-        }
-        events={pharmacyEvents}
-      />
     </div>
   );
 }

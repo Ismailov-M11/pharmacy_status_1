@@ -17,18 +17,26 @@ import { ChevronDown, ChevronUp } from "lucide-react";
 interface ActivityEventsTableProps {
   events: ActivityEvent[];
   isLoading?: boolean;
-  onRowClick?: (event: ActivityEvent) => void;
+  onDateClick?: (date: string) => void;
 }
 
-type SortField = "time" | "pharmacyName" | "type" | "district";
+type SortField =
+  | "code"
+  | "pharmacyName"
+  | "address"
+  | "landmark"
+  | "phone"
+  | "responsiblePhone"
+  | "changeDatetime"
+  | "type";
 type SortDirection = "asc" | "desc";
 
 export function ActivityEventsTable({
   events,
   isLoading = false,
-  onRowClick,
+  onDateClick,
 }: ActivityEventsTableProps) {
-  const [sortField, setSortField] = useState<SortField>("time");
+  const [sortField, setSortField] = useState<SortField>("changeDatetime");
   const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
 
   const handleSort = (field: SortField) => {
@@ -44,14 +52,12 @@ export function ActivityEventsTable({
     let aVal: any = a[sortField];
     let bVal: any = b[sortField];
 
-    if (sortField === "time") {
-      aVal = new Date(a.time).getTime();
-      bVal = new Date(b.time).getTime();
-    }
-
-    if (typeof aVal === "string") {
-      aVal = aVal.toLowerCase();
-      bVal = (bVal as string).toLowerCase();
+    if (sortField === "changeDatetime") {
+      aVal = new Date(a.changeDatetime).getTime();
+      bVal = new Date(b.changeDatetime).getTime();
+    } else {
+      aVal = aVal?.toString().toLowerCase() || "";
+      bVal = (bVal as any)?.toString().toLowerCase() || "";
     }
 
     const comparison = aVal < bVal ? -1 : aVal > bVal ? 1 : 0;
@@ -105,13 +111,16 @@ export function ActivityEventsTable({
         <Table>
           <TableHeader>
             <TableRow className="bg-gray-50">
+              <TableHead className="text-center w-12">
+                <div className="font-semibold text-gray-700">№</div>
+              </TableHead>
               <TableHead
                 className="cursor-pointer hover:bg-gray-100"
-                onClick={() => handleSort("time")}
+                onClick={() => handleSort("code")}
               >
                 <button className="flex items-center font-semibold text-gray-700">
-                  Дата/время
-                  <SortIcon field="time" />
+                  Код
+                  <SortIcon field="code" />
                 </button>
               </TableHead>
               <TableHead
@@ -119,8 +128,53 @@ export function ActivityEventsTable({
                 onClick={() => handleSort("pharmacyName")}
               >
                 <button className="flex items-center font-semibold text-gray-700">
-                  Аптека
+                  Название аптеки
                   <SortIcon field="pharmacyName" />
+                </button>
+              </TableHead>
+              <TableHead
+                className="cursor-pointer hover:bg-gray-100"
+                onClick={() => handleSort("address")}
+              >
+                <button className="flex items-center font-semibold text-gray-700">
+                  Адрес
+                  <SortIcon field="address" />
+                </button>
+              </TableHead>
+              <TableHead
+                className="cursor-pointer hover:bg-gray-100"
+                onClick={() => handleSort("landmark")}
+              >
+                <button className="flex items-center font-semibold text-gray-700">
+                  Ориентир
+                  <SortIcon field="landmark" />
+                </button>
+              </TableHead>
+              <TableHead
+                className="cursor-pointer hover:bg-gray-100"
+                onClick={() => handleSort("phone")}
+              >
+                <button className="flex items-center font-semibold text-gray-700">
+                  Телефон аптеки
+                  <SortIcon field="phone" />
+                </button>
+              </TableHead>
+              <TableHead
+                className="cursor-pointer hover:bg-gray-100"
+                onClick={() => handleSort("responsiblePhone")}
+              >
+                <button className="flex items-center font-semibold text-gray-700">
+                  Телефон ответственного
+                  <SortIcon field="responsiblePhone" />
+                </button>
+              </TableHead>
+              <TableHead
+                className="cursor-pointer hover:bg-gray-100"
+                onClick={() => handleSort("changeDatetime")}
+              >
+                <button className="flex items-center font-semibold text-gray-700">
+                  Дата/время изменения
+                  <SortIcon field="changeDatetime" />
                 </button>
               </TableHead>
               <TableHead
@@ -128,35 +182,42 @@ export function ActivityEventsTable({
                 onClick={() => handleSort("type")}
               >
                 <button className="flex items-center font-semibold text-gray-700">
-                  Событие
+                  Статус изменен на
                   <SortIcon field="type" />
                 </button>
-              </TableHead>
-              <TableHead
-                className="cursor-pointer hover:bg-gray-100"
-                onClick={() => handleSort("district")}
-              >
-                <button className="flex items-center font-semibold text-gray-700">
-                  Район
-                  <SortIcon field="district" />
-                </button>
-              </TableHead>
-              <TableHead className="font-semibold text-gray-700">
-                Источник
               </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {sortedEvents.map((event) => (
-              <TableRow
-                key={event.id}
-                onClick={() => onRowClick?.(event)}
-                className={onRowClick ? "cursor-pointer hover:bg-gray-50" : ""}
-              >
-                <TableCell className="font-medium">
-                  {formatDateTime(event.time)}
+            {sortedEvents.map((event, index) => (
+              <TableRow key={event.id}>
+                <TableCell className="text-center text-sm text-gray-500 w-12">
+                  {index + 1}
                 </TableCell>
-                <TableCell>{event.pharmacyName}</TableCell>
+                <TableCell className="font-medium text-sm">
+                  {event.code}
+                </TableCell>
+                <TableCell className="font-medium">
+                  {event.pharmacyName}
+                </TableCell>
+                <TableCell className="text-sm text-gray-600">
+                  {event.address || "—"}
+                </TableCell>
+                <TableCell className="text-sm text-gray-600">
+                  {event.landmark || "—"}
+                </TableCell>
+                <TableCell className="text-sm text-gray-600">
+                  {event.phone || "—"}
+                </TableCell>
+                <TableCell className="text-sm text-gray-600">
+                  {event.responsiblePhone || "—"}
+                </TableCell>
+                <TableCell
+                  className="text-sm font-medium cursor-pointer hover:text-blue-600"
+                  onClick={() => onDateClick?.(event.changeDatetime)}
+                >
+                  {formatDateTime(event.changeDatetime)}
+                </TableCell>
                 <TableCell>
                   <Badge
                     variant={
@@ -172,10 +233,6 @@ export function ActivityEventsTable({
                       ? "✅ Активирована"
                       : "⛔ Деактивирована"}
                   </Badge>
-                </TableCell>
-                <TableCell>{event.district}</TableCell>
-                <TableCell className="text-gray-600 text-sm">
-                  {event.source}
                 </TableCell>
               </TableRow>
             ))}

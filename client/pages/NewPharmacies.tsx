@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Header } from "@/components/Header";
@@ -17,6 +17,7 @@ import { toast } from "sonner";
 export default function NewPharmacies() {
   const { isAuthenticated, isLoading: authLoading } = useAuth();
   const navigate = useNavigate();
+  const selectedDayRef = useRef<HTMLDivElement>(null);
 
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -95,6 +96,16 @@ export default function NewPharmacies() {
     loadData(from, to, compareFrom, compareTo);
   };
 
+  const handleDateClick = () => {
+    // Scroll to the selected day section after a brief delay
+    setTimeout(() => {
+      selectedDayRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+      });
+    }, 100);
+  };
+
   if (authLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -129,6 +140,7 @@ export default function NewPharmacies() {
             pharmacies={filteredPharmacies}
             isLoading={isLoading}
             fromDate={fromDate}
+            onDateClick={handleDateClick}
           />
 
           {/* Filter Panel */}

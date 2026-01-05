@@ -1,78 +1,132 @@
 // Mock data for development
 const mockActivityData: ActivityResponse = {
-  summary: { activated: 5, deactivated: 4 },
+  summary: { activated: 5, deactivated: 5 },
   events: [
     {
       id: 1,
-      time: "2026-01-05T09:12:00+05:00",
+      changeDatetime: "2026-01-05T09:12:00+05:00",
+      code: "APT-042",
       pharmacyName: "Apteka #42",
+      address: "Ул. Амира Темура, 45",
+      landmark: "Рядом с метро Максим Горький",
+      phone: "+998 71 210-45-45",
+      responsiblePhone: "+998 91 210-45-45",
       district: "Sergeli",
       type: "DEACTIVATED",
       source: "manual",
+      currentStatus: "inactive",
     },
     {
       id: 2,
-      time: "2026-01-06T11:03:00+05:00",
+      changeDatetime: "2026-01-06T11:03:00+05:00",
+      code: "APT-042",
       pharmacyName: "Apteka #42",
+      address: "Ул. Амира Темура, 45",
+      landmark: "Рядом с метро Максим Горький",
+      phone: "+998 71 210-45-45",
+      responsiblePhone: "+998 91 210-45-45",
       district: "Sergeli",
       type: "ACTIVATED",
       source: "agent",
+      currentStatus: "active",
     },
     {
       id: 3,
-      time: "2026-01-07T08:30:00+05:00",
+      changeDatetime: "2026-01-07T08:30:00+05:00",
+      code: "APT-015",
       pharmacyName: "Apteka #15",
+      address: "Ул. Букхоро, 78",
+      landmark: "Возле ТРЦ Анвар",
+      phone: "+998 71 215-30-30",
+      responsiblePhone: "+998 91 215-30-30",
       district: "Yunusabad",
       type: "ACTIVATED",
       source: "system",
+      currentStatus: "active",
     },
     {
       id: 4,
-      time: "2026-01-08T14:22:00+05:00",
+      changeDatetime: "2026-01-08T09:15:00+05:00",
+      code: "APT-088",
       pharmacyName: "Apteka #88",
+      address: "Проспект Мирабда, 12",
+      landmark: "Напротив парка",
+      phone: "+998 71 220-15-15",
+      responsiblePhone: "+998 91 220-15-15",
       district: "Mirabad",
       type: "DEACTIVATED",
       source: "manual",
+      currentStatus: "inactive",
     },
     {
       id: 5,
-      time: "2026-01-09T10:15:00+05:00",
+      changeDatetime: "2026-01-08T14:22:00+05:00",
+      code: "APT-005",
       pharmacyName: "Apteka #5",
+      address: "Ул. Чустаки, 55",
+      landmark: "Рядом с детским садом",
+      phone: "+998 71 225-60-60",
+      responsiblePhone: "+998 91 225-60-60",
       district: "Shayhantaur",
       type: "ACTIVATED",
       source: "agent",
+      currentStatus: "active",
     },
     {
       id: 6,
-      time: "2026-01-10T13:45:00+05:00",
+      changeDatetime: "2026-01-09T10:15:00+05:00",
+      code: "APT-025",
       pharmacyName: "Apteka #25",
+      address: "Ул. Туси, 20",
+      landmark: "Рядом с магазином",
+      phone: "+998 71 230-25-25",
+      responsiblePhone: "+998 91 230-25-25",
       district: "Chilianzar",
       type: "ACTIVATED",
       source: "system",
+      currentStatus: "active",
     },
     {
       id: 7,
-      time: "2026-01-11T09:20:00+05:00",
+      changeDatetime: "2026-01-10T13:45:00+05:00",
+      code: "APT-060",
       pharmacyName: "Apteka #60",
+      address: "Ул. Абая, 90",
+      landmark: "Центр Сергели",
+      phone: "+998 71 235-40-40",
+      responsiblePhone: "+998 91 235-40-40",
       district: "Sergeli",
       type: "DEACTIVATED",
       source: "manual",
+      currentStatus: "inactive",
     },
     {
       id: 8,
-      time: "2026-01-12T11:50:00+05:00",
+      changeDatetime: "2026-01-11T09:20:00+05:00",
+      code: "APT-033",
       pharmacyName: "Apteka #33",
+      address: "Ул. Хорезма, 33",
+      landmark: "На центральной улице",
+      phone: "+998 71 240-50-50",
+      responsiblePhone: "+998 91 240-50-50",
       district: "Yunusabad",
       type: "DEACTIVATED",
       source: "agent",
+      currentStatus: "inactive",
     },
     {
       id: 9,
-      time: "2026-01-13T15:30:00+05:00",
+      changeDatetime: "2026-01-12T15:30:00+05:00",
+      code: "APT-077",
       pharmacyName: "Apteka #77",
+      address: "Ул. Фирдавси, 15",
+      landmark: "Возле библиотеки",
+      phone: "+998 71 245-70-70",
+      responsiblePhone: "+998 91 245-70-70",
       district: "Mirabad",
       type: "ACTIVATED",
       source: "manual",
+      currentStatus: "active",
     },
   ],
 };
@@ -231,11 +285,17 @@ const mockNewPharmaciesData: NewPharmaciesResponse = {
 
 export interface ActivityEvent {
   id: number;
-  time: string;
+  changeDatetime: string;
+  code: string;
   pharmacyName: string;
+  address?: string;
+  landmark?: string;
+  phone?: string;
+  responsiblePhone?: string;
   district: string;
   type: "ACTIVATED" | "DEACTIVATED";
   source: string;
+  currentStatus: "active" | "inactive";
 }
 
 export interface ActivitySummary {
@@ -285,7 +345,7 @@ function filterActivityByDateRange(
   toDate: Date,
 ): ActivityEvent[] {
   return events.filter((event) => {
-    const eventDate = new Date(event.time);
+    const eventDate = new Date(event.changeDatetime);
     return eventDate >= fromDate && eventDate <= toDate;
   });
 }
