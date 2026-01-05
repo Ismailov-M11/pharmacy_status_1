@@ -345,7 +345,7 @@ function filterActivityByDateRange(
   toDate: Date,
 ): ActivityEvent[] {
   return events.filter((event) => {
-    const eventDate = new Date(event.time);
+    const eventDate = new Date(event.changeDatetime);
     return eventDate >= fromDate && eventDate <= toDate;
   });
 }
