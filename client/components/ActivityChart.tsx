@@ -17,6 +17,9 @@ interface ActivityChartProps {
   events: ActivityEvent[];
   isLoading?: boolean;
   onDateClick?: (date: string) => void;
+  fromDate?: Date;
+  toDate?: Date;
+  selectedDate?: string | null;
 }
 
 interface ChartDataPoint {
