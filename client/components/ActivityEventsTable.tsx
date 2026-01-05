@@ -26,7 +26,6 @@ type SortDirection = "asc" | "desc";
 export function ActivityEventsTable({
   events,
   isLoading = false,
-  onRowClick,
   onDateClick,
 }: ActivityEventsTableProps) {
   const [sortField, setSortField] = useState<SortField>("changeDatetime");
