@@ -29,6 +29,7 @@ export function NewPharmaciesFilterPanelDropdown({
   onReset,
   isLoading = false,
 }: NewPharmaciesFilterPanelDropdownProps) {
+  const { t } = useLanguage();
   const today = new Date();
   const [mode, setMode] = useState<"months" | "range">("months");
   const [selectedMonth, setSelectedMonth] = useState<string>(
