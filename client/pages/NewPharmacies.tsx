@@ -3,7 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Header } from "@/components/Header";
 import { KpiCard } from "@/components/KpiCard";
-import { NewPharmaciesFilterPanel } from "@/components/NewPharmaciesFilterPanel";
+import { NewPharmaciesFilterPanelDropdown } from "@/components/NewPharmaciesFilterPanelDropdown";
+import { NewPharmaciesChart } from "@/components/NewPharmaciesChart";
 import { NewPharmaciesTable } from "@/components/NewPharmaciesTable";
 import {
   fetchNewPharmaciesData,
