@@ -22,10 +22,20 @@ interface ActivityChartProps {
   onDateClick?: (date: string) => void;
 }
 
+interface ChartDataPoint {
+  date: string;
+  fullDate: string;
+  activated: number;
+  deactivated: number;
+}
+
 export function ActivityChart({
   events,
   isLoading = false,
+  onDateClick,
 }: ActivityChartProps) {
+  const [selectedDate, setSelectedDate] = useState<string | null>(null);
+
   const chartData = useMemo(() => {
     // Group events by date
     const groupedByDate: Record<
