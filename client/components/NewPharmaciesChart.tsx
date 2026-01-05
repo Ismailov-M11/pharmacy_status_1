@@ -203,7 +203,7 @@ export function NewPharmaciesChart({
             <Bar
               dataKey="count"
               fill="#a855f7"
-              name="Новые аптеки"
+              name={t.newPharmaciesTitle}
               radius={[4, 4, 0, 0]}
               onClick={(data) => handleBarClick(data as ChartDataPoint)}
             >
