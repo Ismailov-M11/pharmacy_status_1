@@ -214,11 +214,14 @@ export interface ActivityResponse {
 
 export interface NewPharmacy {
   id: number;
-  onboardedAt: string;
+  code: string;
   pharmacyName: string;
-  district: string;
   address?: string;
+  landmark?: string;
   phone?: string;
+  responsiblePhone?: string;
+  onboardedAt: string;
+  district: string;
   currentStatus: "active" | "inactive";
 }
 
