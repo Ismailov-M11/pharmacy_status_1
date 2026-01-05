@@ -38,7 +38,6 @@ export function NewPharmaciesChart({
   onDateClick,
   selectedDate = null,
 }: NewPharmaciesChartProps) {
-
   // Get month name in Russian
   const monthName = useMemo(() => {
     return format(startOfMonth(fromDate), "LLLL yyyy", { locale: ru });
@@ -233,7 +232,8 @@ export function NewPharmaciesChart({
             >
               <div className="flex items-center justify-between p-6 border-b border-blue-200 bg-blue-50">
                 <h3 className="text-lg font-semibold text-gray-900">
-                  Аптеки добавлены {format(new Date(selectedDate), "dd.MM.yyyy")}
+                  Аптеки добавлены{" "}
+                  {format(new Date(selectedDate), "dd.MM.yyyy")}
                 </h3>
                 <button
                   onClick={() => onDateClick?.(null)}
