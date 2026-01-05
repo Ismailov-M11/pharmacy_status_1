@@ -118,88 +118,109 @@ export default function PharmaciesActivity() {
             </div>
           )}
 
-          {/* Filter Panel */}
-          <ActivityFilterPanelDropdown
-            onFiltersChange={handleFiltersChange}
-            onReset={handleReset}
-            isLoading={isLoading}
-          />
-
-          {/* KPI Cards */}
-          {data && (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-              <KpiCard
-                label="✅ Активировано"
-                value={data.summary.activated}
-                variant="success"
-              />
-              <KpiCard
-                label="⛔ Деактивировано"
-                value={data.summary.deactivated}
-                variant="danger"
-              />
-              <KpiCard
-                label="🔄 Чистое изменение"
-                value={data.summary.activated - data.summary.deactivated}
-                variant={
-                  data.summary.activated - data.summary.deactivated >= 0
-                    ? "success"
-                    : "danger"
-                }
-              />
-            </div>
-          )}
-
-          {/* Activity Chart */}
+          {/* Activity Chart - Moved to Top */}
           <ActivityChart
             events={data?.events || []}
             isLoading={isLoading}
             onDateClick={handleDateClick}
           />
 
-          {/* Date Filter Info */}
-          {selectedDateFilter && (
-            <div className="mb-4 p-4 bg-blue-50 border border-blue-200 rounded-lg flex items-center justify-between">
-              <p className="text-blue-900 font-medium">
-                Фильтр активирован: показаны события за{" "}
-                {new Date(selectedDateFilter).toLocaleDateString("ru-RU")}
-              </p>
-              <button
-                onClick={() => setSelectedDateFilter(null)}
-                className="text-blue-600 hover:text-blue-800 font-medium text-sm"
-              >
-                Очистить фильтр
-              </button>
-            </div>
-          )}
-
-          {/* Events Table */}
-          <ActivityEventsTable
-            events={filteredEvents}
+          {/* Filter Panel - After Chart */}
+          <ActivityFilterPanelDropdown
+            onFiltersChange={handleFiltersChange}
+            onReset={handleReset}
             isLoading={isLoading}
-            onRowClick={handleRowClick}
+          />
+
+          {/* Events Table - Full Month Data */}
+          <ActivityEventsTable
+            events={data?.events || []}
+            isLoading={isLoading}
             onDateClick={handleDateClick}
           />
+
+          {/* Selected Day Events Section - Independent */}
+          {selectedDateFilter && selectedDayEvents.length > 0 && (
+            <div ref={selectedDayRef} className="mt-8 scroll-mt-20">
+              <Card className="p-6 border-blue-200 bg-blue-50">
+                <div className="flex items-center justify-between mb-6">
+                  <h3 className="text-lg font-semibold text-gray-900">
+                    События {format(new Date(selectedDateFilter), "dd.MM.yyyy")}
+                  </h3>
+                  <button
+                    onClick={() => setSelectedDateFilter(null)}
+                    className="inline-flex items-center justify-center w-8 h-8 rounded-full text-gray-500 hover:bg-blue-100 hover:text-gray-700 transition-colors"
+                    aria-label="Закрыть"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="border-b border-blue-200">
+                        <th className="text-left py-3 px-3 font-semibold text-gray-700">
+                          №
+                        </th>
+                        <th className="text-left py-3 px-3 font-semibold text-gray-700">
+                          Код
+                        </th>
+                        <th className="text-left py-3 px-3 font-semibold text-gray-700">
+                          Название
+                        </th>
+                        <th className="text-left py-3 px-3 font-semibold text-gray-700">
+                          Адрес
+                        </th>
+                        <th className="text-left py-3 px-3 font-semibold text-gray-700">
+                          Статус
+                        </th>
+                        <th className="text-left py-3 px-3 font-semibold text-gray-700">
+                          Время
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {selectedDayEvents.map((event, index) => (
+                        <tr
+                          key={event.id}
+                          className="border-b border-blue-100 hover:bg-blue-100 transition-colors"
+                        >
+                          <td className="py-3 px-3 text-gray-600">{index + 1}</td>
+                          <td className="py-3 px-3 font-medium text-gray-900">
+                            {event.code}
+                          </td>
+                          <td className="py-3 px-3 text-gray-900">
+                            {event.pharmacyName}
+                          </td>
+                          <td className="py-3 px-3 text-gray-600">
+                            {event.address || "—"}
+                          </td>
+                          <td className="py-3 px-3">
+                            <Badge
+                              className={
+                                event.type === "ACTIVATED"
+                                  ? "bg-green-100 text-green-800"
+                                  : "bg-red-100 text-red-800"
+                              }
+                            >
+                              {event.type === "ACTIVATED"
+                                ? "✅ Активирована"
+                                : "⛔ Деактивирована"}
+                            </Badge>
+                          </td>
+                          <td className="py-3 px-3 text-gray-600">
+                            {format(new Date(event.changeDatetime), "HH:mm")}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </Card>
+            </div>
+          )}
         </div>
       </main>
-
-      {/* Pharmacy History Modal */}
-      <PharmacyHistoryModal
-        isOpen={isModalOpen}
-        onClose={() => {
-          setIsModalOpen(false);
-          setSelectedEvent(null);
-        }}
-        pharmacy={
-          selectedEvent
-            ? {
-                name: selectedEvent.pharmacyName,
-                district: selectedEvent.district,
-              }
-            : undefined
-        }
-        events={pharmacyEvents}
-      />
     </div>
   );
 }
