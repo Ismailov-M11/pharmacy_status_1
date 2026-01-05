@@ -75,7 +75,13 @@ export function NewPharmaciesTable({
   if (isLoading) {
     return (
       <Card className="p-6">
-        <div className="text-center text-gray-500">Загрузка...</div>
+        <div className="text-center py-8">
+          <div className="animate-pulse">
+            <div className="h-12 bg-gray-200 rounded mb-4"></div>
+            <div className="h-12 bg-gray-200 rounded mb-4"></div>
+            <div className="h-12 bg-gray-200 rounded"></div>
+          </div>
+        </div>
       </Card>
     );
   }
@@ -83,7 +89,9 @@ export function NewPharmaciesTable({
   if (pharmacies.length === 0) {
     return (
       <Card className="p-6">
-        <div className="text-center text-gray-500">Нет данных</div>
+        <div className="text-center py-8">
+          <p className="text-gray-500">Нет новых аптек за выбранный период</p>
+        </div>
       </Card>
     );
   }
