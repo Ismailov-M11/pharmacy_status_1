@@ -1,19 +1,21 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Header } from "@/components/Header";
-import { KpiCard } from "@/components/KpiCard";
 import { ActivityFilterPanelDropdown } from "@/components/ActivityFilterPanelDropdown";
 import { ActivityChart } from "@/components/ActivityChart";
 import { ActivityEventsTable } from "@/components/ActivityEventsTable";
-import { PharmacyHistoryModal } from "@/components/PharmacyHistoryModal";
 import {
   fetchActivityData,
   ActivityEvent,
   ActivityResponse,
 } from "@/lib/reportsApi";
-import { startOfWeek, endOfDay } from "date-fns";
+import { startOfMonth, endOfMonth } from "date-fns";
 import { toast } from "sonner";
+import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { X } from "lucide-react";
+import { format } from "date-fns";
 
 export default function PharmaciesActivity() {
   const { isAuthenticated, isLoading: authLoading } = useAuth();
