@@ -223,7 +223,7 @@ export function ActivityChart({
             <Bar
               dataKey="activated"
               fill="#10b981"
-              name="Активировано"
+              name={t.activated}
               radius={[4, 4, 0, 0]}
               onClick={(data) => handleBarClick(data as ChartDataPoint)}
               style={{ cursor: "pointer" }}
@@ -238,7 +238,7 @@ export function ActivityChart({
             <Bar
               dataKey="deactivated"
               fill="#ef4444"
-              name="Деактивировано"
+              name={t.deactivated}
               radius={[4, 4, 0, 0]}
               onClick={(data) => handleBarClick(data as ChartDataPoint)}
               style={{ cursor: "pointer" }}
