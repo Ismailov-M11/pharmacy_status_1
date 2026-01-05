@@ -64,7 +64,7 @@ export function NewPharmaciesChart({
         </h2>
         <div className="flex items-center justify-center h-64">
           <span className="text-gray-500">
-            Нет новых аптек за выбранный период
+            Нет новых аптек за период
           </span>
         </div>
       </Card>
@@ -106,18 +106,13 @@ export function NewPharmaciesChart({
               borderRadius: "0.5rem",
             }}
             cursor={{ fill: "rgba(168, 85, 247, 0.05)" }}
-          />
-          <Legend />
-          <Bar
-            dataKey="active"
-            fill="#10b981"
-            name="Активные"
-            radius={[4, 4, 0, 0]}
+            formatter={(value) => value}
+            labelFormatter={(label) => `${label}`}
           />
           <Bar
-            dataKey="inactive"
-            fill="#f59e0b"
-            name="Неактивные"
+            dataKey="count"
+            fill="#a855f7"
+            name="Новые аптеки"
             radius={[4, 4, 0, 0]}
           />
         </BarChart>
