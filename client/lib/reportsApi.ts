@@ -1,5 +1,5 @@
 // Mock data for development
-const mockActivityData = {
+const mockActivityData: ActivityResponse = {
   summary: { activated: 5, deactivated: 4 },
   events: [
     {
@@ -7,7 +7,7 @@ const mockActivityData = {
       time: "2026-01-05T09:12:00+05:00",
       pharmacyName: "Apteka #42",
       district: "Sergeli",
-      type: "DEACTIVATED" as const,
+      type: "DEACTIVATED",
       source: "manual",
     },
     {
@@ -77,7 +77,7 @@ const mockActivityData = {
   ],
 };
 
-const mockNewPharmaciesData = {
+const mockNewPharmaciesData: NewPharmaciesResponse = {
   periodA: { label: "Январь 2026", count: 12 },
   periodB: { label: "Декабрь 2025", count: 9 },
   diff: { value: 3, percent: 33.3 },
