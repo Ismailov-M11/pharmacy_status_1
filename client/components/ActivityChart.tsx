@@ -59,13 +59,27 @@ export function ActivityChart({
       }
     });
 
-    // Convert to array and sort by date
-    const dataArray = Object.entries(groupedByDate)
-      .map(([dateStr, data]) => {
+    // Generate all days in the date range
+    const allDays: string[] = [];
+    if (fromDate && toDate) {
+      let currentDate = new Date(fromDate);
+      while (currentDate <= toDate) {
+        allDays.push(format(currentDate, "yyyy-MM-dd"));
+        currentDate.setDate(currentDate.getDate() + 1);
+      }
+    }
+
+    // Convert to array - include all days if date range provided
+    const dataArray = (allDays.length > 0 ? allDays : Object.keys(groupedByDate))
+      .map((dateStr) => {
         try {
           const dateObj = parse(dateStr, "yyyy-MM-dd", new Date());
+          const data = groupedByDate[dateStr] || {
+            activated: 0,
+            deactivated: 0,
+          };
           return {
-            date: format(dateObj, "dd MMM", { locale: undefined }),
+            date: format(dateObj, "dd", { locale: undefined }),
             fullDate: dateStr,
             activated: data.activated,
             deactivated: data.deactivated,
@@ -75,15 +89,15 @@ export function ActivityChart({
           return {
             date: dateStr,
             fullDate: dateStr,
-            activated: data.activated,
-            deactivated: data.deactivated,
+            activated: 0,
+            deactivated: 0,
           };
         }
       })
       .sort((a, b) => a.fullDate.localeCompare(b.fullDate));
 
     return dataArray;
-  }, [events]);
+  }, [events, fromDate, toDate]);
 
 
   // Calculate smart Y-axis domain based on max value
