@@ -20,16 +20,13 @@ import { format } from "date-fns";
 export default function PharmaciesActivity() {
   const { isAuthenticated, isLoading: authLoading } = useAuth();
   const navigate = useNavigate();
+  const selectedDayRef = useRef<HTMLDivElement>(null);
 
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [data, setData] = useState<ActivityResponse | null>(null);
-  const [selectedEvent, setSelectedEvent] = useState<ActivityEvent | null>(
-    null,
-  );
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [fromDate, setFromDate] = useState<Date>(startOfWeek(new Date()));
-  const [toDate, setToDate] = useState<Date>(endOfDay(new Date()));
+  const [fromDate, setFromDate] = useState<Date>(startOfMonth(new Date()));
+  const [toDate, setToDate] = useState<Date>(endOfMonth(new Date()));
   const [selectedDateFilter, setSelectedDateFilter] = useState<string | null>(
     null,
   );
