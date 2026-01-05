@@ -16,8 +16,9 @@ import {
   startOfYear,
   endOfDay,
 } from "date-fns";
+import { toast } from "sonner";
 
-export type DatePreset = "day" | "week" | "month" | "year";
+export type DatePreset = "day" | "week" | "month" | "year" | "custom";
 
 interface ActivityFilterPanelDropdownProps {
   onFiltersChange: (fromDate: Date, toDate: Date) => void;
@@ -39,6 +40,7 @@ export function ActivityFilterPanelDropdown({
   const [toDate, setToDate] = useState<string>(
     endOfDay(today).toISOString().split("T")[0],
   );
+  const [validationError, setValidationError] = useState<string | null>(null);
 
   const getPresetDates = (p: DatePreset): [Date, Date] => {
     const now = new Date();
@@ -51,22 +53,49 @@ export function ActivityFilterPanelDropdown({
         return [startOfMonth(now), endOfDay(now)];
       case "year":
         return [startOfYear(now), endOfDay(now)];
+      case "custom":
+        return [new Date(fromDate), new Date(toDate)];
     }
+  };
+
+  const validateDates = (from: Date, to: Date): boolean => {
+    setValidationError(null);
+
+    if (from > to) {
+      setValidationError('Дата "С" не может быть позже даты "По"');
+      return false;
+    }
+
+    const diffTime = Math.abs(to.getTime() - from.getTime());
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    if (diffDays > 366) {
+      toast.warning("⚠️ Период больше 366 дней. Показаны данные, но это может быть слишком большой диапазон.");
+    }
+
+    return true;
   };
 
   const handlePresetChange = (p: DatePreset) => {
     setPreset(p);
-    const [from, to] = getPresetDates(p);
-    setFromDate(from.toISOString().split("T")[0]);
-    setToDate(to.toISOString().split("T")[0]);
-    onFiltersChange(from, to);
+    setValidationError(null);
+    if (p !== "custom") {
+      const [from, to] = getPresetDates(p);
+      setFromDate(from.toISOString().split("T")[0]);
+      setToDate(to.toISOString().split("T")[0]);
+      if (validateDates(from, to)) {
+        onFiltersChange(from, to);
+      }
+    }
   };
 
   const handleApply = () => {
     const from = new Date(fromDate);
     const to = new Date(toDate);
     to.setHours(23, 59, 59, 999);
-    onFiltersChange(from, to);
+
+    if (validateDates(from, to)) {
+      onFiltersChange(from, to);
+    }
   };
 
   const handleReset = () => {
@@ -74,6 +103,7 @@ export function ActivityFilterPanelDropdown({
     setFromDate(from.toISOString().split("T")[0]);
     setToDate(to.toISOString().split("T")[0]);
     setPreset("week");
+    setValidationError(null);
     onReset();
   };
 
@@ -92,51 +122,68 @@ export function ActivityFilterPanelDropdown({
             <SelectItem value="week">Неделя</SelectItem>
             <SelectItem value="month">Месяц</SelectItem>
             <SelectItem value="year">Год</SelectItem>
+            <SelectItem value="custom">Произвольный</SelectItem>
           </SelectContent>
         </Select>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-        <div>
-          <label className="text-sm font-medium text-gray-700 block mb-2">
-            С:
-          </label>
-          <Input
-            type="date"
-            value={fromDate}
-            onChange={(e) => setFromDate(e.target.value)}
-            className="w-full"
-          />
+      {preset === "custom" && (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+          <div>
+            <label className="text-sm font-medium text-gray-700 block mb-2">
+              С:
+            </label>
+            <Input
+              type="date"
+              value={fromDate}
+              onChange={(e) => {
+                setFromDate(e.target.value);
+                setValidationError(null);
+              }}
+              className="w-full"
+            />
+          </div>
+          <div>
+            <label className="text-sm font-medium text-gray-700 block mb-2">
+              По:
+            </label>
+            <Input
+              type="date"
+              value={toDate}
+              onChange={(e) => {
+                setToDate(e.target.value);
+                setValidationError(null);
+              }}
+              className="w-full"
+            />
+          </div>
         </div>
-        <div>
-          <label className="text-sm font-medium text-gray-700 block mb-2">
-            По:
-          </label>
-          <Input
-            type="date"
-            value={toDate}
-            onChange={(e) => setToDate(e.target.value)}
-            className="w-full"
-          />
-        </div>
-      </div>
+      )}
 
-      <div className="flex gap-2 flex-col sm:flex-row">
-        <Button
-          onClick={handleApply}
-          disabled={isLoading}
-          className="bg-purple-700 hover:bg-purple-800 text-white flex-1 sm:flex-none"
-        >
-          {isLoading ? "Загрузка..." : "Применить"}
-        </Button>
-        <Button
-          onClick={handleReset}
-          variant="outline"
-          className="border-purple-700 text-purple-700 hover:bg-purple-50 flex-1 sm:flex-none"
-        >
-          Сброс
-        </Button>
-      </div>
+      {validationError && (
+        <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded text-red-700 text-sm">
+          {validationError}
+        </div>
+      )}
+
+      {preset === "custom" && (
+        <div className="flex gap-2 flex-col sm:flex-row">
+          <Button
+            onClick={handleApply}
+            disabled={isLoading || !!validationError}
+            className="bg-purple-700 hover:bg-purple-800 text-white flex-1 sm:flex-none"
+          >
+            {isLoading ? "Загрузка..." : "Применить"}
+          </Button>
+          <Button
+            onClick={handleReset}
+            variant="outline"
+            className="border-purple-700 text-purple-700 hover:bg-purple-50 flex-1 sm:flex-none"
+          >
+            Сброс
+          </Button>
+        </div>
+      )}
     </Card>
   );
 }
