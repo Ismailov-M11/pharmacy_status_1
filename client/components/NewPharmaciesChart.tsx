@@ -34,6 +34,7 @@ export function NewPharmaciesChart({
   pharmacies,
   isLoading = false,
   fromDate = new Date(),
+  onDateClick,
 }: NewPharmaciesChartProps) {
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
 
