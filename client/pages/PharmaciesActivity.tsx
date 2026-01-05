@@ -1,10 +1,11 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Header } from "@/components/Header";
 import { ActivityFilterPanelDropdown } from "@/components/ActivityFilterPanelDropdown";
 import { ActivityChart } from "@/components/ActivityChart";
 import { ActivityEventsTable } from "@/components/ActivityEventsTable";
+import { StatusFilterPanel } from "@/components/StatusFilterPanel";
 import {
   fetchActivityData,
   ActivityEvent,
