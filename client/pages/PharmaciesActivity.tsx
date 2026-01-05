@@ -22,6 +22,7 @@ import { format } from "date-fns";
 
 export default function PharmaciesActivity() {
   const { isAuthenticated, isLoading: authLoading } = useAuth();
+  const { t } = useLanguage();
   const navigate = useNavigate();
   const selectedDayRef = useRef<HTMLDivElement>(null);
 
