@@ -17,7 +17,6 @@ export function StatusFilterPanel({
     return {
       activated: events.filter((e) => e.type === "ACTIVATED").length,
       deactivated: events.filter((e) => e.type === "DEACTIVATED").length,
-      clean: events.filter((e) => e.type === "CLEAN").length,
     };
   }, [events]);
 
