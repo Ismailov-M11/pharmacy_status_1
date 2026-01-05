@@ -99,7 +99,10 @@ export default function NewPharmacies() {
   const handleDateClick = () => {
     // Scroll to the selected day section after a brief delay
     setTimeout(() => {
-      selectedDayRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+      selectedDayRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+      });
     }, 100);
   };
 

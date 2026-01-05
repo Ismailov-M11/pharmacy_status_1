@@ -20,7 +20,15 @@ interface ActivityEventsTableProps {
   onDateClick?: (date: string) => void;
 }
 
-type SortField = "code" | "pharmacyName" | "address" | "landmark" | "phone" | "responsiblePhone" | "changeDatetime" | "type";
+type SortField =
+  | "code"
+  | "pharmacyName"
+  | "address"
+  | "landmark"
+  | "phone"
+  | "responsiblePhone"
+  | "changeDatetime"
+  | "type";
 type SortDirection = "asc" | "desc";
 
 export function ActivityEventsTable({
@@ -182,9 +190,7 @@ export function ActivityEventsTable({
           </TableHeader>
           <TableBody>
             {sortedEvents.map((event, index) => (
-              <TableRow
-                key={event.id}
-              >
+              <TableRow key={event.id}>
                 <TableCell className="text-center text-sm text-gray-500 w-12">
                   {index + 1}
                 </TableCell>

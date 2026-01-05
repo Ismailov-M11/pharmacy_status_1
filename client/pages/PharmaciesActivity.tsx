@@ -77,7 +77,10 @@ export default function PharmaciesActivity() {
     setSelectedDateFilter(date);
     // Scroll to the selected day section after a brief delay
     setTimeout(() => {
-      selectedDayRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+      selectedDayRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+      });
     }, 100);
   };
 
@@ -185,7 +188,9 @@ export default function PharmaciesActivity() {
                           key={event.id}
                           className="border-b border-blue-100 hover:bg-blue-100 transition-colors"
                         >
-                          <td className="py-3 px-3 text-gray-600">{index + 1}</td>
+                          <td className="py-3 px-3 text-gray-600">
+                            {index + 1}
+                          </td>
                           <td className="py-3 px-3 font-medium text-gray-900">
                             {event.code}
                           </td>

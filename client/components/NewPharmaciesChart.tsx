@@ -95,7 +95,10 @@ export function NewPharmaciesChart({
     onDateClick?.();
     // Scroll to the selected day panel after a brief delay
     setTimeout(() => {
-      selectedDayPanelRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+      selectedDayPanelRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+      });
     }, 100);
   };
 
@@ -229,7 +232,10 @@ export function NewPharmaciesChart({
 
       {/* Selected Day Panel */}
       {selectedDate && selectedDayPharmacies.length > 0 && (
-        <Card ref={selectedDayPanelRef} className="p-6 mt-4 border-blue-200 bg-blue-50 scroll-mt-20">
+        <Card
+          ref={selectedDayPanelRef}
+          className="p-6 mt-4 border-blue-200 bg-blue-50 scroll-mt-20"
+        >
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-semibold text-gray-900">
               Аптеки добавлены {format(new Date(selectedDate), "dd.MM.yyyy")}
