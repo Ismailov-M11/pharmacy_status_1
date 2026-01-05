@@ -118,8 +118,6 @@ export const translations = {
     noNewPharmaciesSelected: "Нет новых аптек за выбранный период",
     noActivitiesSelected: "Нет событий за выбранный период",
     noEvents: "Нет событий",
-    activated: "Активирована",
-    deactivated: "Деактивирована",
     loading_action: "Загрузка...",
     apply_action: "Применить",
 
