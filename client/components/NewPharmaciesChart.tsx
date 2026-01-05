@@ -23,35 +23,20 @@ export function NewPharmaciesChart({
   isLoading = false,
 }: NewPharmaciesChartProps) {
   const chartData = useMemo(() => {
-    // Group pharmacies by date
-    const groupedByDate: Record<
-      string,
-      { active: number; inactive: number; total: number }
-    > = {};
+    // Group pharmacies by date and count total
+    const groupedByDate: Record<string, number> = {};
 
     pharmacies.forEach((pharmacy) => {
       const dateKey = format(new Date(pharmacy.onboardedAt), "yyyy-MM-dd");
-
-      if (!groupedByDate[dateKey]) {
-        groupedByDate[dateKey] = { active: 0, inactive: 0, total: 0 };
-      }
-
-      if (pharmacy.currentStatus === "active") {
-        groupedByDate[dateKey].active++;
-      } else {
-        groupedByDate[dateKey].inactive++;
-      }
-      groupedByDate[dateKey].total++;
+      groupedByDate[dateKey] = (groupedByDate[dateKey] || 0) + 1;
     });
 
     // Convert to array and sort by date
     return Object.entries(groupedByDate)
-      .map(([date, data]) => ({
+      .map(([date, count]) => ({
         date: format(new Date(date), "dd MMM", { locale: undefined }),
         fullDate: date,
-        active: data.active,
-        inactive: data.inactive,
-        total: data.total,
+        count: count,
       }))
       .sort((a, b) => a.fullDate.localeCompare(b.fullDate));
   }, [pharmacies]);
