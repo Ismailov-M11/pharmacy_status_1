@@ -25,7 +25,7 @@ export function StatusFilterPanel({
   };
 
   return (
-    <div className="mb-6 grid grid-cols-1 sm:grid-cols-3 gap-4">
+    <div className="mb-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
       {/* Activated Filter */}
       <Card
         className={`p-6 cursor-pointer transition-all border-2 ${
@@ -63,26 +63,6 @@ export function StatusFilterPanel({
             </p>
           </div>
           <span className="text-4xl">⛔</span>
-        </div>
-      </Card>
-
-      {/* Clean Change Filter */}
-      <Card
-        className={`p-6 cursor-pointer transition-all border-2 ${
-          selectedStatus === "CLEAN"
-            ? "border-teal-500 bg-teal-50"
-            : "border-teal-100 bg-teal-50 hover:border-teal-300"
-        }`}
-        onClick={() => handleStatusClick("CLEAN")}
-      >
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-sm font-medium text-gray-600">Чистое изменение</p>
-            <p className="text-2xl font-bold text-teal-700">
-              {statusCounts.clean}
-            </p>
-          </div>
-          <span className="text-4xl">🔄</span>
         </div>
       </Card>
     </div>
