@@ -151,10 +151,18 @@ export function ActivityChart({
       <h2 className="text-lg font-semibold text-gray-900 mb-4">
         График активности аптек
       </h2>
-      <ResponsiveContainer width="100%" height={300}>
+      <ResponsiveContainer width="100%" height={400}>
         <BarChart
           data={chartData}
-          margin={{ top: 20, right: 30, left: 0, bottom: 60 }}
+          margin={{ top: 20, right: 30, left: 50, bottom: 60 }}
+          onClick={(state) => {
+            if (state && state.activeTooltipIndex !== undefined) {
+              const data = chartData[state.activeTooltipIndex];
+              if (data) {
+                handleBarClick(data);
+              }
+            }
+          }}
         >
           <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
           <XAxis
@@ -165,8 +173,10 @@ export function ActivityChart({
             tick={{ fontSize: 12 }}
           />
           <YAxis
+            domain={yAxisDomain}
             tick={{ fontSize: 12 }}
             allowDecimals={false}
+            type="number"
             label={{
               value: "Количество событий",
               angle: -90,
@@ -181,6 +191,8 @@ export function ActivityChart({
               borderRadius: "0.5rem",
             }}
             cursor={{ fill: "rgba(168, 85, 247, 0.05)" }}
+            formatter={(value) => value}
+            labelFormatter={(label) => `${label}`}
           />
           <Legend />
           <Bar
@@ -188,13 +200,33 @@ export function ActivityChart({
             fill="#10b981"
             name="Активировано"
             radius={[4, 4, 0, 0]}
-          />
+            onClick={(data) => handleBarClick(data as ChartDataPoint)}
+          >
+            {chartData.map((entry, index) => (
+              <Cell
+                key={`cell-activated-${index}`}
+                fill={selectedDate === entry.fullDate ? "#059669" : "#10b981"}
+                style={{ cursor: "pointer" }}
+                onClick={() => handleBarClick(entry)}
+              />
+            ))}
+          </Bar>
           <Bar
             dataKey="deactivated"
             fill="#ef4444"
             name="Деактивировано"
             radius={[4, 4, 0, 0]}
-          />
+            onClick={(data) => handleBarClick(data as ChartDataPoint)}
+          >
+            {chartData.map((entry, index) => (
+              <Cell
+                key={`cell-deactivated-${index}`}
+                fill={selectedDate === entry.fullDate ? "#dc2626" : "#ef4444"}
+                style={{ cursor: "pointer" }}
+                onClick={() => handleBarClick(entry)}
+              />
+            ))}
+          </Bar>
         </BarChart>
       </ResponsiveContainer>
     </Card>
