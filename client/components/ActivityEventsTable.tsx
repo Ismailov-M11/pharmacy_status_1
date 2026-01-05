@@ -46,14 +46,12 @@ export function ActivityEventsTable({
     let aVal: any = a[sortField];
     let bVal: any = b[sortField];
 
-    if (sortField === "time") {
-      aVal = new Date(a.time).getTime();
-      bVal = new Date(b.time).getTime();
-    }
-
-    if (typeof aVal === "string") {
-      aVal = aVal.toLowerCase();
-      bVal = (bVal as string).toLowerCase();
+    if (sortField === "changeDatetime") {
+      aVal = new Date(a.changeDatetime).getTime();
+      bVal = new Date(b.changeDatetime).getTime();
+    } else {
+      aVal = aVal?.toString().toLowerCase() || "";
+      bVal = (bVal as any)?.toString().toLowerCase() || "";
     }
 
     const comparison = aVal < bVal ? -1 : aVal > bVal ? 1 : 0;
