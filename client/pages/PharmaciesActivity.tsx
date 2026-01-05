@@ -139,7 +139,6 @@ export default function PharmaciesActivity() {
           <ActivityEventsTable
             events={data?.events || []}
             isLoading={isLoading}
-            onDateClick={handleDateClick}
           />
 
           {/* Selected Day Events Section - Independent */}
