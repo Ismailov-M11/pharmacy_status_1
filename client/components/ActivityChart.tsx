@@ -123,12 +123,7 @@ export function ActivityChart({
   }, [chartData]);
 
   const handleBarClick = (data: ChartDataPoint) => {
-    setSelectedDate(data.fullDate);
     onDateClick?.(data.fullDate);
-  };
-
-  const handleClosePanel = () => {
-    setSelectedDate(null);
   };
 
   if (isLoading) {
