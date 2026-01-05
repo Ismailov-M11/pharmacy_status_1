@@ -148,24 +148,26 @@ export default function NewPharmacies() {
           />
 
           {/* KPI Cards */}
-          {data && (
+          {data && !error && (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
               <KpiCard
                 label="🆕 Новых в периоде"
-                value={filteredPharmacies.length}
+                value={data.periodA.count}
                 variant="success"
               />
               <KpiCard
                 label="📅 Период сравнения"
-                value={data.periodB.count}
+                value={data.periodB.count >= 0 ? data.periodB.count : "—"}
                 variant="default"
               />
               <KpiCard
-                label={`📈 Разница (${data.diff.percent.toFixed(1)}%)`}
+                label={`📈 Разница ${
+                  data.periodB.count > 0
+                    ? `(${data.diff.percent.toFixed(1)}%)`
+                    : "(нет сравнения)"
+                }`}
                 value={
-                  data.diff.value >= 0
-                    ? `+${data.diff.value}`
-                    : `${data.diff.value}`
+                  data.diff.value >= 0 ? `+${data.diff.value}` : `${data.diff.value}`
                 }
                 variant={data.diff.value >= 0 ? "success" : "danger"}
               />
