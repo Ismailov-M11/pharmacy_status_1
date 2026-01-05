@@ -39,7 +39,7 @@ export function StatusFilterPanel({
       >
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-sm font-medium text-gray-600">Активирована</p>
+            <p className="text-sm font-medium text-gray-600">{t.activated}</p>
             <p className="text-2xl font-bold text-green-700">
               {statusCounts.activated}
             </p>
@@ -59,7 +59,7 @@ export function StatusFilterPanel({
       >
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-sm font-medium text-gray-600">Деактивирована</p>
+            <p className="text-sm font-medium text-gray-600">{t.deactivated}</p>
             <p className="text-2xl font-bold text-red-700">
               {statusCounts.deactivated}
             </p>
