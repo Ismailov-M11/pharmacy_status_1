@@ -36,9 +36,8 @@ export function NewPharmaciesChart({
   isLoading = false,
   fromDate = new Date(),
   onDateClick,
+  selectedDate = null,
 }: NewPharmaciesChartProps) {
-  const [selectedDate, setSelectedDate] = useState<string | null>(null);
-  const selectedDayPanelRef = useRef<HTMLDivElement>(null);
 
   // Get month name in Russian
   const monthName = useMemo(() => {
