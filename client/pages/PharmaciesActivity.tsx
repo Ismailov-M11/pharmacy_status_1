@@ -152,6 +152,22 @@ export default function PharmaciesActivity() {
             isLoading={isLoading}
           />
 
+          {/* KPI Cards */}
+          {data && !error && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+              <KpiCard
+                label="✅ Активировано"
+                value={filteredEvents.filter((e) => e.type === "ACTIVATED").length}
+                variant="success"
+              />
+              <KpiCard
+                label="⛔ Деактивировано"
+                value={filteredEvents.filter((e) => e.type === "DEACTIVATED").length}
+                variant="danger"
+              />
+            </div>
+          )}
+
           {/* Status Filter Panel */}
           <StatusFilterPanel
             events={data?.events || []}
