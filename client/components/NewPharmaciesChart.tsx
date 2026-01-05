@@ -122,7 +122,7 @@ export function NewPharmaciesChart({
     return (
       <Card className="p-6 mb-8">
         <h2 className="text-lg font-semibold text-gray-900 mb-4">
-          График новых аптек
+          График новых аптек — {monthName}
         </h2>
         <div className="flex items-center justify-center h-64">
           <div className="animate-pulse w-full">
