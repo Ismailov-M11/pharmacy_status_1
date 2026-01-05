@@ -32,6 +32,7 @@ export function ActivityFilterPanelDropdown({
   onReset,
   isLoading = false,
 }: ActivityFilterPanelDropdownProps) {
+  const { t } = useLanguage();
   const today = new Date();
 
   const [preset, setPreset] = useState<DatePreset>("week");
