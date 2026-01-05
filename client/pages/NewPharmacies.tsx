@@ -64,9 +64,8 @@ export default function NewPharmacies() {
       setFilteredPharmacies(response.items);
     } catch (err) {
       console.error("Failed to fetch new pharmacies data:", err);
-      const errorMsg = "Ошибка при загрузке данных";
-      setError(errorMsg);
-      toast.error(errorMsg);
+      setError(t.dataLoadError);
+      toast.error(t.dataLoadError);
     } finally {
       setIsLoading(false);
     }
