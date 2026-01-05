@@ -86,6 +86,38 @@ export function NewPharmaciesChart({
     setSelectedDate(null);
   };
 
+  // Calculate smart Y-axis domain based on max value
+  const yAxisDomain = useMemo(() => {
+    const maxCount = Math.max(...chartData.map((d) => d.count), 1);
+
+    let tickCount = 5;
+    let roundedMax = maxCount;
+
+    if (maxCount <= 10) {
+      roundedMax = Math.ceil(maxCount / 2) * 2;
+      tickCount = roundedMax / 2 + 1;
+    } else if (maxCount <= 50) {
+      roundedMax = Math.ceil(maxCount / 10) * 10;
+      tickCount = roundedMax / 10 + 1;
+    } else if (maxCount <= 100) {
+      roundedMax = Math.ceil(maxCount / 20) * 20;
+      tickCount = roundedMax / 20 + 1;
+    } else if (maxCount <= 500) {
+      roundedMax = Math.ceil(maxCount / 50) * 50;
+      tickCount = roundedMax / 50 + 1;
+    } else {
+      roundedMax = Math.ceil(maxCount / 100) * 100;
+      tickCount = roundedMax / 100 + 1;
+    }
+
+    return [0, roundedMax];
+  }, [chartData]);
+
+  // Get month name in Russian
+  const monthName = useMemo(() => {
+    return format(startOfMonth(fromDate), "LLLL yyyy", { locale: ru });
+  }, [fromDate]);
+
   if (isLoading) {
     return (
       <Card className="p-6 mb-8">
