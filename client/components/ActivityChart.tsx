@@ -58,7 +58,7 @@ export function ActivityChart({
     });
 
     // Convert to array and sort by date
-    return Object.entries(groupedByDate)
+    const dataArray = Object.entries(groupedByDate)
       .map(([date, data]) => ({
         date: format(new Date(date), "dd MMM", { locale: undefined }),
         fullDate: date,
@@ -66,7 +66,57 @@ export function ActivityChart({
         deactivated: data.deactivated,
       }))
       .sort((a, b) => a.fullDate.localeCompare(b.fullDate));
+
+    return dataArray;
   }, [events]);
+
+  // Get pharmacies for the selected date
+  const selectedDayEvents = useMemo(() => {
+    if (!selectedDate) return [];
+    return events.filter((e) => {
+      const dateKey = format(new Date(e.changeDatetime), "yyyy-MM-dd");
+      return dateKey === selectedDate;
+    });
+  }, [selectedDate, events]);
+
+  // Calculate smart Y-axis domain based on max value
+  const yAxisDomain = useMemo(() => {
+    const maxCount = Math.max(
+      ...chartData.map((d) => d.activated + d.deactivated),
+      1,
+    );
+
+    let tickCount = 5;
+    let roundedMax = maxCount;
+
+    if (maxCount <= 10) {
+      roundedMax = Math.ceil(maxCount / 2) * 2;
+      tickCount = roundedMax / 2 + 1;
+    } else if (maxCount <= 50) {
+      roundedMax = Math.ceil(maxCount / 10) * 10;
+      tickCount = roundedMax / 10 + 1;
+    } else if (maxCount <= 100) {
+      roundedMax = Math.ceil(maxCount / 20) * 20;
+      tickCount = roundedMax / 20 + 1;
+    } else if (maxCount <= 500) {
+      roundedMax = Math.ceil(maxCount / 50) * 50;
+      tickCount = roundedMax / 50 + 1;
+    } else {
+      roundedMax = Math.ceil(maxCount / 100) * 100;
+      tickCount = roundedMax / 100 + 1;
+    }
+
+    return [0, roundedMax];
+  }, [chartData]);
+
+  const handleBarClick = (data: ChartDataPoint) => {
+    setSelectedDate(data.fullDate);
+    onDateClick?.(data.fullDate);
+  };
+
+  const handleClosePanel = () => {
+    setSelectedDate(null);
+  };
 
   if (isLoading) {
     return (
