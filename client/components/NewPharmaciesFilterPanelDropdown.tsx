@@ -204,7 +204,7 @@ export function NewPharmaciesFilterPanelDropdown({
           </div>
           <div>
             <label className="text-sm font-medium text-gray-700 block mb-2">
-              По:
+              {t.to}
             </label>
             <Input
               type="date"
@@ -231,14 +231,14 @@ export function NewPharmaciesFilterPanelDropdown({
           disabled={isLoading || !!validationError}
           className="bg-purple-700 hover:bg-purple-800 text-white flex-1 sm:flex-none"
         >
-          {isLoading ? "Загрузка..." : "Применить"}
+          {isLoading ? t.loading_action : t.apply_action}
         </Button>
         <Button
           onClick={handleReset}
           variant="outline"
           className="border-purple-700 text-purple-700 hover:bg-purple-50 flex-1 sm:flex-none"
         >
-          Сброс
+          {t.reset}
         </Button>
       </div>
     </Card>
