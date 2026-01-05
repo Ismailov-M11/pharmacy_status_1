@@ -132,7 +132,8 @@ export const translations = {
 
     // Validation
     invalidDateRange: 'Дата "С" не может быть позже даты "По"',
-    periodTooLarge: "⚠️ Период больше 366 дней. Показаны данные, но это может быть слишком большой диапазон.",
+    periodTooLarge:
+      "⚠️ Период больше 366 дней. Показаны данные, но это может быть слишком большой диапазон.",
 
     // Filters
     filter: "Фильтр",
@@ -242,7 +243,8 @@ export const translations = {
 
     // New Pharmacies Page
     newPharmaciesTitle: "Yangi dorixonalar",
-    newPharmaciesDescription: "O'qitishdan so'ng birinchi marta faollashtirilgan dorixonalar",
+    newPharmaciesDescription:
+      "O'qitishdan so'ng birinchi marta faollashtirilgan dorixonalar",
     newPharmaciesChart: "Yangi dorixonalar grafigi",
     newPharmaciesCount: "Davrda yangi",
     comparisonPeriod: "Taqqoslash davri",
@@ -252,7 +254,8 @@ export const translations = {
 
     // Pharmacy Activities Page
     activitiesTitle: "Dorixonalar faoliyyati",
-    activitiesDescription: "Dorixonalarni faollashtirish va o'chirishni ko'rish",
+    activitiesDescription:
+      "Dorixonalarni faollashtirish va o'chirishni ko'rish",
     activitiesChart: "Dorixona faoliyyati grafigi",
     noActivities: "Tanlangan davr uchun voqealar yo'q",
     eventsLabel: "Voqealar",
@@ -295,7 +298,8 @@ export const translations = {
 
     // Validation
     invalidDateRange: 'Sana "Dan" sana "Gacha"dan keyin bo\'lishi mumkin emas',
-    periodTooLarge: "⚠️ Davr 366 kundan ko'p. Ma'lumotlar ko'rsatildi, lekin bu juda katta oraliq bo'lishi mumkin.",
+    periodTooLarge:
+      "⚠️ Davr 366 kundan ko'p. Ma'lumotlar ko'rsatildi, lekin bu juda katta oraliq bo'lishi mumkin.",
 
     // Filters
     filter: "Filtr",
