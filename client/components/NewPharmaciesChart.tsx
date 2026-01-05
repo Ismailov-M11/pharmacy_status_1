@@ -155,7 +155,7 @@ export function NewPharmaciesChart({
     <div className="mb-8">
       <Card className="p-6">
         <h2 className="text-lg font-semibold text-gray-900 mb-6">
-          График новых аптек — {monthName}
+          {t.newPharmaciesChart} — {monthName}
         </h2>
         <ResponsiveContainer width="100%" height={400}>
           <BarChart
