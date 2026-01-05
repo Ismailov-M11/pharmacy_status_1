@@ -9,6 +9,7 @@ import {
   Tooltip,
   Legend,
   ResponsiveContainer,
+  Cell,
 } from "recharts";
 import { ActivityEvent } from "@/lib/reportsApi";
 import { format, parse } from "date-fns";
