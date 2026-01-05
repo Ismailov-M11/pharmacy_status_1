@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useRef } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Header } from "@/components/Header";
@@ -17,7 +17,6 @@ import { toast } from "sonner";
 export default function NewPharmacies() {
   const { isAuthenticated, isLoading: authLoading } = useAuth();
   const navigate = useNavigate();
-  const selectedDayRef = useRef<HTMLDivElement>(null);
 
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -29,6 +28,9 @@ export default function NewPharmacies() {
   const [toDate, setToDate] = useState<Date>(endOfMonth(new Date()));
   const [compareFromDate, setCompareFromDate] = useState<Date | null>(null);
   const [compareToDate, setCompareToDate] = useState<Date | null>(null);
+  const [selectedDateFilter, setSelectedDateFilter] = useState<string | null>(
+    null,
+  );
 
   useEffect(() => {
     if (authLoading) return;
@@ -96,14 +98,8 @@ export default function NewPharmacies() {
     loadData(from, to, compareFrom, compareTo);
   };
 
-  const handleDateClick = () => {
-    // Scroll to the selected day section after a brief delay
-    setTimeout(() => {
-      selectedDayRef.current?.scrollIntoView({
-        behavior: "smooth",
-        block: "center",
-      });
-    }, 100);
+  const handleDateClick = (date: string | null) => {
+    setSelectedDateFilter(date);
   };
 
   if (authLoading) {
@@ -141,6 +137,7 @@ export default function NewPharmacies() {
             isLoading={isLoading}
             fromDate={fromDate}
             onDateClick={handleDateClick}
+            selectedDate={selectedDateFilter}
           />
 
           {/* Filter Panel */}

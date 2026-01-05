@@ -1,10 +1,11 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Header } from "@/components/Header";
 import { ActivityFilterPanelDropdown } from "@/components/ActivityFilterPanelDropdown";
 import { ActivityChart } from "@/components/ActivityChart";
 import { ActivityEventsTable } from "@/components/ActivityEventsTable";
+import { StatusFilterPanel } from "@/components/StatusFilterPanel";
 import {
   fetchActivityData,
   ActivityEvent,
@@ -30,6 +31,7 @@ export default function PharmaciesActivity() {
   const [selectedDateFilter, setSelectedDateFilter] = useState<string | null>(
     null,
   );
+  const [selectedStatus, setSelectedStatus] = useState<string | null>(null);
 
   useEffect(() => {
     if (authLoading) return;
@@ -70,8 +72,16 @@ export default function PharmaciesActivity() {
     setFromDate(from);
     setToDate(to);
     setSelectedDateFilter(null);
+    setSelectedStatus(null);
     loadData(from, to);
   };
+
+  // Filter events based on selected status
+  const filteredEvents = useMemo(() => {
+    if (!data?.events) return [];
+    if (!selectedStatus) return data.events;
+    return data.events.filter((e) => e.type === selectedStatus);
+  }, [data?.events, selectedStatus]);
 
   const handleDateClick = (date: string) => {
     setSelectedDateFilter(date);
@@ -84,13 +94,14 @@ export default function PharmaciesActivity() {
     }, 100);
   };
 
-  // Get events for the selected day (independent from main table filter)
-  const selectedDayEvents = selectedDateFilter
-    ? data?.events.filter((e) => {
-        const dateKey = e.changeDatetime.split("T")[0];
-        return dateKey === selectedDateFilter;
-      }) || []
-    : [];
+  // Get events for the selected day
+  const selectedDayEvents = useMemo(() => {
+    if (!selectedDateFilter) return [];
+    return filteredEvents.filter((e) => {
+      const dateKey = e.changeDatetime.split("T")[0];
+      return dateKey === selectedDateFilter;
+    });
+  }, [selectedDateFilter, filteredEvents]);
 
   if (authLoading) {
     return (
@@ -123,9 +134,12 @@ export default function PharmaciesActivity() {
 
           {/* Activity Chart - Moved to Top */}
           <ActivityChart
-            events={data?.events || []}
+            events={filteredEvents}
             isLoading={isLoading}
             onDateClick={handleDateClick}
+            fromDate={fromDate}
+            toDate={toDate}
+            selectedDate={selectedDateFilter}
           />
 
           {/* Filter Panel - After Chart */}
@@ -135,94 +149,104 @@ export default function PharmaciesActivity() {
             isLoading={isLoading}
           />
 
-          {/* Events Table - Full Month Data */}
-          <ActivityEventsTable
+          {/* Status Filter Panel */}
+          <StatusFilterPanel
             events={data?.events || []}
-            isLoading={isLoading}
-            onDateClick={handleDateClick}
+            selectedStatus={selectedStatus}
+            onStatusChange={setSelectedStatus}
           />
 
-          {/* Selected Day Events Section - Independent */}
+          {/* Events Table - Full Month Data */}
+          <ActivityEventsTable
+            events={filteredEvents}
+            isLoading={isLoading}
+          />
+
+          {/* Selected Day Events Modal - Centralized Display */}
           {selectedDateFilter && selectedDayEvents.length > 0 && (
-            <div ref={selectedDayRef} className="mt-8 scroll-mt-20">
-              <Card className="p-6 border-blue-200 bg-blue-50">
-                <div className="flex items-center justify-between mb-6">
-                  <h3 className="text-lg font-semibold text-gray-900">
-                    События {format(new Date(selectedDateFilter), "dd.MM.yyyy")}
-                  </h3>
-                  <button
-                    onClick={() => setSelectedDateFilter(null)}
-                    className="inline-flex items-center justify-center w-8 h-8 rounded-full text-gray-500 hover:bg-blue-100 hover:text-gray-700 transition-colors"
-                    aria-label="Закрыть"
-                  >
-                    <X className="w-5 h-5" />
-                  </button>
-                </div>
-                <div className="overflow-x-auto">
-                  <table className="w-full text-sm">
-                    <thead>
-                      <tr className="border-b border-blue-200">
-                        <th className="text-left py-3 px-3 font-semibold text-gray-700">
-                          №
-                        </th>
-                        <th className="text-left py-3 px-3 font-semibold text-gray-700">
-                          Код
-                        </th>
-                        <th className="text-left py-3 px-3 font-semibold text-gray-700">
-                          Название
-                        </th>
-                        <th className="text-left py-3 px-3 font-semibold text-gray-700">
-                          Адрес
-                        </th>
-                        <th className="text-left py-3 px-3 font-semibold text-gray-700">
-                          Статус
-                        </th>
-                        <th className="text-left py-3 px-3 font-semibold text-gray-700">
-                          Время
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {selectedDayEvents.map((event, index) => (
-                        <tr
-                          key={event.id}
-                          className="border-b border-blue-100 hover:bg-blue-100 transition-colors"
-                        >
-                          <td className="py-3 px-3 text-gray-600">
-                            {index + 1}
-                          </td>
-                          <td className="py-3 px-3 font-medium text-gray-900">
-                            {event.code}
-                          </td>
-                          <td className="py-3 px-3 text-gray-900">
-                            {event.pharmacyName}
-                          </td>
-                          <td className="py-3 px-3 text-gray-600">
-                            {event.address || "—"}
-                          </td>
-                          <td className="py-3 px-3">
-                            <Badge
-                              className={
-                                event.type === "ACTIVATED"
-                                  ? "bg-green-100 text-green-800"
-                                  : "bg-red-100 text-red-800"
-                              }
-                            >
-                              {event.type === "ACTIVATED"
-                                ? "✅ Активирована"
-                                : "⛔ Деактивирована"}
-                            </Badge>
-                          </td>
-                          <td className="py-3 px-3 text-gray-600">
-                            {format(new Date(event.changeDatetime), "HH:mm")}
-                          </td>
+            <>
+              {/* Modal Overlay */}
+              <div
+                className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-40"
+                onClick={() => setSelectedDateFilter(null)}
+              >
+                {/* Modal Content */}
+                <Card
+                  className="w-full max-w-4xl max-h-[80vh] overflow-hidden flex flex-col border-blue-200 bg-white"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <div className="flex items-center justify-between p-6 border-b border-blue-200 bg-blue-50">
+                    <h3 className="text-lg font-semibold text-gray-900">
+                      События {format(new Date(selectedDateFilter), "dd.MM.yyyy")}
+                    </h3>
+                    <button
+                      onClick={() => setSelectedDateFilter(null)}
+                      className="inline-flex items-center justify-center w-8 h-8 rounded-full text-gray-500 hover:bg-blue-100 hover:text-gray-700 transition-colors"
+                      aria-label="Закрыть"
+                    >
+                      <X className="w-5 h-5" />
+                    </button>
+                  </div>
+
+                  {/* Modal Body */}
+                  <div className="flex-1 overflow-x-auto p-6">
+                    <table className="w-full text-sm">
+                      <thead>
+                        <tr className="border-b border-blue-200">
+                          <th className="text-left py-3 px-3 font-semibold text-gray-700">
+                            №
+                          </th>
+                          <th className="text-left py-3 px-3 font-semibold text-gray-700">
+                            Код
+                          </th>
+                          <th className="text-left py-3 px-3 font-semibold text-gray-700">
+                            Название
+                          </th>
+                          <th className="text-left py-3 px-3 font-semibold text-gray-700">
+                            Адрес
+                          </th>
+                          <th className="text-left py-3 px-3 font-semibold text-gray-700">
+                            Статус
+                          </th>
+                          <th className="text-left py-3 px-3 font-semibold text-gray-700">
+                            Время
+                          </th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </Card>
-            </div>
+                      </thead>
+                      <tbody>
+                        {selectedDayEvents.map((event, index) => (
+                          <tr
+                            key={event.id}
+                            className="border-b border-blue-100 hover:bg-blue-50 transition-colors"
+                          >
+                            <td className="py-3 px-3 text-gray-600">
+                              {index + 1}
+                            </td>
+                            <td className="py-3 px-3 font-medium text-gray-900">
+                              {event.code}
+                            </td>
+                            <td className="py-3 px-3 text-gray-900">
+                              {event.pharmacyName}
+                            </td>
+                            <td className="py-3 px-3 text-gray-600">
+                              {event.address || "—"}
+                            </td>
+                            <td className="py-3 px-3 text-center">
+                              <span className="text-xl">
+                                {event.type === "ACTIVATED" ? "✅" : "⛔"}
+                              </span>
+                            </td>
+                            <td className="py-3 px-3 text-gray-600">
+                              {format(new Date(event.changeDatetime), "HH:mm")}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </Card>
+              </div>
+            </>
           )}
         </div>
       </main>

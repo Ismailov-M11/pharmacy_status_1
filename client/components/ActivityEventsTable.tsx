@@ -17,7 +17,6 @@ import { ChevronDown, ChevronUp } from "lucide-react";
 interface ActivityEventsTableProps {
   events: ActivityEvent[];
   isLoading?: boolean;
-  onDateClick?: (date: string) => void;
 }
 
 type SortField =
@@ -34,7 +33,6 @@ type SortDirection = "asc" | "desc";
 export function ActivityEventsTable({
   events,
   isLoading = false,
-  onDateClick,
 }: ActivityEventsTableProps) {
   const [sortField, setSortField] = useState<SortField>("changeDatetime");
   const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
@@ -212,27 +210,13 @@ export function ActivityEventsTable({
                 <TableCell className="text-sm text-gray-600">
                   {event.responsiblePhone || "—"}
                 </TableCell>
-                <TableCell
-                  className="text-sm font-medium cursor-pointer hover:text-blue-600"
-                  onClick={() => onDateClick?.(event.changeDatetime)}
-                >
+                <TableCell className="text-sm font-medium">
                   {formatDateTime(event.changeDatetime)}
                 </TableCell>
-                <TableCell>
-                  <Badge
-                    variant={
-                      event.type === "ACTIVATED" ? "default" : "destructive"
-                    }
-                    className={
-                      event.type === "ACTIVATED"
-                        ? "bg-green-100 text-green-800"
-                        : "bg-red-100 text-red-800"
-                    }
-                  >
-                    {event.type === "ACTIVATED"
-                      ? "✅ Активирована"
-                      : "⛔ Деактивирована"}
-                  </Badge>
+                <TableCell className="text-center">
+                  <span className="text-xl">
+                    {event.type === "ACTIVATED" ? "✅" : "⛔"}
+                  </span>
                 </TableCell>
               </TableRow>
             ))}
