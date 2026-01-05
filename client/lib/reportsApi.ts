@@ -87,6 +87,8 @@ const mockNewPharmaciesData: NewPharmaciesResponse = {
       onboardedAt: "2026-01-06T11:03:00+05:00",
       pharmacyName: "Apteka #42",
       district: "Sergeli",
+      address: "Ул. Амира Темура, 45",
+      phone: "+998 71 210-45-45",
       currentStatus: "active",
     },
     {
@@ -94,6 +96,8 @@ const mockNewPharmaciesData: NewPharmaciesResponse = {
       onboardedAt: "2026-01-07T09:15:00+05:00",
       pharmacyName: "Apteka #15",
       district: "Yunusabad",
+      address: "Ул. Букхоро, 78",
+      phone: "+998 71 215-30-30",
       currentStatus: "active",
     },
     {
@@ -101,6 +105,8 @@ const mockNewPharmaciesData: NewPharmaciesResponse = {
       onboardedAt: "2026-01-08T14:30:00+05:00",
       pharmacyName: "Apteka #88",
       district: "Mirabad",
+      address: "Проспект Мирабда, 12",
+      phone: "+998 71 220-15-15",
       currentStatus: "inactive",
     },
     {
@@ -108,6 +114,8 @@ const mockNewPharmaciesData: NewPharmaciesResponse = {
       onboardedAt: "2026-01-09T10:45:00+05:00",
       pharmacyName: "Apteka #5",
       district: "Shayhantaur",
+      address: "Ул. Чустаки, 55",
+      phone: "+998 71 225-60-60",
       currentStatus: "active",
     },
     {
@@ -115,6 +123,8 @@ const mockNewPharmaciesData: NewPharmaciesResponse = {
       onboardedAt: "2026-01-10T13:20:00+05:00",
       pharmacyName: "Apteka #25",
       district: "Chilianzar",
+      address: "Ул. Туси, 20",
+      phone: "+998 71 230-25-25",
       currentStatus: "active",
     },
     {
@@ -122,6 +132,8 @@ const mockNewPharmaciesData: NewPharmaciesResponse = {
       onboardedAt: "2026-01-11T11:00:00+05:00",
       pharmacyName: "Apteka #60",
       district: "Sergeli",
+      address: "Ул. Абая, 90",
+      phone: "+998 71 235-40-40",
       currentStatus: "active",
     },
     {
@@ -129,6 +141,8 @@ const mockNewPharmaciesData: NewPharmaciesResponse = {
       onboardedAt: "2026-01-12T08:30:00+05:00",
       pharmacyName: "Apteka #33",
       district: "Yunusabad",
+      address: "Ул. Хорезма, 33",
+      phone: "+998 71 240-50-50",
       currentStatus: "inactive",
     },
     {
@@ -136,6 +150,8 @@ const mockNewPharmaciesData: NewPharmaciesResponse = {
       onboardedAt: "2026-01-13T15:15:00+05:00",
       pharmacyName: "Apteka #77",
       district: "Mirabad",
+      address: "Ул. Фирдавси, 15",
+      phone: "+998 71 245-70-70",
       currentStatus: "active",
     },
     {
@@ -143,6 +159,8 @@ const mockNewPharmaciesData: NewPharmaciesResponse = {
       onboardedAt: "2026-01-14T10:30:00+05:00",
       pharmacyName: "Apteka #92",
       district: "Yashnabad",
+      address: "Ул. Навои, 88",
+      phone: "+998 71 250-35-35",
       currentStatus: "active",
     },
     {
@@ -150,6 +168,8 @@ const mockNewPharmaciesData: NewPharmaciesResponse = {
       onboardedAt: "2026-01-15T12:45:00+05:00",
       pharmacyName: "Apteka #101",
       district: "Sergeli",
+      address: "Ул. Мирзо Улугбека, 50",
+      phone: "+998 71 255-80-80",
       currentStatus: "active",
     },
     {
@@ -157,6 +177,8 @@ const mockNewPharmaciesData: NewPharmaciesResponse = {
       onboardedAt: "2026-01-16T09:00:00+05:00",
       pharmacyName: "Apteka #47",
       district: "Shayhantaur",
+      address: "Ул. Носыра, 42",
+      phone: "+998 71 260-10-10",
       currentStatus: "active",
     },
     {
@@ -164,6 +186,8 @@ const mockNewPharmaciesData: NewPharmaciesResponse = {
       onboardedAt: "2026-01-17T14:20:00+05:00",
       pharmacyName: "Apteka #64",
       district: "Chilianzar",
+      address: "Ул. Чиланзара, 28",
+      phone: "+998 71 265-90-90",
       currentStatus: "active",
     },
   ],
