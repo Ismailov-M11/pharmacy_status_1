@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import { Card } from "@/components/ui/card";
 import {
   BarChart,
@@ -11,35 +11,78 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { NewPharmacy } from "@/lib/reportsApi";
-import { format } from "date-fns";
+import { format, getDaysInMonth, startOfMonth } from "date-fns";
+import { X } from "lucide-react";
 
 interface NewPharmaciesChartProps {
   pharmacies: NewPharmacy[];
   isLoading?: boolean;
+  fromDate?: Date;
+}
+
+interface ChartDataPoint {
+  date: string;
+  fullDate: string;
+  count: number;
+  day: number;
 }
 
 export function NewPharmaciesChart({
   pharmacies,
   isLoading = false,
+  fromDate = new Date(),
 }: NewPharmaciesChartProps) {
+  const [selectedDate, setSelectedDate] = useState<string | null>(null);
+
   const chartData = useMemo(() => {
-    // Group pharmacies by date and count total
-    const groupedByDate: Record<string, number> = {};
+    // Group pharmacies by date
+    const groupedByDate: Record<string, NewPharmacy[]> = {};
 
     pharmacies.forEach((pharmacy) => {
       const dateKey = format(new Date(pharmacy.onboardedAt), "yyyy-MM-dd");
-      groupedByDate[dateKey] = (groupedByDate[dateKey] || 0) + 1;
+      if (!groupedByDate[dateKey]) {
+        groupedByDate[dateKey] = [];
+      }
+      groupedByDate[dateKey].push(pharmacy);
     });
 
-    // Convert to array and sort by date
-    return Object.entries(groupedByDate)
-      .map(([date, count]) => ({
-        date: format(new Date(date), "dd MMM", { locale: undefined }),
-        fullDate: date,
+    // Get all days in the selected month
+    const monthStart = startOfMonth(fromDate);
+    const daysInMonth = getDaysInMonth(monthStart);
+    const chartDataArray: ChartDataPoint[] = [];
+
+    for (let day = 1; day <= daysInMonth; day++) {
+      const date = new Date(monthStart.getFullYear(), monthStart.getMonth(), day);
+      const dateKey = format(date, "yyyy-MM-dd");
+      const count = groupedByDate[dateKey]?.length || 0;
+
+      chartDataArray.push({
+        date: format(date, "dd", { locale: undefined }),
+        fullDate: dateKey,
         count: count,
-      }))
-      .sort((a, b) => a.fullDate.localeCompare(b.fullDate));
-  }, [pharmacies]);
+        day: day,
+      });
+    }
+
+    return chartDataArray;
+  }, [pharmacies, fromDate]);
+
+  // Get pharmacies for the selected date
+  const selectedDayPharmacies = useMemo(() => {
+    if (!selectedDate) return [];
+    return pharmacies.filter((p) => {
+      const dateKey = format(new Date(p.onboardedAt), "yyyy-MM-dd");
+      return dateKey === selectedDate;
+    });
+  }, [selectedDate, pharmacies]);
+
+  const handleBarClick = (data: ChartDataPoint) => {
+    setSelectedDate(data.fullDate);
+  };
+
+  const handleClosePanel = () => {
+    setSelectedDate(null);
+  };
 
   if (isLoading) {
     return (
