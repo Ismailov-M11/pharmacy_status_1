@@ -212,10 +212,7 @@ export function ActivityEventsTable({
                 <TableCell className="text-sm text-gray-600">
                   {event.responsiblePhone || "—"}
                 </TableCell>
-                <TableCell
-                  className="text-sm font-medium cursor-pointer hover:text-blue-600"
-                  onClick={() => onDateClick?.(event.changeDatetime)}
-                >
+                <TableCell className="text-sm font-medium">
                   {formatDateTime(event.changeDatetime)}
                 </TableCell>
                 <TableCell className="text-center">
