@@ -166,7 +166,16 @@ export function NewPharmaciesChart({
               name="Новые аптеки"
               radius={[4, 4, 0, 0]}
               onClick={(data) => handleBarClick(data as ChartDataPoint)}
-            />
+            >
+              {chartData.map((entry, index) => (
+                <Cell
+                  key={`cell-${index}`}
+                  fill={selectedDate === entry.fullDate ? "#7c3aed" : "#a855f7"}
+                  style={{ cursor: "pointer" }}
+                  onClick={() => handleBarClick(entry)}
+                />
+              ))}
+            </Bar>
           </BarChart>
         </ResponsiveContainer>
       </Card>
