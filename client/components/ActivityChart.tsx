@@ -39,6 +39,7 @@ export function ActivityChart({
   toDate,
   selectedDate = null,
 }: ActivityChartProps) {
+  const { t } = useLanguage();
 
   const chartData = useMemo(() => {
     // Group events by date
