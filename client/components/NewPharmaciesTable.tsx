@@ -99,13 +99,16 @@ export function NewPharmaciesTable({
         <Table>
           <TableHeader>
             <TableRow className="bg-gray-50">
+              <TableHead className="text-center w-12">
+                <div className="font-semibold text-gray-700">№</div>
+              </TableHead>
               <TableHead
                 className="cursor-pointer hover:bg-gray-100"
-                onClick={() => handleSort("onboardedAt")}
+                onClick={() => handleSort("code")}
               >
                 <button className="flex items-center font-semibold text-gray-700">
-                  Дата ввода
-                  <SortIcon field="onboardedAt" />
+                  Код
+                  <SortIcon field="code" />
                 </button>
               </TableHead>
               <TableHead
@@ -113,7 +116,7 @@ export function NewPharmaciesTable({
                 onClick={() => handleSort("pharmacyName")}
               >
                 <button className="flex items-center font-semibold text-gray-700">
-                  Аптека
+                  Название аптеки
                   <SortIcon field="pharmacyName" />
                 </button>
               </TableHead>
@@ -128,38 +131,65 @@ export function NewPharmaciesTable({
               </TableHead>
               <TableHead
                 className="cursor-pointer hover:bg-gray-100"
+                onClick={() => handleSort("landmark")}
+              >
+                <button className="flex items-center font-semibold text-gray-700">
+                  Ориентир
+                  <SortIcon field="landmark" />
+                </button>
+              </TableHead>
+              <TableHead
+                className="cursor-pointer hover:bg-gray-100"
                 onClick={() => handleSort("phone")}
               >
                 <button className="flex items-center font-semibold text-gray-700">
-                  Телефон
+                  Телефон аптеки
                   <SortIcon field="phone" />
                 </button>
               </TableHead>
               <TableHead
                 className="cursor-pointer hover:bg-gray-100"
-                onClick={() => handleSort("district")}
+                onClick={() => handleSort("responsiblePhone")}
               >
                 <button className="flex items-center font-semibold text-gray-700">
-                  Район
-                  <SortIcon field="district" />
+                  Телефон ответственного
+                  <SortIcon field="responsiblePhone" />
+                </button>
+              </TableHead>
+              <TableHead
+                className="cursor-pointer hover:bg-gray-100"
+                onClick={() => handleSort("onboardedAt")}
+              >
+                <button className="flex items-center font-semibold text-gray-700">
+                  Дата ввода
+                  <SortIcon field="onboardedAt" />
                 </button>
               </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {sortedPharmacies.map((pharmacy) => (
+            {sortedPharmacies.map((pharmacy, index) => (
               <TableRow key={pharmacy.id}>
-                <TableCell className="font-medium text-sm">
-                  {formatDateTime(pharmacy.onboardedAt)}
+                <TableCell className="text-center text-sm text-gray-500 w-12">
+                  {index + 1}
                 </TableCell>
+                <TableCell className="font-medium text-sm">{pharmacy.code}</TableCell>
                 <TableCell className="font-medium">{pharmacy.pharmacyName}</TableCell>
                 <TableCell className="text-sm text-gray-600">
                   {pharmacy.address || "—"}
                 </TableCell>
                 <TableCell className="text-sm text-gray-600">
+                  {pharmacy.landmark || "—"}
+                </TableCell>
+                <TableCell className="text-sm text-gray-600">
                   {pharmacy.phone || "—"}
                 </TableCell>
-                <TableCell className="text-sm">{pharmacy.district}</TableCell>
+                <TableCell className="text-sm text-gray-600">
+                  {pharmacy.responsiblePhone || "—"}
+                </TableCell>
+                <TableCell className="text-sm">
+                  {formatDateTime(pharmacy.onboardedAt)}
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>
