@@ -128,6 +128,7 @@ export default function NewPharmacies() {
           <NewPharmaciesChart
             pharmacies={filteredPharmacies}
             isLoading={isLoading}
+            fromDate={fromDate}
           />
 
           {/* Filter Panel */}
