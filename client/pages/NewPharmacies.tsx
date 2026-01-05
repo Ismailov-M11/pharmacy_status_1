@@ -95,7 +95,6 @@ export default function NewPharmacies() {
     loadData(from, to, compareFrom, compareTo);
   };
 
-
   if (authLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">

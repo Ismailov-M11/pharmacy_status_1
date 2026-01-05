@@ -63,9 +63,7 @@ export function NewPharmaciesChart({
           График новых аптек
         </h2>
         <div className="flex items-center justify-center h-64">
-          <span className="text-gray-500">
-            Нет новых аптек за период
-          </span>
+          <span className="text-gray-500">Нет новых аптек за период</span>
         </div>
       </Card>
     );
