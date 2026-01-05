@@ -3,7 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Header } from "@/components/Header";
 import { KpiCard } from "@/components/KpiCard";
-import { NewPharmaciesFilterPanel } from "@/components/NewPharmaciesFilterPanel";
+import { NewPharmaciesFilterPanelDropdown } from "@/components/NewPharmaciesFilterPanelDropdown";
+import { NewPharmaciesChart } from "@/components/NewPharmaciesChart";
 import { NewPharmaciesTable } from "@/components/NewPharmaciesTable";
 import {
   fetchNewPharmaciesData,
@@ -105,7 +106,7 @@ export default function NewPharmacies() {
 
         <div className="px-4 sm:px-6 lg:px-8 pb-8">
           {/* Filter Panel */}
-          <NewPharmaciesFilterPanel
+          <NewPharmaciesFilterPanelDropdown
             onFiltersChange={handleFiltersChange}
             onReset={handleReset}
             isLoading={isLoading}
@@ -135,6 +136,12 @@ export default function NewPharmacies() {
               />
             </div>
           )}
+
+          {/* New Pharmacies Chart */}
+          <NewPharmaciesChart
+            pharmacies={filteredPharmacies}
+            isLoading={isLoading}
+          />
 
           {/* Main Grid */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

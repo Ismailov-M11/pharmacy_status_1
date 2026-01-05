@@ -3,7 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Header } from "@/components/Header";
 import { KpiCard } from "@/components/KpiCard";
-import { ActivityFilterPanel } from "@/components/ActivityFilterPanel";
+import { ActivityFilterPanelDropdown } from "@/components/ActivityFilterPanelDropdown";
+import { ActivityChart } from "@/components/ActivityChart";
 import { ActivityEventsTable } from "@/components/ActivityEventsTable";
 import { PharmacyHistoryModal } from "@/components/PharmacyHistoryModal";
 import {
@@ -99,7 +100,7 @@ export default function PharmaciesActivity() {
 
         <div className="px-4 sm:px-6 lg:px-8 pb-8">
           {/* Filter Panel */}
-          <ActivityFilterPanel
+          <ActivityFilterPanelDropdown
             onFiltersChange={handleFiltersChange}
             onReset={handleReset}
             isLoading={isLoading}
@@ -129,6 +130,9 @@ export default function PharmaciesActivity() {
               />
             </div>
           )}
+
+          {/* Activity Chart */}
+          <ActivityChart events={data?.events || []} isLoading={isLoading} />
 
           {/* Events Table */}
           <ActivityEventsTable

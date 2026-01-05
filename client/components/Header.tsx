@@ -53,7 +53,7 @@ export function Header() {
     navigationItems.push(
       {
         label: agentLabel,
-        path: role === "ROLE_OPERATOR" ? "/operator" : "/agent",
+        path: "/agent",
         icon: agentIcon,
       },
       { label: t.maps || "Карты", path: "/maps", icon: Map },
