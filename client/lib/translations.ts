@@ -288,6 +288,15 @@ export const translations = {
     year: "Yil",
     custom: "Maxsus",
     graphLabel: "Dorixona soni",
+    landmark: "Mo'ljal",
+    onboardedAt: "Kiritilgan sana",
+    noNewPharmaciesSelected: "Tanlangan davr uchun yangi dorixonalar yo'q",
+    noActivitiesSelected: "Tanlangan davr uchun voqealar yo'q",
+    noEvents: "Voqealar yo'q",
+    activated: "Faollashtirildi",
+    deactivated: "O'chirildi",
+    loading_action: "Yuklanmoqda...",
+    apply_action: "Qo'llash",
 
     // Actions
     edit: "Tahrirlash",
