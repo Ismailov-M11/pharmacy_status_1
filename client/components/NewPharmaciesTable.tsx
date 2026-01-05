@@ -17,7 +17,14 @@ interface NewPharmaciesTableProps {
   isLoading?: boolean;
 }
 
-type SortField = "code" | "pharmacyName" | "address" | "landmark" | "phone" | "responsiblePhone" | "onboardedAt";
+type SortField =
+  | "code"
+  | "pharmacyName"
+  | "address"
+  | "landmark"
+  | "phone"
+  | "responsiblePhone"
+  | "onboardedAt";
 type SortDirection = "asc" | "desc";
 
 export function NewPharmaciesTable({
@@ -173,8 +180,12 @@ export function NewPharmaciesTable({
                 <TableCell className="text-center text-sm text-gray-500 w-12">
                   {index + 1}
                 </TableCell>
-                <TableCell className="font-medium text-sm">{pharmacy.code}</TableCell>
-                <TableCell className="font-medium">{pharmacy.pharmacyName}</TableCell>
+                <TableCell className="font-medium text-sm">
+                  {pharmacy.code}
+                </TableCell>
+                <TableCell className="font-medium">
+                  {pharmacy.pharmacyName}
+                </TableCell>
                 <TableCell className="text-sm text-gray-600">
                   {pharmacy.address || "—"}
                 </TableCell>

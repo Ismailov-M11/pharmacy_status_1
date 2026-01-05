@@ -59,7 +59,11 @@ export function NewPharmaciesChart({
     const chartDataArray: ChartDataPoint[] = [];
 
     for (let day = 1; day <= daysInMonth; day++) {
-      const date = new Date(monthStart.getFullYear(), monthStart.getMonth(), day);
+      const date = new Date(
+        monthStart.getFullYear(),
+        monthStart.getMonth(),
+        day,
+      );
       const dateKey = format(date, "yyyy-MM-dd");
       const count = groupedByDate[dateKey]?.length || 0;
 
