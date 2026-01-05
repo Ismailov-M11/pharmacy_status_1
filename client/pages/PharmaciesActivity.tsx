@@ -1,11 +1,13 @@
 import { useState, useEffect, useRef, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { Header } from "@/components/Header";
 import { ActivityFilterPanelDropdown } from "@/components/ActivityFilterPanelDropdown";
 import { ActivityChart } from "@/components/ActivityChart";
 import { ActivityEventsTable } from "@/components/ActivityEventsTable";
 import { StatusFilterPanel } from "@/components/StatusFilterPanel";
+import { KpiCard } from "@/components/KpiCard";
 import {
   fetchActivityData,
   ActivityEvent,
