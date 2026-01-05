@@ -203,7 +203,7 @@ export function ActivityChart({
               allowDecimals={false}
               type="number"
               label={{
-                value: "Количество событий",
+                value: t.eventCount,
                 angle: -90,
                 position: "insideLeft",
                 offset: 10,
