@@ -231,11 +231,17 @@ const mockNewPharmaciesData: NewPharmaciesResponse = {
 
 export interface ActivityEvent {
   id: number;
-  time: string;
+  changeDatetime: string;
+  code: string;
   pharmacyName: string;
+  address?: string;
+  landmark?: string;
+  phone?: string;
+  responsiblePhone?: string;
   district: string;
   type: "ACTIVATED" | "DEACTIVATED";
   source: string;
+  currentStatus: "active" | "inactive";
 }
 
 export interface ActivitySummary {
