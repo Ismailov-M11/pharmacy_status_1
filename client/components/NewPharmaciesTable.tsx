@@ -7,7 +7,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { NewPharmacy } from "@/lib/reportsApi";
 import { format } from "date-fns";
