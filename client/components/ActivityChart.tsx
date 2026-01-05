@@ -224,7 +224,14 @@ export function ActivityChart({
               radius={[4, 4, 0, 0]}
               onClick={(data) => handleBarClick(data as ChartDataPoint)}
               style={{ cursor: "pointer" }}
-            />
+            >
+              {chartData.map((entry, index) => (
+                <Cell
+                  key={`cell-activated-${index}`}
+                  fill={selectedDate === entry.fullDate ? "#059669" : "#10b981"}
+                />
+              ))}
+            </Bar>
             <Bar
               dataKey="deactivated"
               fill="#ef4444"
@@ -232,7 +239,14 @@ export function ActivityChart({
               radius={[4, 4, 0, 0]}
               onClick={(data) => handleBarClick(data as ChartDataPoint)}
               style={{ cursor: "pointer" }}
-            />
+            >
+              {chartData.map((entry, index) => (
+                <Cell
+                  key={`cell-deactivated-${index}`}
+                  fill={selectedDate === entry.fullDate ? "#dc2626" : "#ef4444"}
+                />
+              ))}
+            </Bar>
           </BarChart>
         </ResponsiveContainer>
       </Card>
