@@ -95,23 +95,6 @@ export default function NewPharmacies() {
     loadData(from, to, compareFrom, compareTo);
   };
 
-  // Calculate top districts
-  const topDistricts = useMemo(() => {
-    if (!filteredPharmacies.length) return [];
-
-    const districtCounts = filteredPharmacies.reduce(
-      (acc, pharmacy) => {
-        acc[pharmacy.district] = (acc[pharmacy.district] || 0) + 1;
-        return acc;
-      },
-      {} as Record<string, number>,
-    );
-
-    return Object.entries(districtCounts)
-      .map(([district, count]) => ({ district, count }))
-      .sort((a, b) => b.count - a.count)
-      .slice(0, 5);
-  }, [filteredPharmacies]);
 
   if (authLoading) {
     return (
