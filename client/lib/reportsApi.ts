@@ -7,7 +7,7 @@ const mockActivityData = {
       time: "2026-01-05T09:12:00+05:00",
       pharmacyName: "Apteka #42",
       district: "Sergeli",
-      type: "DEACTIVATED",
+      type: "DEACTIVATED" as const,
       source: "manual",
     },
     {
