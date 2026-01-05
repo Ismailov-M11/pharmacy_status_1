@@ -14,6 +14,7 @@ import {
 import { NewPharmacy } from "@/lib/reportsApi";
 import { format, getDaysInMonth, startOfMonth } from "date-fns";
 import { X } from "lucide-react";
+import { ru } from "date-fns/locale";
 
 interface NewPharmaciesChartProps {
   pharmacies: NewPharmacy[];
