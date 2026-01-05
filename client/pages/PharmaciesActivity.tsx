@@ -156,12 +156,12 @@ export default function PharmaciesActivity() {
           {data && !error && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
               <KpiCard
-                label="✅ Активировано"
+                label={`✅ ${t.activated}`}
                 value={filteredEvents.filter((e) => e.type === "ACTIVATED").length}
                 variant="success"
               />
               <KpiCard
-                label="⛔ Деактивировано"
+                label={`⛔ ${t.deactivated}`}
                 value={filteredEvents.filter((e) => e.type === "DEACTIVATED").length}
                 variant="danger"
               />
