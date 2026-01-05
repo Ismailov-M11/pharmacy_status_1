@@ -288,9 +288,10 @@ export async function fetchNewPharmaciesData(
     try {
       const from = fromDate.toISOString().split("T")[0];
       const to = toDate.toISOString().split("T")[0];
-      const query = compareFromDate && compareToDate
-        ? `from=${from}&to=${to}&compareFrom=${compareFromDate.toISOString().split("T")[0]}&compareTo=${compareToDate.toISOString().split("T")[0]}`
-        : `from=${from}&to=${to}`;
+      const query =
+        compareFromDate && compareToDate
+          ? `from=${from}&to=${to}&compareFrom=${compareFromDate.toISOString().split("T")[0]}&compareTo=${compareToDate.toISOString().split("T")[0]}`
+          : `from=${from}&to=${to}`;
       const response = await fetch(`${apiUrl}/reports/new-pharmacies?${query}`);
       if (!response.ok) throw new Error("API failed");
       return response.json();
@@ -326,9 +327,10 @@ export async function fetchNewPharmaciesData(
       count: countA,
     },
     periodB: {
-      label: compareFromDate && compareToDate
-        ? `Период B (${compareFromDate.toLocaleDateString("ru-RU")})`
-        : "Период B",
+      label:
+        compareFromDate && compareToDate
+          ? `Период B (${compareFromDate.toLocaleDateString("ru-RU")})`
+          : "Период B",
       count: countB,
     },
     diff: {

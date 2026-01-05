@@ -18,7 +18,10 @@ interface ActivityChartProps {
   isLoading?: boolean;
 }
 
-export function ActivityChart({ events, isLoading = false }: ActivityChartProps) {
+export function ActivityChart({
+  events,
+  isLoading = false,
+}: ActivityChartProps) {
   const chartData = useMemo(() => {
     // Group events by date
     const groupedByDate: Record<
@@ -100,7 +103,12 @@ export function ActivityChart({ events, isLoading = false }: ActivityChartProps)
           <YAxis
             tick={{ fontSize: 12 }}
             allowDecimals={false}
-            label={{ value: "Количество событий", angle: -90, position: "insideLeft", offset: 10 }}
+            label={{
+              value: "Количество событий",
+              angle: -90,
+              position: "insideLeft",
+              offset: 10,
+            }}
           />
           <Tooltip
             contentStyle={{

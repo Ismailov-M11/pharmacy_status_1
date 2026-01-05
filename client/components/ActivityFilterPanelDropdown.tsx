@@ -69,7 +69,9 @@ export function ActivityFilterPanelDropdown({
     const diffTime = Math.abs(to.getTime() - from.getTime());
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
     if (diffDays > 366) {
-      toast.warning("⚠️ Период больше 366 дней. Показаны данные, но это может быть слишком большой диапазон.");
+      toast.warning(
+        "⚠️ Период больше 366 дней. Показаны данные, но это может быть слишком большой диапазон.",
+      );
     }
 
     return true;

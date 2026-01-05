@@ -107,7 +107,12 @@ export function NewPharmaciesChart({
           <YAxis
             tick={{ fontSize: 12 }}
             allowDecimals={false}
-            label={{ value: "Количество аптек", angle: -90, position: "insideLeft", offset: 10 }}
+            label={{
+              value: "Количество аптек",
+              angle: -90,
+              position: "insideLeft",
+              offset: 10,
+            }}
           />
           <Tooltip
             contentStyle={{

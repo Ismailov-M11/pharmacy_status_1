@@ -73,7 +73,9 @@ export function NewPharmaciesFilterPanelDropdown({
     const diffTime = Math.abs(to.getTime() - from.getTime());
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
     if (diffDays > 366) {
-      toast.warning("⚠️ Период больше 366 дней. Показаны данные, но это может быть слишком большой диапазон.");
+      toast.warning(
+        "⚠️ Период больше 366 дней. Показаны данные, но это может быть слишком большой диапазон.",
+      );
     }
 
     return true;
@@ -86,7 +88,11 @@ export function NewPharmaciesFilterPanelDropdown({
       const to = endOfMonth(from);
 
       const [compareYear, compareMonth2] = compareMonth.split("-");
-      const compareFrom = new Date(parseInt(compareYear), parseInt(compareMonth2) - 1, 1);
+      const compareFrom = new Date(
+        parseInt(compareYear),
+        parseInt(compareMonth2) - 1,
+        1,
+      );
       const compareTo = endOfMonth(compareFrom);
 
       if (validateDates(from, to) && validateDates(compareFrom, compareTo)) {

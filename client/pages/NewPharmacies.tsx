@@ -37,12 +37,7 @@ export default function NewPharmacies() {
       return;
     }
 
-    loadData(
-      fromDate,
-      toDate,
-      compareFromDate,
-      compareToDate,
-    );
+    loadData(fromDate, toDate, compareFromDate, compareToDate);
   }, [authLoading, isAuthenticated, navigate]);
 
   const loadData = async (
@@ -174,7 +169,9 @@ export default function NewPharmacies() {
                     : "(нет сравнения)"
                 }`}
                 value={
-                  data.diff.value >= 0 ? `+${data.diff.value}` : `${data.diff.value}`
+                  data.diff.value >= 0
+                    ? `+${data.diff.value}`
+                    : `${data.diff.value}`
                 }
                 variant={data.diff.value >= 0 ? "success" : "danger"}
               />
