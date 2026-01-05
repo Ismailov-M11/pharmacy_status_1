@@ -170,7 +170,7 @@ export function NewPharmaciesFilterPanelDropdown({
 
           <div>
             <label className="text-sm font-medium text-gray-700 block mb-2">
-              Сравнить с:
+              {t.compareTo}
             </label>
             <Select value={compareMonth} onValueChange={setCompareMonth}>
               <SelectTrigger>
@@ -190,7 +190,7 @@ export function NewPharmaciesFilterPanelDropdown({
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
           <div>
             <label className="text-sm font-medium text-gray-700 block mb-2">
-              С:
+              {t.from}
             </label>
             <Input
               type="date"
