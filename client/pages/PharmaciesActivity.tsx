@@ -7,7 +7,6 @@ import { ActivityFilterPanelDropdown } from "@/components/ActivityFilterPanelDro
 import { ActivityChart } from "@/components/ActivityChart";
 import { ActivityEventsTable } from "@/components/ActivityEventsTable";
 import { StatusFilterPanel } from "@/components/StatusFilterPanel";
-import { KpiCard } from "@/components/KpiCard";
 import {
   fetchActivityData,
   ActivityEvent,
@@ -151,26 +150,6 @@ export default function PharmaciesActivity() {
             onReset={handleReset}
             isLoading={isLoading}
           />
-
-          {/* KPI Cards */}
-          {data && !error && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-              <KpiCard
-                label={`✅ ${t.activated}`}
-                value={
-                  filteredEvents.filter((e) => e.type === "ACTIVATED").length
-                }
-                variant="success"
-              />
-              <KpiCard
-                label={`⛔ ${t.deactivated}`}
-                value={
-                  filteredEvents.filter((e) => e.type === "DEACTIVATED").length
-                }
-                variant="danger"
-              />
-            </div>
-          )}
 
           {/* Status Filter Panel */}
           <StatusFilterPanel
