@@ -26,6 +26,7 @@ export function PharmacyHistoryModal({
   pharmacy,
   events,
 }: PharmacyHistoryModalProps) {
+  const { t } = useLanguage();
   const formatDateTime = (dateString: string) => {
     try {
       return format(new Date(dateString), "dd.MM.yyyy HH:mm");
