@@ -11,6 +11,7 @@ import { Card } from "@/components/ui/card";
 import { NewPharmacy } from "@/lib/reportsApi";
 import { format } from "date-fns";
 import { ChevronDown, ChevronUp } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface NewPharmaciesTableProps {
   pharmacies: NewPharmacy[];
