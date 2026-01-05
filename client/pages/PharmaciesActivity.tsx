@@ -159,87 +159,91 @@ export default function PharmaciesActivity() {
             isLoading={isLoading}
           />
 
-          {/* Selected Day Events Section - Independent */}
+          {/* Selected Day Events Modal - Centralized Display */}
           {selectedDateFilter && selectedDayEvents.length > 0 && (
-            <div ref={selectedDayRef} className="mt-8 scroll-mt-20">
-              <Card className="p-6 border-blue-200 bg-blue-50">
-                <div className="flex items-center justify-between mb-6">
-                  <h3 className="text-lg font-semibold text-gray-900">
-                    События {format(new Date(selectedDateFilter), "dd.MM.yyyy")}
-                  </h3>
-                  <button
-                    onClick={() => setSelectedDateFilter(null)}
-                    className="inline-flex items-center justify-center w-8 h-8 rounded-full text-gray-500 hover:bg-blue-100 hover:text-gray-700 transition-colors"
-                    aria-label="Закрыть"
-                  >
-                    <X className="w-5 h-5" />
-                  </button>
-                </div>
-                <div className="overflow-x-auto">
-                  <table className="w-full text-sm">
-                    <thead>
-                      <tr className="border-b border-blue-200">
-                        <th className="text-left py-3 px-3 font-semibold text-gray-700">
-                          №
-                        </th>
-                        <th className="text-left py-3 px-3 font-semibold text-gray-700">
-                          Код
-                        </th>
-                        <th className="text-left py-3 px-3 font-semibold text-gray-700">
-                          Название
-                        </th>
-                        <th className="text-left py-3 px-3 font-semibold text-gray-700">
-                          Адрес
-                        </th>
-                        <th className="text-left py-3 px-3 font-semibold text-gray-700">
-                          Статус
-                        </th>
-                        <th className="text-left py-3 px-3 font-semibold text-gray-700">
-                          Время
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {selectedDayEvents.map((event, index) => (
-                        <tr
-                          key={event.id}
-                          className="border-b border-blue-100 hover:bg-blue-100 transition-colors"
-                        >
-                          <td className="py-3 px-3 text-gray-600">
-                            {index + 1}
-                          </td>
-                          <td className="py-3 px-3 font-medium text-gray-900">
-                            {event.code}
-                          </td>
-                          <td className="py-3 px-3 text-gray-900">
-                            {event.pharmacyName}
-                          </td>
-                          <td className="py-3 px-3 text-gray-600">
-                            {event.address || "—"}
-                          </td>
-                          <td className="py-3 px-3">
-                            <Badge
-                              className={
-                                event.type === "ACTIVATED"
-                                  ? "bg-green-100 text-green-800"
-                                  : "bg-red-100 text-red-800"
-                              }
-                            >
-                              {event.type === "ACTIVATED"
-                                ? "✅ Активирована"
-                                : "⛔ Деактивирована"}
-                            </Badge>
-                          </td>
-                          <td className="py-3 px-3 text-gray-600">
-                            {format(new Date(event.changeDatetime), "HH:mm")}
-                          </td>
+            <>
+              {/* Modal Overlay */}
+              <div
+                className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-40"
+                onClick={() => setSelectedDateFilter(null)}
+              >
+                {/* Modal Content */}
+                <Card
+                  className="w-full max-w-4xl max-h-[80vh] overflow-hidden flex flex-col border-blue-200 bg-white"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <div className="flex items-center justify-between p-6 border-b border-blue-200 bg-blue-50">
+                    <h3 className="text-lg font-semibold text-gray-900">
+                      События {format(new Date(selectedDateFilter), "dd.MM.yyyy")}
+                    </h3>
+                    <button
+                      onClick={() => setSelectedDateFilter(null)}
+                      className="inline-flex items-center justify-center w-8 h-8 rounded-full text-gray-500 hover:bg-blue-100 hover:text-gray-700 transition-colors"
+                      aria-label="Закрыть"
+                    >
+                      <X className="w-5 h-5" />
+                    </button>
+                  </div>
+
+                  {/* Modal Body */}
+                  <div className="flex-1 overflow-x-auto p-6">
+                    <table className="w-full text-sm">
+                      <thead>
+                        <tr className="border-b border-blue-200">
+                          <th className="text-left py-3 px-3 font-semibold text-gray-700">
+                            №
+                          </th>
+                          <th className="text-left py-3 px-3 font-semibold text-gray-700">
+                            Код
+                          </th>
+                          <th className="text-left py-3 px-3 font-semibold text-gray-700">
+                            Название
+                          </th>
+                          <th className="text-left py-3 px-3 font-semibold text-gray-700">
+                            Адрес
+                          </th>
+                          <th className="text-left py-3 px-3 font-semibold text-gray-700">
+                            Статус
+                          </th>
+                          <th className="text-left py-3 px-3 font-semibold text-gray-700">
+                            Время
+                          </th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </Card>
-            </div>
+                      </thead>
+                      <tbody>
+                        {selectedDayEvents.map((event, index) => (
+                          <tr
+                            key={event.id}
+                            className="border-b border-blue-100 hover:bg-blue-50 transition-colors"
+                          >
+                            <td className="py-3 px-3 text-gray-600">
+                              {index + 1}
+                            </td>
+                            <td className="py-3 px-3 font-medium text-gray-900">
+                              {event.code}
+                            </td>
+                            <td className="py-3 px-3 text-gray-900">
+                              {event.pharmacyName}
+                            </td>
+                            <td className="py-3 px-3 text-gray-600">
+                              {event.address || "—"}
+                            </td>
+                            <td className="py-3 px-3 text-center">
+                              <span className="text-xl">
+                                {event.type === "ACTIVATED" ? "✅" : "⛔"}
+                              </span>
+                            </td>
+                            <td className="py-3 px-3 text-gray-600">
+                              {format(new Date(event.changeDatetime), "HH:mm")}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </Card>
+              </div>
+            </>
           )}
         </div>
       </main>
