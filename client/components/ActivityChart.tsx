@@ -34,7 +34,6 @@ export function ActivityChart({
   isLoading = false,
   onDateClick,
 }: ActivityChartProps) {
-  const [selectedDate, setSelectedDate] = useState<string | null>(null);
 
   const chartData = useMemo(() => {
     // Group events by date
