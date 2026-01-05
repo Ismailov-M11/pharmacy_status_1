@@ -19,12 +19,15 @@ export default function NewPharmacies() {
   const navigate = useNavigate();
 
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [data, setData] = useState<NewPharmaciesResponse | null>(null);
   const [filteredPharmacies, setFilteredPharmacies] = useState<NewPharmacy[]>(
     [],
   );
   const [fromDate, setFromDate] = useState<Date>(startOfMonth(new Date()));
   const [toDate, setToDate] = useState<Date>(endOfMonth(new Date()));
+  const [compareFromDate, setCompareFromDate] = useState<Date | null>(null);
+  const [compareToDate, setCompareToDate] = useState<Date | null>(null);
 
   useEffect(() => {
     if (authLoading) return;
@@ -34,35 +37,67 @@ export default function NewPharmacies() {
       return;
     }
 
-    loadData(fromDate, toDate);
+    loadData(
+      fromDate,
+      toDate,
+      compareFromDate,
+      compareToDate,
+    );
   }, [authLoading, isAuthenticated, navigate]);
 
-  const loadData = async (from: Date, to: Date) => {
+  const loadData = async (
+    from: Date,
+    to: Date,
+    compareFrom?: Date | null,
+    compareTo?: Date | null,
+  ) => {
     setIsLoading(true);
+    setError(null);
     try {
-      const response = await fetchNewPharmaciesData(from, to);
+      const response = await fetchNewPharmaciesData(
+        from,
+        to,
+        compareFrom || undefined,
+        compareTo || undefined,
+      );
       setData(response);
       setFilteredPharmacies(response.items);
-    } catch (error) {
-      console.error("Failed to fetch new pharmacies data:", error);
-      toast.error("Ошибка при загрузке данных");
+    } catch (err) {
+      console.error("Failed to fetch new pharmacies data:", err);
+      const errorMsg = "Ошибка при загрузке данных";
+      setError(errorMsg);
+      toast.error(errorMsg);
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleFiltersChange = (from: Date, to: Date, compareMode: boolean) => {
+  const handleFiltersChange = (
+    from: Date,
+    to: Date,
+    compareFrom?: Date | null,
+    compareTo?: Date | null,
+  ) => {
     setFromDate(from);
     setToDate(to);
-    loadData(from, to);
+    if (compareFrom !== undefined) setCompareFromDate(compareFrom);
+    if (compareTo !== undefined) setCompareToDate(compareTo);
+    loadData(from, to, compareFrom, compareTo);
   };
 
   const handleReset = () => {
     const from = startOfMonth(new Date());
     const to = endOfMonth(new Date());
+    const prevMonth = new Date(from);
+    prevMonth.setMonth(prevMonth.getMonth() - 1);
+    const compareTo = endOfMonth(prevMonth);
+    const compareFrom = startOfMonth(prevMonth);
+
     setFromDate(from);
     setToDate(to);
-    loadData(from, to);
+    setCompareFromDate(compareFrom);
+    setCompareToDate(compareTo);
+    loadData(from, to, compareFrom, compareTo);
   };
 
   // Calculate top districts
