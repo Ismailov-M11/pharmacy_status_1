@@ -72,8 +72,16 @@ export default function PharmaciesActivity() {
     setFromDate(from);
     setToDate(to);
     setSelectedDateFilter(null);
+    setSelectedStatus(null);
     loadData(from, to);
   };
+
+  // Filter events based on selected status
+  const filteredEvents = useMemo(() => {
+    if (!data?.events) return [];
+    if (!selectedStatus) return data.events;
+    return data.events.filter((e) => e.type === selectedStatus);
+  }, [data?.events, selectedStatus]);
 
   const handleDateClick = (date: string) => {
     setSelectedDateFilter(date);
