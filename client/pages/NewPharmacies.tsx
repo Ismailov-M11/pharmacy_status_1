@@ -99,14 +99,8 @@ export default function NewPharmacies() {
     loadData(from, to, compareFrom, compareTo);
   };
 
-  const handleDateClick = () => {
-    // Scroll to the selected day section after a brief delay
-    setTimeout(() => {
-      selectedDayRef.current?.scrollIntoView({
-        behavior: "smooth",
-        block: "center",
-      });
-    }, 100);
+  const handleDateClick = (date: string | null) => {
+    setSelectedDateFilter(date);
   };
 
   if (authLoading) {
