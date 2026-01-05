@@ -20,6 +20,7 @@ interface NewPharmaciesChartProps {
   pharmacies: NewPharmacy[];
   isLoading?: boolean;
   fromDate?: Date;
+  onDateClick?: () => void;
 }
 
 interface ChartDataPoint {
