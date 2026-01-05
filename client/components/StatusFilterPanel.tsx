@@ -14,6 +14,7 @@ export function StatusFilterPanel({
   selectedStatus,
   onStatusChange,
 }: StatusFilterPanelProps) {
+  const { t } = useLanguage();
   const statusCounts = useMemo(() => {
     return {
       activated: events.filter((e) => e.type === "ACTIVATED").length,
