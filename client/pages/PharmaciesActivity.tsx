@@ -81,18 +81,13 @@ export default function PharmaciesActivity() {
     }, 100);
   };
 
-  const pharmacyEvents = selectedEvent
-    ? data?.events.filter(
-        (e) => e.pharmacyName === selectedEvent.pharmacyName,
-      ) || []
-    : [];
-
-  const filteredEvents = selectedDateFilter
+  // Get events for the selected day (independent from main table filter)
+  const selectedDayEvents = selectedDateFilter
     ? data?.events.filter((e) => {
         const dateKey = e.changeDatetime.split("T")[0];
         return dateKey === selectedDateFilter;
       }) || []
-    : data?.events || [];
+    : [];
 
   if (authLoading) {
     return (
