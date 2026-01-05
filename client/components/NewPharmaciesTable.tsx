@@ -129,15 +129,6 @@ export function NewPharmaciesTable({
                   <SortIcon field="district" />
                 </button>
               </TableHead>
-              <TableHead
-                className="cursor-pointer hover:bg-gray-100"
-                onClick={() => handleSort("currentStatus")}
-              >
-                <button className="flex items-center font-semibold text-gray-700">
-                  Статус
-                  <SortIcon field="currentStatus" />
-                </button>
-              </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -148,24 +139,6 @@ export function NewPharmaciesTable({
                 </TableCell>
                 <TableCell>{pharmacy.pharmacyName}</TableCell>
                 <TableCell>{pharmacy.district}</TableCell>
-                <TableCell>
-                  <Badge
-                    variant={
-                      pharmacy.currentStatus === "active"
-                        ? "default"
-                        : "destructive"
-                    }
-                    className={
-                      pharmacy.currentStatus === "active"
-                        ? "bg-green-100 text-green-800"
-                        : "bg-red-100 text-red-800"
-                    }
-                  >
-                    {pharmacy.currentStatus === "active"
-                      ? "🟢 Активна"
-                      : "🔴 Неактивна"}
-                  </Badge>
-                </TableCell>
               </TableRow>
             ))}
           </TableBody>
