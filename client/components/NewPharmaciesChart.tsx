@@ -118,11 +118,6 @@ export function NewPharmaciesChart({
     return [0, roundedMax];
   }, [chartData]);
 
-  // Get month name in Russian
-  const monthName = useMemo(() => {
-    return format(startOfMonth(fromDate), "LLLL yyyy", { locale: ru });
-  }, [fromDate]);
-
   if (isLoading) {
     return (
       <Card className="p-6 mb-8">
