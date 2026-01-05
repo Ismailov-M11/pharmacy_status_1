@@ -142,10 +142,10 @@ export function NewPharmaciesChart({
     return (
       <Card className="p-6 mb-8">
         <h2 className="text-lg font-semibold text-gray-900 mb-4">
-          График новых аптек — {monthName}
+          {t.newPharmaciesChart} — {monthName}
         </h2>
         <div className="flex items-center justify-center h-64">
-          <span className="text-gray-500">Нет новых аптек за период</span>
+          <span className="text-gray-500">{t.noNewPharmacies}</span>
         </div>
       </Card>
     );
