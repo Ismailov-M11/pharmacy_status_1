@@ -196,7 +196,7 @@ export default function PharmaciesActivity() {
                 >
                   <div className="flex items-center justify-between p-6 border-b border-blue-200 bg-blue-50">
                     <h3 className="text-lg font-semibold text-gray-900">
-                      События {format(new Date(selectedDateFilter), "dd.MM.yyyy")}
+                      {t.eventsLabel} {format(new Date(selectedDateFilter), "dd.MM.yyyy")}
                     </h3>
                     <button
                       onClick={() => setSelectedDateFilter(null)}
