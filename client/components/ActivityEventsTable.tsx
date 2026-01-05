@@ -13,6 +13,7 @@ import { Card } from "@/components/ui/card";
 import { ActivityEvent } from "@/lib/reportsApi";
 import { format } from "date-fns";
 import { ChevronDown, ChevronUp } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface ActivityEventsTableProps {
   events: ActivityEvent[];
