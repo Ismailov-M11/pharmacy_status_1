@@ -96,6 +96,13 @@ export default function NewPharmacies() {
     loadData(from, to, compareFrom, compareTo);
   };
 
+  const handleDateClick = () => {
+    // Scroll to the selected day section after a brief delay
+    setTimeout(() => {
+      selectedDayRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+    }, 100);
+  };
+
   if (authLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
