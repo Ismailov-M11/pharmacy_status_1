@@ -7,7 +7,6 @@ import { ActivityFilterPanelDropdown } from "@/components/ActivityFilterPanelDro
 import { ActivityChart } from "@/components/ActivityChart";
 import { ActivityEventsTable } from "@/components/ActivityEventsTable";
 import { StatusFilterPanel } from "@/components/StatusFilterPanel";
-import { KpiCard } from "@/components/KpiCard";
 import {
   fetchActivityData,
   ActivityEvent,
