@@ -99,7 +99,7 @@ export function ActivityEventsTable({
     return (
       <Card className="p-6">
         <div className="text-center py-8">
-          <p className="text-gray-500">Нет событий за выбранный период</p>
+          <p className="text-gray-500">{t.noActivitiesSelected}</p>
         </div>
       </Card>
     );
