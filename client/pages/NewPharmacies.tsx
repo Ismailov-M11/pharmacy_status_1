@@ -125,6 +125,12 @@ export default function NewPharmacies() {
             </div>
           )}
 
+          {/* New Pharmacies Chart */}
+          <NewPharmaciesChart
+            pharmacies={filteredPharmacies}
+            isLoading={isLoading}
+          />
+
           {/* Filter Panel */}
           <NewPharmaciesFilterPanelDropdown
             onFiltersChange={handleFiltersChange}
@@ -146,10 +152,10 @@ export default function NewPharmacies() {
                 variant="default"
               />
               <KpiCard
-                label={`📈 Разница ${
+                label={`📈 Разница${
                   data.periodB.count > 0
-                    ? `(${data.diff.percent.toFixed(1)}%)`
-                    : "(нет сравнения)"
+                    ? ` (${data.diff.percent.toFixed(1)}%)`
+                    : ""
                 }`}
                 value={
                   data.diff.value >= 0
@@ -161,52 +167,11 @@ export default function NewPharmacies() {
             </div>
           )}
 
-          {/* New Pharmacies Chart */}
-          <NewPharmaciesChart
+          {/* Pharmacies Table */}
+          <NewPharmaciesTable
             pharmacies={filteredPharmacies}
             isLoading={isLoading}
           />
-
-          {/* Main Grid */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Pharmacies Table - Takes 2 columns on desktop */}
-            <div className="lg:col-span-2">
-              <NewPharmaciesTable
-                pharmacies={filteredPharmacies}
-                isLoading={isLoading}
-              />
-            </div>
-
-            {/* Top Districts - Right sidebar on desktop */}
-            <div>
-              <div className="bg-white rounded-lg border shadow-sm p-6">
-                <h3 className="font-semibold text-lg mb-4 text-gray-900">
-                  Топ районы по новым аптекам
-                </h3>
-                {topDistricts.length === 0 ? (
-                  <p className="text-gray-500 text-center">Нет данных</p>
-                ) : (
-                  <div className="space-y-3">
-                    {topDistricts.map((item, index) => (
-                      <div
-                        key={item.district}
-                        className="flex items-center justify-between p-3 bg-gray-50 rounded"
-                      >
-                        <div>
-                          <p className="font-medium text-gray-900 text-sm">
-                            {index + 1}. {item.district}
-                          </p>
-                        </div>
-                        <div className="bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm font-semibold">
-                          {item.count}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
         </div>
       </main>
     </div>
