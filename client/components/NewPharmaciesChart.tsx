@@ -149,10 +149,10 @@ export function NewPharmaciesChart({
   return (
     <div className="mb-8">
       <Card className="p-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">
-          График новых аптек
+        <h2 className="text-lg font-semibold text-gray-900 mb-6">
+          График новых аптек — {monthName}
         </h2>
-        <ResponsiveContainer width="100%" height={300}>
+        <ResponsiveContainer width="100%" height={400}>
           <BarChart
             data={chartData}
             margin={{ top: 20, right: 30, left: 0, bottom: 60 }}
