@@ -24,8 +24,8 @@ export function NewPharmaciesTable({
   pharmacies,
   isLoading = false,
 }: NewPharmaciesTableProps) {
-  const [sortField, setSortField] = useState<SortField>("onboardedAt");
-  const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
+  const [sortField, setSortField] = useState<SortField>("code");
+  const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
 
   const handleSort = (field: SortField) => {
     if (sortField === field) {
