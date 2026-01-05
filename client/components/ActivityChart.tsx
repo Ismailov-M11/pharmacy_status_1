@@ -54,8 +54,13 @@ export function ActivityChart({ events, isLoading = false }: ActivityChartProps)
   if (isLoading) {
     return (
       <Card className="p-6 mb-8">
+        <h2 className="text-lg font-semibold text-gray-900 mb-4">
+          График активности аптек
+        </h2>
         <div className="flex items-center justify-center h-64">
-          <span className="text-gray-500">Загрузка данных...</span>
+          <div className="animate-pulse w-full">
+            <div className="h-full bg-gray-200 rounded"></div>
+          </div>
         </div>
       </Card>
     );
@@ -64,8 +69,11 @@ export function ActivityChart({ events, isLoading = false }: ActivityChartProps)
   if (chartData.length === 0) {
     return (
       <Card className="p-6 mb-8">
+        <h2 className="text-lg font-semibold text-gray-900 mb-4">
+          График активности аптек
+        </h2>
         <div className="flex items-center justify-center h-64">
-          <span className="text-gray-500">Нет данных для отображения</span>
+          <span className="text-gray-500">Нет событий за выбранный период</span>
         </div>
       </Card>
     );
