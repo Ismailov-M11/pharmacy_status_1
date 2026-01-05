@@ -253,22 +253,22 @@ export function NewPharmaciesChart({
                   <thead>
                     <tr className="border-b border-blue-200">
                       <th className="text-left py-3 px-3 font-semibold text-gray-700">
-                        №
+                        {t.number}
                       </th>
                       <th className="text-left py-3 px-3 font-semibold text-gray-700">
-                        Код
+                        {t.code}
                       </th>
                       <th className="text-left py-3 px-3 font-semibold text-gray-700">
-                        Название
+                        {t.pharmacyName}
                       </th>
                       <th className="text-left py-3 px-3 font-semibold text-gray-700">
-                        Адрес
+                        {t.address}
                       </th>
                       <th className="text-left py-3 px-3 font-semibold text-gray-700">
-                        Телефон
+                        {t.phone}
                       </th>
                       <th className="text-left py-3 px-3 font-semibold text-gray-700">
-                        Время
+                        {t.timeLabel}
                       </th>
                     </tr>
                   </thead>
