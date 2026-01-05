@@ -158,7 +158,7 @@ export function NewPharmaciesChart({
         <ResponsiveContainer width="100%" height={400}>
           <BarChart
             data={chartData}
-            margin={{ top: 20, right: 30, left: 50, bottom: 60 }}
+            margin={{ top: 20, right: 30, left: 120, bottom: 60 }}
             onClick={(state) => {
               if (state && state.activeTooltipIndex !== undefined) {
                 const data = chartData[state.activeTooltipIndex];
