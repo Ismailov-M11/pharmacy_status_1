@@ -218,21 +218,10 @@ export function ActivityEventsTable({
                 >
                   {formatDateTime(event.changeDatetime)}
                 </TableCell>
-                <TableCell>
-                  <Badge
-                    variant={
-                      event.type === "ACTIVATED" ? "default" : "destructive"
-                    }
-                    className={
-                      event.type === "ACTIVATED"
-                        ? "bg-green-100 text-green-800"
-                        : "bg-red-100 text-red-800"
-                    }
-                  >
-                    {event.type === "ACTIVATED"
-                      ? "✅ Активирована"
-                      : "⛔ Деактивирована"}
-                  </Badge>
+                <TableCell className="text-center">
+                  <span className="text-xl">
+                    {event.type === "ACTIVATED" ? "✅" : "⛔"}
+                  </span>
                 </TableCell>
               </TableRow>
             ))}
