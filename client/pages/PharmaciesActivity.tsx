@@ -100,7 +100,7 @@ export default function PharmaciesActivity() {
 
         <div className="px-4 sm:px-6 lg:px-8 pb-8">
           {/* Filter Panel */}
-          <ActivityFilterPanel
+          <ActivityFilterPanelDropdown
             onFiltersChange={handleFiltersChange}
             onReset={handleReset}
             isLoading={isLoading}
@@ -130,6 +130,9 @@ export default function PharmaciesActivity() {
               />
             </div>
           )}
+
+          {/* Activity Chart */}
+          <ActivityChart events={data?.events || []} isLoading={isLoading} />
 
           {/* Events Table */}
           <ActivityEventsTable
