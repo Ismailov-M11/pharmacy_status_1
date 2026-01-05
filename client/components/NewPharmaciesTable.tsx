@@ -119,6 +119,24 @@ export function NewPharmaciesTable({
               </TableHead>
               <TableHead
                 className="cursor-pointer hover:bg-gray-100"
+                onClick={() => handleSort("address")}
+              >
+                <button className="flex items-center font-semibold text-gray-700">
+                  Адрес
+                  <SortIcon field="address" />
+                </button>
+              </TableHead>
+              <TableHead
+                className="cursor-pointer hover:bg-gray-100"
+                onClick={() => handleSort("phone")}
+              >
+                <button className="flex items-center font-semibold text-gray-700">
+                  Телефон
+                  <SortIcon field="phone" />
+                </button>
+              </TableHead>
+              <TableHead
+                className="cursor-pointer hover:bg-gray-100"
                 onClick={() => handleSort("district")}
               >
                 <button className="flex items-center font-semibold text-gray-700">
@@ -131,11 +149,17 @@ export function NewPharmaciesTable({
           <TableBody>
             {sortedPharmacies.map((pharmacy) => (
               <TableRow key={pharmacy.id}>
-                <TableCell className="font-medium">
+                <TableCell className="font-medium text-sm">
                   {formatDateTime(pharmacy.onboardedAt)}
                 </TableCell>
-                <TableCell>{pharmacy.pharmacyName}</TableCell>
-                <TableCell>{pharmacy.district}</TableCell>
+                <TableCell className="font-medium">{pharmacy.pharmacyName}</TableCell>
+                <TableCell className="text-sm text-gray-600">
+                  {pharmacy.address || "—"}
+                </TableCell>
+                <TableCell className="text-sm text-gray-600">
+                  {pharmacy.phone || "—"}
+                </TableCell>
+                <TableCell className="text-sm">{pharmacy.district}</TableCell>
               </TableRow>
             ))}
           </TableBody>
