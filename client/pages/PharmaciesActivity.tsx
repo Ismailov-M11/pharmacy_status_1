@@ -20,6 +20,7 @@ export default function PharmaciesActivity() {
   const navigate = useNavigate();
 
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [data, setData] = useState<ActivityResponse | null>(null);
   const [selectedEvent, setSelectedEvent] = useState<ActivityEvent | null>(
     null,
