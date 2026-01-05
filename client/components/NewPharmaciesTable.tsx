@@ -43,11 +43,9 @@ export function NewPharmaciesTable({
     if (sortField === "onboardedAt") {
       aVal = new Date(a.onboardedAt).getTime();
       bVal = new Date(b.onboardedAt).getTime();
-    }
-
-    if (typeof aVal === "string") {
-      aVal = aVal.toLowerCase();
-      bVal = (bVal as string).toLowerCase();
+    } else if (typeof aVal === "string") {
+      aVal = aVal?.toLowerCase() || "";
+      bVal = (bVal as string)?.toLowerCase() || "";
     }
 
     const comparison = aVal < bVal ? -1 : aVal > bVal ? 1 : 0;
