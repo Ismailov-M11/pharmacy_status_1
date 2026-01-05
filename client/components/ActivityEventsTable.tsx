@@ -112,14 +112,14 @@ export function ActivityEventsTable({
           <TableHeader>
             <TableRow className="bg-gray-50">
               <TableHead className="text-center w-12">
-                <div className="font-semibold text-gray-700">№</div>
+                <div className="font-semibold text-gray-700">{t.number}</div>
               </TableHead>
               <TableHead
                 className="cursor-pointer hover:bg-gray-100"
                 onClick={() => handleSort("code")}
               >
                 <button className="flex items-center font-semibold text-gray-700">
-                  Код
+                  {t.code}
                   <SortIcon field="code" />
                 </button>
               </TableHead>
@@ -128,7 +128,7 @@ export function ActivityEventsTable({
                 onClick={() => handleSort("pharmacyName")}
               >
                 <button className="flex items-center font-semibold text-gray-700">
-                  Название аптеки
+                  {t.pharmacyName}
                   <SortIcon field="pharmacyName" />
                 </button>
               </TableHead>
@@ -137,7 +137,7 @@ export function ActivityEventsTable({
                 onClick={() => handleSort("address")}
               >
                 <button className="flex items-center font-semibold text-gray-700">
-                  Адрес
+                  {t.address}
                   <SortIcon field="address" />
                 </button>
               </TableHead>
@@ -146,7 +146,7 @@ export function ActivityEventsTable({
                 onClick={() => handleSort("landmark")}
               >
                 <button className="flex items-center font-semibold text-gray-700">
-                  Ориентир
+                  {t.landmark}
                   <SortIcon field="landmark" />
                 </button>
               </TableHead>
@@ -155,7 +155,7 @@ export function ActivityEventsTable({
                 onClick={() => handleSort("phone")}
               >
                 <button className="flex items-center font-semibold text-gray-700">
-                  Телефон аптеки
+                  {t.pharmacyPhone}
                   <SortIcon field="phone" />
                 </button>
               </TableHead>
@@ -164,7 +164,7 @@ export function ActivityEventsTable({
                 onClick={() => handleSort("responsiblePhone")}
               >
                 <button className="flex items-center font-semibold text-gray-700">
-                  Телефон ответственного
+                  {t.leadPhone}
                   <SortIcon field="responsiblePhone" />
                 </button>
               </TableHead>
@@ -173,7 +173,7 @@ export function ActivityEventsTable({
                 onClick={() => handleSort("changeDatetime")}
               >
                 <button className="flex items-center font-semibold text-gray-700">
-                  Дата/время изменения
+                  {t.dateTime}
                   <SortIcon field="changeDatetime" />
                 </button>
               </TableHead>
@@ -182,7 +182,7 @@ export function ActivityEventsTable({
                 onClick={() => handleSort("type")}
               >
                 <button className="flex items-center font-semibold text-gray-700">
-                  Статус изменен на
+                  {t.statusChangedTo}
                   <SortIcon field="type" />
                 </button>
               </TableHead>
