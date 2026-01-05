@@ -33,6 +33,9 @@ export function ActivityChart({
   events,
   isLoading = false,
   onDateClick,
+  fromDate,
+  toDate,
+  selectedDate = null,
 }: ActivityChartProps) {
 
   const chartData = useMemo(() => {
