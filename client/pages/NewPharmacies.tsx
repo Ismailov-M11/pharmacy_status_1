@@ -137,6 +137,9 @@ export default function NewPharmacies() {
             </div>
           )}
 
+          {/* New Pharmacies Chart */}
+          <NewPharmaciesChart pharmacies={filteredPharmacies} isLoading={isLoading} />
+
           {/* Main Grid */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Pharmacies Table - Takes 2 columns on desktop */}
