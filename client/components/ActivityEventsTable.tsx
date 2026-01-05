@@ -33,7 +33,6 @@ type SortDirection = "asc" | "desc";
 export function ActivityEventsTable({
   events,
   isLoading = false,
-  onDateClick,
 }: ActivityEventsTableProps) {
   const [sortField, setSortField] = useState<SortField>("changeDatetime");
   const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
