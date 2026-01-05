@@ -20,6 +20,7 @@ export default function PharmaciesActivity() {
   const navigate = useNavigate();
 
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [data, setData] = useState<ActivityResponse | null>(null);
   const [selectedEvent, setSelectedEvent] = useState<ActivityEvent | null>(
     null,
@@ -41,12 +42,15 @@ export default function PharmaciesActivity() {
 
   const loadData = async (from: Date, to: Date) => {
     setIsLoading(true);
+    setError(null);
     try {
       const response = await fetchActivityData(from, to);
       setData(response);
-    } catch (error) {
-      console.error("Failed to fetch activity data:", error);
-      toast.error("Ошибка при загрузке данных");
+    } catch (err) {
+      console.error("Failed to fetch activity data:", err);
+      const errorMsg = "Ошибка при загрузке данных";
+      setError(errorMsg);
+      toast.error(errorMsg);
     } finally {
       setIsLoading(false);
     }
@@ -99,6 +103,13 @@ export default function PharmaciesActivity() {
         </div>
 
         <div className="px-4 sm:px-6 lg:px-8 pb-8">
+          {/* Error Message */}
+          {error && (
+            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+              <p className="text-red-800 font-medium">{error}</p>
+            </div>
+          )}
+
           {/* Filter Panel */}
           <ActivityFilterPanelDropdown
             onFiltersChange={handleFiltersChange}
