@@ -91,6 +91,7 @@ export function NewPharmaciesChart({
 
   const handleBarClick = (data: ChartDataPoint) => {
     setSelectedDate(data.fullDate);
+    onDateClick?.();
   };
 
   const handleClosePanel = () => {
