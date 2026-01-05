@@ -17,7 +17,6 @@ import { ChevronDown, ChevronUp } from "lucide-react";
 interface ActivityEventsTableProps {
   events: ActivityEvent[];
   isLoading?: boolean;
-  onDateClick?: (date: string) => void;
 }
 
 type SortField =
