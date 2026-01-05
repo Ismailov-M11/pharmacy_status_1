@@ -103,6 +103,13 @@ export default function PharmaciesActivity() {
         </div>
 
         <div className="px-4 sm:px-6 lg:px-8 pb-8">
+          {/* Error Message */}
+          {error && (
+            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+              <p className="text-red-800 font-medium">{error}</p>
+            </div>
+          )}
+
           {/* Filter Panel */}
           <ActivityFilterPanelDropdown
             onFiltersChange={handleFiltersChange}
