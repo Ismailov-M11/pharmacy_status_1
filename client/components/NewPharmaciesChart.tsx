@@ -23,35 +23,20 @@ export function NewPharmaciesChart({
   isLoading = false,
 }: NewPharmaciesChartProps) {
   const chartData = useMemo(() => {
-    // Group pharmacies by date
-    const groupedByDate: Record<
-      string,
-      { active: number; inactive: number; total: number }
-    > = {};
+    // Group pharmacies by date and count total
+    const groupedByDate: Record<string, number> = {};
 
     pharmacies.forEach((pharmacy) => {
       const dateKey = format(new Date(pharmacy.onboardedAt), "yyyy-MM-dd");
-
-      if (!groupedByDate[dateKey]) {
-        groupedByDate[dateKey] = { active: 0, inactive: 0, total: 0 };
-      }
-
-      if (pharmacy.currentStatus === "active") {
-        groupedByDate[dateKey].active++;
-      } else {
-        groupedByDate[dateKey].inactive++;
-      }
-      groupedByDate[dateKey].total++;
+      groupedByDate[dateKey] = (groupedByDate[dateKey] || 0) + 1;
     });
 
     // Convert to array and sort by date
     return Object.entries(groupedByDate)
-      .map(([date, data]) => ({
+      .map(([date, count]) => ({
         date: format(new Date(date), "dd MMM", { locale: undefined }),
         fullDate: date,
-        active: data.active,
-        inactive: data.inactive,
-        total: data.total,
+        count: count,
       }))
       .sort((a, b) => a.fullDate.localeCompare(b.fullDate));
   }, [pharmacies]);
@@ -78,9 +63,7 @@ export function NewPharmaciesChart({
           График новых аптек
         </h2>
         <div className="flex items-center justify-center h-64">
-          <span className="text-gray-500">
-            Нет новых аптек за выбранный период
-          </span>
+          <span className="text-gray-500">Нет новых аптек за период</span>
         </div>
       </Card>
     );
@@ -121,18 +104,13 @@ export function NewPharmaciesChart({
               borderRadius: "0.5rem",
             }}
             cursor={{ fill: "rgba(168, 85, 247, 0.05)" }}
-          />
-          <Legend />
-          <Bar
-            dataKey="active"
-            fill="#10b981"
-            name="Активные"
-            radius={[4, 4, 0, 0]}
+            formatter={(value) => value}
+            labelFormatter={(label) => `${label}`}
           />
           <Bar
-            dataKey="inactive"
-            fill="#f59e0b"
-            name="Неактивные"
+            dataKey="count"
+            fill="#a855f7"
+            name="Новые аптеки"
             radius={[4, 4, 0, 0]}
           />
         </BarChart>
