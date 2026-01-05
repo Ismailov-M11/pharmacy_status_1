@@ -184,7 +184,7 @@ export function NewPharmaciesChart({
               allowDecimals={false}
               type="number"
               label={{
-                value: "Количество аптек",
+                value: t.graphLabel,
                 angle: -90,
                 position: "insideLeft",
                 offset: 10,
