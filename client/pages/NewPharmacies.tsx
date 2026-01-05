@@ -29,6 +29,9 @@ export default function NewPharmacies() {
   const [toDate, setToDate] = useState<Date>(endOfMonth(new Date()));
   const [compareFromDate, setCompareFromDate] = useState<Date | null>(null);
   const [compareToDate, setCompareToDate] = useState<Date | null>(null);
+  const [selectedDateFilter, setSelectedDateFilter] = useState<string | null>(
+    null,
+  );
 
   useEffect(() => {
     if (authLoading) return;
