@@ -12,7 +12,8 @@ import {
   Cell,
 } from "recharts";
 import { ActivityEvent } from "@/lib/reportsApi";
-import { format, parse } from "date-fns";
+import { format, parse, startOfMonth } from "date-fns";
+import { ru } from "date-fns/locale";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 interface ActivityChartProps {
