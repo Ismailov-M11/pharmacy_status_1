@@ -70,8 +70,9 @@ export default function PharmaciesActivity() {
   };
 
   const handleReset = () => {
-    const from = startOfMonth(new Date());
-    const to = endOfMonth(new Date());
+    const today = new Date();
+    const from = startOfMonth(today);
+    const to = endOfMonth(today);
     setFromDate(from);
     setToDate(to);
     setSelectedDateFilter(null);
