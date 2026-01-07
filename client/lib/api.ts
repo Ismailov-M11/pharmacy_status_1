@@ -157,8 +157,10 @@ export async function updatePharmacyStatus(
 // ============================================
 
 // Use environment variable for backend URL, fallback to localhost for development
+// Use environment variable for backend URL, fallback to localhost for development
+// Ensure it points to the /status base path
 export const STATUS_API_BASE_URL =
-  import.meta.env.VITE_BACKEND_URL || "http://localhost:5000/api/status";
+  (import.meta.env.VITE_BACKEND_URL || "http://localhost:5000/api") + "/status";
 
 export interface PharmacyStatus {
   pharmacy_id: string;
