@@ -226,7 +226,13 @@ export function ActivityChart({
               }}
               cursor={{ fill: "rgba(168, 85, 247, 0.05)" }}
               formatter={(value) => value}
-              labelFormatter={(label) => `${label}`}
+              labelFormatter={(label, payload) => {
+                if (payload && payload.length > 0) {
+                  const data = payload[0].payload as ChartDataPoint;
+                  return `${label} ${data.month || ""}`;
+                }
+                return `${label}`;
+              }}
             />
             <Legend />
             <Bar
