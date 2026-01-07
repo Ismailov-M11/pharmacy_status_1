@@ -198,7 +198,17 @@ export function NewPharmaciesChart({
               }}
               cursor={{ fill: "rgba(168, 85, 247, 0.05)" }}
               formatter={(value) => value}
-              labelFormatter={(label) => `${label}`}
+              labelFormatter={(label, payload) => {
+                if (payload && payload.length > 0) {
+                  const data = payload[0].payload as ChartDataPoint;
+                  const locale = language === "uz" ? undefined : ru;
+                  const monthLabel = format(startOfMonth(fromDate), "LLLL", {
+                    locale,
+                  });
+                  return `${label} ${monthLabel}`;
+                }
+                return `${label}`;
+              }}
             />
             <Bar
               dataKey="count"
