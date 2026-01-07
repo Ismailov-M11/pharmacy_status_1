@@ -41,8 +41,6 @@ export function Header() {
     navigationItems.push(
       { label: t.adminPanel || "Админ", path: "/admin", icon: User },
       { label: t.maps || "Карты", path: "/maps", icon: Map },
-      { label: "Активности", path: "/pharmacies-activity", icon: Activity },
-      { label: "Новые аптеки", path: "/new-pharmacies", icon: Store },
     );
   } else if (role === "ROLE_AGENT" || role === "ROLE_OPERATOR") {
     const agentLabel =
@@ -57,6 +55,14 @@ export function Header() {
         icon: agentIcon,
       },
       { label: t.maps || "Карты", path: "/maps", icon: Map },
+    );
+  }
+
+  // Add reports pages for all non-admin roles
+  if (role !== "ROLE_ADMIN") {
+    navigationItems.push(
+      { label: t.activities || "Активности", path: "/pharmacies-activity", icon: Activity },
+      { label: t.newPharmacies || "Новые аптеки", path: "/new-pharmacies", icon: Store },
     );
   }
 
