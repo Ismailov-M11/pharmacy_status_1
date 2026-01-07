@@ -90,6 +90,7 @@ export function ActivityChart({
       .map((dateStr) => {
         try {
           const dateObj = parse(dateStr, "yyyy-MM-dd", new Date());
+          const locale = language === "uz" ? undefined : ru;
           const data = groupedByDate[dateStr] || {
             activated: 0,
             deactivated: 0,
@@ -99,6 +100,7 @@ export function ActivityChart({
             fullDate: dateStr,
             activated: data.activated,
             deactivated: data.deactivated,
+            month: format(dateObj, "LLLL", { locale }),
           };
         } catch (err) {
           console.error("Error parsing date:", dateStr, err);
