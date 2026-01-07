@@ -45,7 +45,7 @@ export default function PharmaciesActivity() {
     }
 
     loadData(fromDate, toDate);
-  }, [authLoading, isAuthenticated, navigate, fromDate, toDate]);
+  }, [authLoading, isAuthenticated, navigate]);
 
   const loadData = async (from: Date, to: Date) => {
     setIsLoading(true);
