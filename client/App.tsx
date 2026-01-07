@@ -101,7 +101,13 @@ const App = () => (
               <Route
                 path="/pharmacies-activity"
                 element={
-                  <RoleBasedRoute allowedRoles={["ROLE_ADMIN"]}>
+                  <RoleBasedRoute
+                    allowedRoles={[
+                      "ROLE_ADMIN",
+                      "ROLE_AGENT",
+                      "ROLE_OPERATOR",
+                    ]}
+                  >
                     <PharmaciesActivity />
                   </RoleBasedRoute>
                 }
@@ -109,7 +115,13 @@ const App = () => (
               <Route
                 path="/new-pharmacies"
                 element={
-                  <RoleBasedRoute allowedRoles={["ROLE_ADMIN"]}>
+                  <RoleBasedRoute
+                    allowedRoles={[
+                      "ROLE_ADMIN",
+                      "ROLE_AGENT",
+                      "ROLE_OPERATOR",
+                    ]}
+                  >
                     <NewPharmacies />
                   </RoleBasedRoute>
                 }
