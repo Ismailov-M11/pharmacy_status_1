@@ -321,6 +321,53 @@ export interface ActivityResponse {
 
 // ... existing code ...
 
+import {
+  STATUS_API_BASE_URL,
+  getPharmacyList,
+  Pharmacy
+} from "@/lib/api";
+
+// Helper to get pharmacy details for filling in reports
+async function getPharmacyLookup(token: string): Promise<Map<number, Pharmacy>> {
+  try {
+    const response = await getPharmacyList(token, "", 0, null, 10000);
+    const map = new Map<number, Pharmacy>();
+    response.payload.list.forEach((p) => map.set(p.id, p));
+    return map;
+  } catch (error) {
+    console.error("Failed to load pharmacy lookup:", error);
+    return new Map();
+  }
+}
+
+// Helper to filter events by date range
+function filterActivityByDateRange(
+  events: ActivityEvent[],
+  from: Date,
+  to: Date
+): ActivityEvent[] {
+  const fromTime = from.getTime();
+  const toTime = to.getTime();
+  return events.filter((e) => {
+    const time = new Date(e.changeDatetime).getTime();
+    return time >= fromTime && time <= toTime;
+  });
+}
+
+// Helper to filter new pharmacies by date range (onboardedAt)
+function filterNewPharmaciesByDateRange(
+  items: NewPharmacy[],
+  from: Date,
+  to: Date
+): NewPharmacy[] {
+  const fromTime = from.getTime();
+  const toTime = to.getTime();
+  return items.filter((item) => {
+    const time = new Date(item.onboardedAt).getTime();
+    return time >= fromTime && time <= toTime;
+  });
+}
+
 // Fetch activity data
 export async function fetchActivityData(
   token: string,
