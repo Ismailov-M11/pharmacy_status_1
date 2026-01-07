@@ -30,6 +30,7 @@ interface ChartDataPoint {
   fullDate: string;
   activated: number;
   deactivated: number;
+  month?: string;
 }
 
 export function ActivityChart({
@@ -40,7 +41,16 @@ export function ActivityChart({
   toDate,
   selectedDate = null,
 }: ActivityChartProps) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
+
+  // Get month name in Russian or Uzbek
+  const monthName = useMemo(() => {
+    const locale = language === "uz" ? undefined : ru;
+    if (fromDate) {
+      return format(startOfMonth(fromDate), "LLLL yyyy", { locale });
+    }
+    return format(startOfMonth(new Date()), "LLLL yyyy", { locale });
+  }, [fromDate, language]);
 
   const chartData = useMemo(() => {
     // Group events by date
