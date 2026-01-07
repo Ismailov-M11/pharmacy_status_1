@@ -115,7 +115,7 @@ export function ActivityChart({
       .sort((a, b) => a.fullDate.localeCompare(b.fullDate));
 
     return dataArray;
-  }, [events, fromDate, toDate]);
+  }, [events, fromDate, toDate, language]);
 
   // Calculate smart Y-axis domain based on max value
   const yAxisDomain = useMemo(() => {
