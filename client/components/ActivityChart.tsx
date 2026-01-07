@@ -155,7 +155,7 @@ export function ActivityChart({
     return (
       <Card className="p-6 mb-8">
         <h2 className="text-lg font-semibold text-gray-900 mb-4">
-          {t.activitiesChart}
+          {t.activitiesChart} — {monthName}
         </h2>
         <div className="flex items-center justify-center h-64">
           <div className="animate-pulse w-full">
@@ -170,7 +170,7 @@ export function ActivityChart({
     return (
       <Card className="p-6 mb-8">
         <h2 className="text-lg font-semibold text-gray-900 mb-4">
-          {t.activitiesChart}
+          {t.activitiesChart} — {monthName}
         </h2>
         <div className="flex items-center justify-center h-64">
           <span className="text-gray-500">{t.noActivities}</span>
@@ -183,12 +183,7 @@ export function ActivityChart({
     <div className="mb-8">
       <Card className="p-6">
         <h2 className="text-lg font-semibold text-gray-900 mb-6">
-          {t.activitiesChart}
-          {fromDate && (
-            <span className="text-sm font-normal text-gray-600 ml-2">
-              ({format(fromDate, "LLLL yyyy")})
-            </span>
-          )}
+          {t.activitiesChart} — {monthName}
         </h2>
         <ResponsiveContainer width="100%" height={400}>
           <BarChart
