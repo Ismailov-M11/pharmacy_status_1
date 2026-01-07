@@ -28,8 +28,9 @@ export default function PharmaciesActivity() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [data, setData] = useState<ActivityResponse | null>(null);
-  const [fromDate, setFromDate] = useState<Date>(startOfMonth(new Date()));
-  const [toDate, setToDate] = useState<Date>(endOfMonth(new Date()));
+  const today = new Date();
+  const [fromDate, setFromDate] = useState<Date>(startOfMonth(today));
+  const [toDate, setToDate] = useState<Date>(endOfMonth(today));
   const [selectedDateFilter, setSelectedDateFilter] = useState<string | null>(
     null,
   );
