@@ -20,7 +20,7 @@ import { X } from "lucide-react";
 import { format } from "date-fns";
 
 export default function PharmaciesActivity() {
-  const { isAuthenticated, isLoading: authLoading } = useAuth();
+  const { isAuthenticated, isLoading: authLoading, token } = useAuth();
   const { t } = useLanguage();
   const navigate = useNavigate();
   const selectedDayRef = useRef<HTMLDivElement>(null);

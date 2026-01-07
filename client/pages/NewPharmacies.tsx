@@ -16,7 +16,7 @@ import { startOfMonth, endOfMonth } from "date-fns";
 import { toast } from "sonner";
 
 export default function NewPharmacies() {
-  const { isAuthenticated, isLoading: authLoading } = useAuth();
+  const { isAuthenticated, isLoading: authLoading, token } = useAuth();
   const { t } = useLanguage();
   const navigate = useNavigate();
 
@@ -164,8 +164,8 @@ export default function NewPharmacies() {
               />
               <KpiCard
                 label={`📈 Разница${data.periodB.count > 0
-                    ? ` (${data.diff.percent.toFixed(1)}%)`
-                    : ""
+                  ? ` (${data.diff.percent.toFixed(1)}%)`
+                  : ""
                   }`}
                 value={
                   data.diff.value >= 0
