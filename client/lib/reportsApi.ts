@@ -304,85 +304,22 @@ export interface ActivitySummary {
 }
 
 export interface ActivityResponse {
-  summary: ActivitySummary;
+  cards: {
+    activated: number;
+    deactivated: number;
+    net: number;
+  };
+  chart: {
+    date: string;
+    activated: number;
+    deactivated: number;
+  }[];
   events: ActivityEvent[];
+  // Frontend legacy support
+  summary?: ActivitySummary;
 }
 
-export interface NewPharmacy {
-  id: number;
-  code: string;
-  pharmacyName: string;
-  address?: string;
-  landmark?: string;
-  phone?: string;
-  responsiblePhone?: string;
-  onboardedAt: string;
-  district: string;
-  currentStatus: "active" | "inactive";
-}
-
-export interface PeriodData {
-  label: string;
-  count: number;
-}
-
-export interface Difference {
-  value: number;
-  percent: number;
-}
-
-export interface NewPharmaciesResponse {
-  periodA: PeriodData;
-  periodB: PeriodData;
-  diff: Difference;
-  items: NewPharmacy[];
-}
-
-import { getPharmacyList, STATUS_API_BASE_URL } from "./api";
-
-// ... (existing helper functions if any, or just imports)
-
-// Filter mock data by date range
-function filterActivityByDateRange(
-  events: ActivityEvent[],
-  fromDate: Date,
-  toDate: Date,
-): ActivityEvent[] {
-  return events.filter((event) => {
-    const eventDate = new Date(event.changeDatetime);
-    return eventDate >= fromDate && eventDate <= toDate;
-  });
-}
-
-function filterNewPharmaciesByDateRange(
-  items: NewPharmacy[],
-  fromDate: Date,
-  toDate: Date,
-): NewPharmacy[] {
-  return items.filter((item) => {
-    const itemDate = new Date(item.onboardedAt);
-    return itemDate >= fromDate && itemDate <= toDate;
-  });
-}
-
-// Helper to look up pharmacy details
-async function getPharmacyLookup(token: string) {
-  try {
-    // Fetch a large list to ensure we cover most pharmacies
-    // We assume 1000 is enough for now, or we could handle pagination
-    const response = await getPharmacyList(token, "", 0, null, 1000);
-    const lookup = new Map<number, any>(); // Map ID -> Pharmacy Object
-    if (response.payload && response.payload.list) {
-      response.payload.list.forEach((p) => {
-        lookup.set(p.id, p);
-      });
-    }
-    return lookup;
-  } catch (error) {
-    console.warn("Failed to fetch pharmacy list for lookup:", error);
-    return new Map<number, any>();
-  }
-}
+// ... existing code ...
 
 // Fetch activity data
 export async function fetchActivityData(
@@ -403,7 +340,7 @@ export async function fetchActivityData(
       ]);
 
       if (!backendResponse.ok) throw new Error("API failed");
-      const data = await backendResponse.json();
+      const data: ActivityResponse = await backendResponse.json();
 
       // Merge details
       const enrichedEvents = data.events.map((event: any) => {
@@ -417,14 +354,16 @@ export async function fetchActivityData(
           code: pharmacy?.code || event.code || "N/A",
           address: pharmacy?.address || event.address || "—",
           phone: pharmacy?.phone || event.phone || "",
-          responsiblePhone: pharmacy?.lead?.phone || event.responsiblePhone || "", // Assuming lead phone is responsible phone
-          district: pharmacy?.district || event.district || "—", // Note: district might not be in external API pharmacy object, check interface
+          responsiblePhone: pharmacy?.lead?.phone || event.responsiblePhone || "",
+          district: pharmacy?.district || event.district || "—",
         };
       });
 
       return {
-        summary: data.summary,
-        events: enrichedEvents
+        ...data,
+        events: enrichedEvents,
+        // Map strict 'cards' to legacy 'summary' for component compatibility
+        summary: data.cards
       };
 
     } catch (error) {
@@ -432,7 +371,7 @@ export async function fetchActivityData(
     }
   }
 
-  // Use mock data
+  // Use mock data...
   const filteredEvents = filterActivityByDateRange(
     mockActivityData.events,
     fromDate,
@@ -444,7 +383,10 @@ export async function fetchActivityData(
     deactivated: filteredEvents.filter((e) => e.type === "DEACTIVATED").length,
   };
 
+  // Mock response structure (adapted to compatible type)
   return {
+    cards: { activated: summary.activated, deactivated: summary.deactivated, net: summary.activated - summary.deactivated },
+    chart: [],
     summary,
     events: filteredEvents,
   };
