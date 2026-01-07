@@ -1,7 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Card } from "@/components/ui/card";
 import {
   Select,
   SelectContent,
@@ -9,17 +7,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  startOfDay,
-  startOfWeek,
-  startOfMonth,
-  startOfYear,
-  endOfDay,
-} from "date-fns";
+import { Input } from "@/components/ui/input";
+import { Card } from "@/components/ui/card";
+import { startOfMonth, endOfMonth } from "date-fns";
 import { toast } from "sonner";
 import { useLanguage } from "@/contexts/LanguageContext";
-
-export type DatePreset = "day" | "week" | "month" | "year" | "custom";
 
 interface ActivityFilterPanelDropdownProps {
   onFiltersChange: (fromDate: Date, toDate: Date) => void;
@@ -34,31 +26,38 @@ export function ActivityFilterPanelDropdown({
 }: ActivityFilterPanelDropdownProps) {
   const { t } = useLanguage();
   const today = new Date();
-
-  const [preset, setPreset] = useState<DatePreset>("week");
+  const [mode, setMode] = useState<"months" | "range">("months");
+  const [selectedMonth, setSelectedMonth] = useState<string>(
+    today.toISOString().slice(0, 7),
+  );
+  const [compareMonth, setCompareMonth] = useState<string>(
+    new Date(today.getFullYear(), today.getMonth() - 1)
+      .toISOString()
+      .slice(0, 7),
+  );
   const [fromDate, setFromDate] = useState<string>(
-    startOfWeek(today).toISOString().split("T")[0],
+    today.toISOString().split("T")[0],
   );
   const [toDate, setToDate] = useState<string>(
-    endOfDay(today).toISOString().split("T")[0],
+    today.toISOString().split("T")[0],
   );
   const [validationError, setValidationError] = useState<string | null>(null);
 
-  const getPresetDates = (p: DatePreset): [Date, Date] => {
-    const now = new Date();
-    switch (p) {
-      case "day":
-        return [startOfDay(now), endOfDay(now)];
-      case "week":
-        return [startOfWeek(now), endOfDay(now)];
-      case "month":
-        return [startOfMonth(now), endOfDay(now)];
-      case "year":
-        return [startOfYear(now), endOfDay(now)];
-      case "custom":
-        return [new Date(fromDate), new Date(toDate)];
+  const months = useMemo(() => {
+    const result = [];
+    const current = new Date(today.getFullYear(), today.getMonth(), 1);
+    for (let i = 0; i < 24; i++) {
+      const month = new Date(current.getFullYear(), current.getMonth() - i, 1);
+      result.push({
+        value: month.toISOString().slice(0, 7),
+        label: new Intl.DateTimeFormat("ru", {
+          year: "numeric",
+          month: "long",
+        }).format(month),
+      });
     }
-  };
+    return result;
+  }, [today]);
 
   const validateDates = (from: Date, to: Date): boolean => {
     setValidationError(null);
@@ -79,34 +78,36 @@ export function ActivityFilterPanelDropdown({
     return true;
   };
 
-  const handlePresetChange = (p: DatePreset) => {
-    setPreset(p);
-    setValidationError(null);
-    if (p !== "custom") {
-      const [from, to] = getPresetDates(p);
-      setFromDate(from.toISOString().split("T")[0]);
-      setToDate(to.toISOString().split("T")[0]);
+  const handleApply = () => {
+    if (mode === "months") {
+      const [year, month] = selectedMonth.split("-");
+      const from = new Date(parseInt(year), parseInt(month) - 1, 1);
+      const to = endOfMonth(from);
+
+      if (validateDates(from, to)) {
+        onFiltersChange(from, to);
+      }
+    } else {
+      const from = new Date(fromDate);
+      const to = new Date(toDate);
+      to.setHours(23, 59, 59, 999);
+
       if (validateDates(from, to)) {
         onFiltersChange(from, to);
       }
     }
   };
 
-  const handleApply = () => {
-    const from = new Date(fromDate);
-    const to = new Date(toDate);
-    to.setHours(23, 59, 59, 999);
-
-    if (validateDates(from, to)) {
-      onFiltersChange(from, to);
-    }
-  };
-
   const handleReset = () => {
-    const [from, to] = getPresetDates("week");
-    setFromDate(from.toISOString().split("T")[0]);
-    setToDate(to.toISOString().split("T")[0]);
-    setPreset("week");
+    setMode("months");
+    setSelectedMonth(today.toISOString().slice(0, 7));
+    setCompareMonth(
+      new Date(today.getFullYear(), today.getMonth() - 1)
+        .toISOString()
+        .slice(0, 7),
+    );
+    setFromDate(today.toISOString().split("T")[0]);
+    setToDate(today.toISOString().split("T")[0]);
     setValidationError(null);
     onReset();
   };
@@ -115,23 +116,64 @@ export function ActivityFilterPanelDropdown({
     <Card className="p-4 md:p-6 mb-6">
       <div className="mb-4">
         <label className="text-sm font-medium text-gray-700 block mb-2">
-          {t.period}
+          {t.filterMode}
         </label>
-        <Select value={preset} onValueChange={handlePresetChange}>
+        <Select
+          value={mode}
+          onValueChange={(value) => {
+            setMode(value as "months" | "range");
+            setValidationError(null);
+          }}
+        >
           <SelectTrigger>
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="day">{t.day}</SelectItem>
-            <SelectItem value="week">{t.week}</SelectItem>
-            <SelectItem value="month">{t.month}</SelectItem>
-            <SelectItem value="year">{t.year}</SelectItem>
-            <SelectItem value="custom">{t.custom}</SelectItem>
+            <SelectItem value="months">{t.byMonths}</SelectItem>
+            <SelectItem value="range">{t.byPeriod}</SelectItem>
           </SelectContent>
         </Select>
       </div>
 
-      {preset === "custom" && (
+      {mode === "months" ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+          <div>
+            <label className="text-sm font-medium text-gray-700 block mb-2">
+              {t.currentMonth}
+            </label>
+            <Select value={selectedMonth} onValueChange={setSelectedMonth}>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {months.map((m) => (
+                  <SelectItem key={m.value} value={m.value}>
+                    {m.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div>
+            <label className="text-sm font-medium text-gray-700 block mb-2">
+              {t.compareTo}
+            </label>
+            <Select value={compareMonth} onValueChange={setCompareMonth}>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {months.map((m) => (
+                  <SelectItem key={m.value} value={m.value}>
+                    {m.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+      ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
           <div>
             <label className="text-sm font-medium text-gray-700 block mb-2">
@@ -170,24 +212,22 @@ export function ActivityFilterPanelDropdown({
         </div>
       )}
 
-      {preset === "custom" && (
-        <div className="flex gap-2 flex-col sm:flex-row">
-          <Button
-            onClick={handleApply}
-            disabled={isLoading || !!validationError}
-            className="bg-purple-700 hover:bg-purple-800 text-white flex-1 sm:flex-none"
-          >
-            {isLoading ? t.loading_action : t.apply_action}
-          </Button>
-          <Button
-            onClick={handleReset}
-            variant="outline"
-            className="border-purple-700 text-purple-700 hover:bg-purple-50 flex-1 sm:flex-none"
-          >
-            {t.reset}
-          </Button>
-        </div>
-      )}
+      <div className="flex gap-2 flex-col sm:flex-row">
+        <Button
+          onClick={handleApply}
+          disabled={isLoading || !!validationError}
+          className="bg-purple-700 hover:bg-purple-800 text-white flex-1 sm:flex-none"
+        >
+          {isLoading ? t.loading_action : t.apply_action}
+        </Button>
+        <Button
+          onClick={handleReset}
+          variant="outline"
+          className="border-purple-700 text-purple-700 hover:bg-purple-50 flex-1 sm:flex-none"
+        >
+          {t.reset}
+        </Button>
+      </div>
     </Card>
   );
 }
