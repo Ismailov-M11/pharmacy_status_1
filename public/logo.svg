@@ -1,0 +1,17 @@
+<svg viewBox="0 0 800 800" xmlns="http://www.w3.org/2000/svg">
+  <!-- Yellow circle top-left -->
+  <circle cx="250" cy="250" r="200" fill="#FFD93D"/>
+  
+  <!-- Pink/Red circle top-right -->
+  <circle cx="550" cy="250" r="200" fill="#FF2E7E"/>
+  
+  <!-- Purple circle bottom-left -->
+  <circle cx="250" cy="550" r="200" fill="#7B3FF2"/>
+  
+  <!-- Cyan circle bottom-right -->
+  <circle cx="550" cy="550" r="200" fill="#06D6D6"/>
+  
+  <!-- White cross/plus -->
+  <rect x="300" y="200" width="200" height="400" fill="white"/>
+  <rect x="200" y="300" width="400" height="200" fill="white"/>
+</svg>

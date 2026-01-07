@@ -1,0 +1,353 @@
+export type Language = "ru" | "uz";
+
+export const translations = {
+  ru: {
+    // Common
+    save: "Сохранено",
+    error: "Ошибка",
+    logout: "Выход",
+    language: "Язык",
+    siteTitle: "Состояние аптек",
+    emptyPlaceholder: "—",
+    close: "Закрыть",
+    apply: "Применить",
+    reset: "Сброс",
+
+    // Navigation
+    activities: "Активности",
+    newPharmacies: "Новые аптеки",
+
+    // Login Page
+    login: "Логин",
+    password: "Пароль",
+    enterLogin: "Введите логин",
+    enterPassword: "Введите пароль",
+    loginButton: "Войти",
+    loginError: "Ошибка входа. Проверьте логин и пароль.",
+    invalidCredentials: "Неверные учетные данные",
+    activationRequired: "Требуется активация аккаунта",
+
+    // Table Headers
+    number: "№",
+    code: "Код",
+    pharmacyName: "Название аптеки",
+    address: "Адрес",
+    landmark: "Ориентир",
+    pharmacyPhone: "Телефон аптеки",
+    leadPhone: "Телефон ответственного",
+    leadStatus: "Статус ответственного",
+    contactPerson: "Контактное лицо",
+    brandedPacket: "Пакет",
+    training: "Обучение",
+    status: "Статус",
+    registrationDate: "Дата регистрации",
+    telegramBot: "Telegram Bot",
+    slug: "Slug",
+    stir: "СТИР",
+    additionalPhone: "Дополнительный телефон",
+    juridicalName: "Юридическое название",
+    juridicalAddress: "Юридический адрес",
+    bankName: "Название банка",
+    bankAccount: "Банковский счет",
+    mfo: "МФО",
+    active: "Активна",
+    inactive: "Неактивна",
+    allPharmacies: "Все аптеки",
+    dateTime: "Дата/время изменения",
+    phone: "Телефон",
+    timeLabel: "Время",
+
+    // Status Values
+    yes: "ЕСТЬ",
+    no: "НЕТ",
+    yesTraining: "ЕСТЬ",
+    noTraining: "НЕТ",
+    available: "Доступно",
+    unavailable: "Недоступно",
+    statusActivated: "✅",
+    statusDeactivated: "⛔",
+
+    // Panel Titles
+    agentPanel: "Панель Агента",
+    operatorPanel: "Панель оператора колл-центра",
+    adminPanel: "Панель Администратора",
+    maps: "Карты",
+    pharmacyMap: "Отображение аптек на карте",
+    pharmacies: "Аптеки",
+    all: "Все",
+    action: "Действие",
+
+    // New Pharmacies Page
+    newPharmaciesTitle: "Новые аптеки",
+    newPharmaciesDescription: "Аптеки, активированные впервые после обучения",
+    newPharmaciesChart: "График новых аптек",
+    newPharmaciesCount: "Новых в периоде",
+    comparisonPeriod: "Период сравнения",
+    difference: "Разница",
+    noNewPharmacies: "Нет новых аптек за период",
+    pharmaciesAdded: "Аптеки добавлены",
+
+    // Pharmacy Activities Page
+    activitiesTitle: "Активности аптек",
+    activitiesDescription: "Просмотр активации и деактивации аптек",
+    activitiesChart: "График активности аптек",
+    noActivities: "Нет событий за выбранный период",
+    eventsLabel: "События",
+    activated: "Активировано",
+    deactivated: "Деактивировано",
+    eventCount: "Количество событий",
+    statusChangedTo: "Статус изменен на",
+
+    // Filter Panel
+    filterMode: "Режим фильтра:",
+    byMonths: "По месяцам",
+    byPeriod: "По периоду",
+    currentMonth: "Текущий месяц:",
+    compareTo: "Сравнить с:",
+    from: "С:",
+    to: "По:",
+    period: "Период:",
+    day: "День",
+    week: "Неделя",
+    month: "Месяц",
+    year: "Год",
+    custom: "Произвольный",
+    graphLabel: "Количество аптек",
+    landmark: "Ориентир",
+    onboardedAt: "Дата ввода",
+    noNewPharmaciesSelected: "Нет новых аптек за выбранный период",
+    noActivitiesSelected: "Нет событий за выбранный период",
+    noEvents: "Нет событий",
+    loading_action: "Загрузка...",
+    apply_action: "Применить",
+
+    // Actions
+    edit: "Редактировать",
+    save_action: "Сохранить",
+    cancel: "Отменить",
+    saved: "Сохранено успешно",
+    changeStatus: "Изменить статус",
+    currentStatus: "Текущий статус",
+    update: "Обновить",
+
+    // Loading and Empty States
+    loading: "Загрузка...",
+    loadingData: "Загрузка...",
+    noData: "Нет данных",
+    loadingPharmacies: "Загрузка аптек...",
+    dataLoadError: "Ошибка при загрузке данных",
+
+    // Validation
+    invalidDateRange: 'Дата "С" не может быть позже даты "По"',
+    periodTooLarge:
+      "⚠️ Период больше 366 дней. Показаны данные, но это может быть слишком большой диапазон.",
+
+    // Filters
+    filter: "Фильтр",
+
+    // Pharmacy Details Modal
+    pharmacyDetails: "Детали аптеки",
+    details: "Детали",
+    comment: "Комментарий",
+    enterComment: "Введите ваш комментарий...",
+    commentRequired: "Комментарий обязателен",
+    history: "История",
+    noChanges: "Нет изменений",
+    changedTo: "изменено на",
+    by: "пользователем",
+    deleted: "Удалено",
+    telegramUsers: "Пользователи Telegram Bot",
+    name: "Имя",
+    username: "Имя пользователя",
+    chatId: "Чат ID",
+    noTelegramUsers: "Нет пользователей Telegram",
+    confirmDelete: "Вы действительно хотите удалить?",
+    deleteSelected: "Удалить выбранные",
+    clear: "Очистить",
+    deleteWarning: "Эта запись будет удалена безвозвратно.",
+    deleteWarningMultiple: "Выбранные записи будут удалены безвозвратно.",
+    yearUnit: "год",
+    confirmYes: "ДА",
+    confirmNo: "НЕТ",
+    shown: "Показано",
+  },
+  uz: {
+    // Common
+    shown: "Ko'rsatildi",
+    save: "Saqlandi",
+    error: "Xatolik",
+    logout: "Chiqish",
+    language: "Til",
+    siteTitle: "Aptekalar holati",
+    emptyPlaceholder: "—",
+    close: "Yopish",
+    apply: "Qo'llash",
+    reset: "Tozalash",
+
+    // Navigation
+    activities: "Faoliyyatlar",
+    newPharmacies: "Yangi dorixonalar",
+
+    // Login Page
+    login: "Login",
+    password: "Parol",
+    enterLogin: "Loginingizni kiriting",
+    enterPassword: "Parolingizni kiriting",
+    loginButton: "Kirish",
+    loginError: "Kirish xatosi. Login va parolni tekshiring.",
+    invalidCredentials: "Noto'g'ri hisob ma'lumotlari",
+    activationRequired: "Hisobni faollashtirish talab qilinadi",
+
+    // Table Headers
+    number: "№",
+    code: "Kod",
+    pharmacyName: "Dorixona nomi",
+    address: "Manzil",
+    landmark: "Mo'ljal",
+    pharmacyPhone: "Dorixona telefoni",
+    leadPhone: "Mas'ul telefoni",
+    leadStatus: "Mas'ul holati",
+    contactPerson: "Aloqa o'rtagi",
+    brandedPacket: "Brendli paket",
+    training: "O'qitilgan",
+    status: "Holati",
+    registrationDate: "Ro'yxatga olish sanasi",
+    telegramBot: "Telegram Bot",
+    slug: "Slug",
+    stir: "STIR",
+    additionalPhone: "Qo'shimcha telefon",
+    juridicalName: "Yuridik nom",
+    juridicalAddress: "Yuridik manzil",
+    bankName: "Bank nomi",
+    bankAccount: "Bank hisob raqami",
+    mfo: "MFO",
+    active: "Faol",
+    inactive: "Nofaol",
+    allPharmacies: "Barcha dorixonalar",
+    dateTime: "O'zgarish sanasi/vaqti",
+    phone: "Telefon",
+    timeLabel: "Vaqt",
+
+    // Status Values
+    yes: "BOR",
+    no: "YO'Q",
+    yesTraining: "HA",
+    noTraining: "YO'Q",
+    available: "Mavjud",
+    unavailable: "Mavjud emas",
+    statusActivated: "✅",
+    statusDeactivated: "⛔",
+
+    // Panel Titles
+    agentPanel: "Agent paneli",
+    operatorPanel: "Call-markaz operatori paneli",
+    adminPanel: "Admin paneli",
+    maps: "Xaritalar",
+    pharmacyMap: "Dorixonalarni xaritada ko'rsatish",
+    pharmacies: "Dorixonalar",
+    all: "Barchasi",
+    action: "Harakat",
+
+    // New Pharmacies Page
+    newPharmaciesTitle: "Yangi dorixonalar",
+    newPharmaciesDescription:
+      "O'qitishdan so'ng birinchi marta faollashtirilgan dorixonalar",
+    newPharmaciesChart: "Yangi dorixonalar grafigi",
+    newPharmaciesCount: "Davrda yangi",
+    comparisonPeriod: "Taqqoslash davri",
+    difference: "Farq",
+    noNewPharmacies: "Davr uchun yangi dorixonalar yo'q",
+    pharmaciesAdded: "Dorixonalar qo'shildi",
+
+    // Pharmacy Activities Page
+    activitiesTitle: "Dorixonalar faoliyyati",
+    activitiesDescription:
+      "Dorixonalarni faollashtirish va o'chirishni ko'rish",
+    activitiesChart: "Dorixona faoliyyati grafigi",
+    noActivities: "Tanlangan davr uchun voqealar yo'q",
+    eventsLabel: "Voqealar",
+    activated: "Faollashtirildi",
+    deactivated: "O'chirildi",
+    eventCount: "Voqealar soni",
+    statusChangedTo: "Holati o'zgartirildi",
+
+    // Filter Panel
+    filterMode: "Filtr rejimi:",
+    byMonths: "Oylar bo'yicha",
+    byPeriod: "Davr bo'yicha",
+    currentMonth: "Joriy oy:",
+    compareTo: "Bilan solishtirish:",
+    from: "Dan:",
+    to: "Gacha:",
+    period: "Davr:",
+    day: "Kun",
+    week: "Hafta",
+    month: "Oy",
+    year: "Yil",
+    custom: "Maxsus",
+    graphLabel: "Dorixona soni",
+    landmark: "Mo'ljal",
+    onboardedAt: "Kiritilgan sana",
+    noNewPharmaciesSelected: "Tanlangan davr uchun yangi dorixonalar yo'q",
+    noActivitiesSelected: "Tanlangan davr uchun voqealar yo'q",
+    noEvents: "Voqealar yo'q",
+    loading_action: "Yuklanmoqda...",
+    apply_action: "Qo'llash",
+
+    // Actions
+    edit: "Tahrirlash",
+    save_action: "Saqlash",
+    cancel: "Bekor qilish",
+    saved: "Muvaffaqiyatli saqlandi",
+    changeStatus: "Holatni o'zgartirish",
+    currentStatus: "Joriy holat",
+    update: "Yangilash",
+
+    // Loading and Empty States
+    loading: "Yuklanmoqda...",
+    loadingData: "Yuklanmoqda...",
+    noData: "Ma'lumot yo'q",
+    loadingPharmacies: "Dorixonalar yuklanmoqda...",
+    dataLoadError: "Ma'lumotlarni yuklashda xato",
+
+    // Validation
+    invalidDateRange: 'Sana "Dan" sana "Gacha"dan keyin bo\'lishi mumkin emas',
+    periodTooLarge:
+      "⚠️ Davr 366 kundan ko'p. Ma'lumotlar ko'rsatildi, lekin bu juda katta oraliq bo'lishi mumkin.",
+
+    // Filters
+    filter: "Filtr",
+
+    // Pharmacy Details Modal
+    pharmacyDetails: "Dorixona tafsilotlari",
+    details: "Tafsilotlar",
+    comment: "Izoh",
+    enterComment: "Izohingizni kiriting...",
+    commentRequired: "Izoh kerak",
+    history: "Tarix",
+    noChanges: "O'zgarishlar yo'q",
+    changedTo: "o'zgartirildi",
+    by: "tomonidan",
+    deleted: "O'chirildi",
+    telegramUsers: "Telegram Bot foydalanuvchilari",
+    name: "Ism",
+    username: "Foydalanuvchi nomi",
+    chatId: "Chat ID",
+    noTelegramUsers: "Telegram foydalanuvchilari yo'q",
+    confirmDelete: "Haqiqatan ham o'chirmoqchimisiz?",
+    deleteSelected: "Tanlanganlarni o'chirish",
+    clear: "Tozalash",
+    deleteWarning: "Bu yozuv qaytarib bo'lmaydigan tarzda o'chiriladi.",
+    deleteWarningMultiple:
+      "Tanlangan yozuvlar qaytarib bo'lmaydigan tarzda o'chiriladi.",
+    yearUnit: "yil",
+    confirmYes: "HA",
+    confirmNo: "YO'Q",
+  },
+};
+
+export function getTranslation(
+  language: Language,
+): (typeof translations)["ru"] {
+  return translations[language];
+}
