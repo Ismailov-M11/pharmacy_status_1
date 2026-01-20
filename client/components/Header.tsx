@@ -40,6 +40,7 @@ export function Header() {
   if (role === "ROLE_ADMIN") {
     navigationItems.push(
       { label: t.adminPanel || "Админ", path: "/admin", icon: User },
+      { label: "Лиды", path: "/leads", icon: UserCog }, // Hardcoded label or add to translations
       { label: t.maps || "Карты", path: "/maps", icon: Map },
       {
         label: t.activities || "Активности",
@@ -64,6 +65,7 @@ export function Header() {
         path: "/agent",
         icon: agentIcon,
       },
+      { label: "Лиды", path: "/leads", icon: UserCog },
       { label: t.maps || "Карты", path: "/maps", icon: Map },
       {
         label: t.activities || "Активности",
@@ -102,9 +104,8 @@ export function Header() {
                   <DropdownMenuItem
                     key={item.path}
                     onClick={() => navigate(item.path)}
-                    className={`cursor-pointer ${
-                      isActive ? "bg-purple-50 text-purple-700" : ""
-                    }`}
+                    className={`cursor-pointer ${isActive ? "bg-purple-50 text-purple-700" : ""
+                      }`}
                   >
                     <Icon className="h-4 w-4 mr-2" />
                     <span>{item.label}</span>

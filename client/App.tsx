@@ -11,6 +11,7 @@ import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import Login from "./pages/Login";
 import AgentPanel from "./pages/AgentPanel";
 import AdminPanel from "./pages/AdminPanel";
+import LeadsPanel from "./pages/LeadsPanel";
 import PharmacyMaps from "./pages/PharmacyMaps";
 import PharmaciesActivity from "./pages/PharmaciesActivity";
 import NewPharmacies from "./pages/NewPharmacies";
@@ -85,6 +86,14 @@ const App = () => (
                 element={
                   <RoleBasedRoute allowedRoles={["ROLE_ADMIN"]}>
                     <AdminPanel />
+                  </RoleBasedRoute>
+                }
+              />
+              <Route
+                path="/leads"
+                element={
+                  <RoleBasedRoute allowedRoles={["ROLE_ADMIN", "ROLE_AGENT", "ROLE_OPERATOR"]}>
+                    <LeadsPanel />
                   </RoleBasedRoute>
                 }
               />
