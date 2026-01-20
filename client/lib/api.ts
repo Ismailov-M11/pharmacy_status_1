@@ -97,7 +97,6 @@ export async function login(credentials: LoginRequest): Promise<LoginResponse> {
 
   return response.json();
 }
-
 export async function getPharmacyList(
   token: string,
   searchKey: string = "",
@@ -105,27 +104,123 @@ export async function getPharmacyList(
   active: boolean | null = true,
   size: number = 1000,
 ): Promise<PharmacyListResponse> {
-  const response = await fetch(`${API_BASE_URL}/market/list`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json, text/plain, */*",
-      "Accept-Language": "ru,en-US;q=0.9,en;q=0.8",
-      Authorization: `Bearer ${token}`,
-    },
-    body: JSON.stringify({
-      searchKey,
-      page,
-      size,
-      active,
-    }),
-  });
+  // If we only want ACTIVE pharmacies, just fetch market/list (leads are inactive)
+  if (active === true) {
+    const response = await fetch(`${API_BASE_URL}/market/list`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json, text/plain, */*",
+        "Accept-Language": "ru,en-US;q=0.9,en;q=0.8",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        searchKey,
+        page,
+        size,
+        active,
+      }),
+    });
 
-  if (!response.ok) {
-    throw new Error("Failed to fetch pharmacy list");
+    if (!response.ok) throw new Error("Failed to fetch pharmacy list");
+    return response.json();
   }
 
-  return response.json();
+  // If we want ALL or INACTIVE, we need to merge Market + Leads
+  try {
+    // 1. Fetch Market List (All or Inactive)
+    // We use a large size to fetch all locally for merging if strictly needed,
+    // but here we respect the passed size for the market request as a base,
+    // OR we might need to fetch ALL to merge properly.
+    // Given the prompt implies "list from API... also gather info from lead/list",
+    // and we do client-side filtering, we should probably fetch ALL from both if we want accurate total counts and sorting.
+    // However, for performance regular pagination might be desired.
+    // BUT, the user requirement is "exclude converted", which requires checking against the full list or ID.
+    // Let's stick effectively to "Fetch All and Client Side Merge" for this specific filtered view as per plan.
+
+    const [marketRes, leadsRes] = await Promise.all([
+      fetch(`${API_BASE_URL}/market/list`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ searchKey, page: 0, size: 10000, active }), // Fetch all market items matching filter
+      }),
+      fetch(`${API_BASE_URL}/lead/list`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ searchKey, page: 0, size: 10000 }), // Fetch all leads
+      }),
+    ]);
+
+    if (!marketRes.ok || !leadsRes.ok) throw new Error("Failed to fetch lists");
+
+    const marketData = await marketRes.json();
+    const leadsData = await leadsRes.json();
+
+    const marketList: Pharmacy[] = marketData.payload.list || [];
+    const leadsList: any[] = leadsData.payload.list || [];
+
+    // 2. Filter Leads
+    // Exclude leads that have status 'CONVERTED'
+    const unconvertedLeads = leadsList.filter((l) => l.status !== "CONVERTED");
+
+    // 3. Map Leads to Pharmacy Interface
+    const mappedLeads: Pharmacy[] = unconvertedLeads.map((lead) => ({
+      ...lead,
+      id: lead.id, // Ensure this doesn't collide with market IDs ideally, but we use what we have
+      name: lead.name || "Lead",
+      code: lead.code || "LEAD",
+      address: lead.address || "",
+      phone: lead.phone,
+      active: false, // Force inactive
+      lead: lead, // Self-reference or specific structure
+      marketChats: [],
+      creationDate: lead.creationDate,
+      modifiedDate: lead.modifiedDate,
+      // Map other specific fields if the frontend relies on them (e.g. juridicalName)
+      juridicalName: lead.juridicalName,
+    }));
+
+    // 4. Merge
+    let mergedList = [...marketList, ...mappedLeads];
+
+    // 5. Client-side Search (if searchKey was applied to both APIs, this is partially redundant but ensures safety)
+    if (searchKey) {
+      const key = searchKey.toLowerCase();
+      mergedList = mergedList.filter(
+        (p) =>
+          p.name?.toLowerCase().includes(key) ||
+          p.code?.toLowerCase().includes(key) ||
+          p.address?.toLowerCase().includes(key)
+      );
+    }
+
+    // 6. Pagination (Simulated)
+    const total = mergedList.length;
+    // If original request had size/page, slice it
+    // If size is 1000 (default in calling code), we might just return all or slice.
+    // Current pagination is 0-indexed.
+    const start = page * size;
+    const end = start + size;
+    const slicedList = mergedList.slice(start, end);
+
+    return {
+      payload: {
+        list: slicedList,
+        total: total,
+      },
+      status: "Ok",
+      code: 200,
+    };
+  } catch (error) {
+    console.error("Merge error:", error);
+    throw new Error("Failed to fetch/merge lists");
+  }
 }
 
 export async function updatePharmacyStatus(
