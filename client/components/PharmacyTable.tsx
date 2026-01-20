@@ -28,6 +28,9 @@ interface PharmacyTableProps {
   onSearchChange?: (value: string) => void;
   onPharmacyClick?: (pharmacy: Pharmacy) => void;
   onRefresh?: () => void;
+  leadStatusFilter?: string | null;
+  onLeadStatusFilterChange?: (value: string | null) => void;
+  leadStatusOptions?: string[];
 }
 
 export function PharmacyTable({
@@ -46,6 +49,9 @@ export function PharmacyTable({
   onSearchChange,
   onPharmacyClick,
   onRefresh,
+  leadStatusFilter,
+  onLeadStatusFilterChange,
+  leadStatusOptions = [],
 }: PharmacyTableProps) {
   const { t } = useLanguage();
 
@@ -59,6 +65,18 @@ export function PharmacyTable({
       setter(false);
     } else {
       setter(null);
+    }
+  };
+
+  const handleStringFilterChange = (
+    value: string,
+    setter?: (val: string | null) => void,
+  ) => {
+    if (!setter) return;
+    if (value === "null") {
+      setter(null);
+    } else {
+      setter(value);
     }
   };
 
@@ -363,7 +381,43 @@ export function PharmacyTable({
               {isAdmin && (
                 <>
                   <th className="px-2 md:px-4 py-2 md:py-3 text-left font-semibold text-gray-700 whitespace-nowrap min-w-max">
-                    {t.leadStatus}
+                    {onLeadStatusFilterChange && leadStatusOptions && leadStatusOptions.length > 0 ? (
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="-ml-3 h-8 data-[state=open]:bg-purple-600 data-[state=open]:text-white"
+                          >
+                            <span>{t.leadStatus}</span>
+                            <ChevronDown className="ml-2 h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="start">
+                          <DropdownMenuRadioGroup
+                            value={leadStatusFilter || "null"}
+                            onValueChange={(val) =>
+                              handleStringFilterChange(val, onLeadStatusFilterChange)
+                            }
+                          >
+                            <DropdownMenuRadioItem value="null">
+                              {t.all || "Все"}
+                            </DropdownMenuRadioItem>
+                            {leadStatusOptions.map((status) => (
+                              <DropdownMenuRadioItem
+                                key={status}
+                                value={status}
+                                className="cursor-pointer"
+                              >
+                                {status}
+                              </DropdownMenuRadioItem>
+                            ))}
+                          </DropdownMenuRadioGroup>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    ) : (
+                      t.leadStatus
+                    )}
                   </th>
                   <th className="px-2 md:px-4 py-2 md:py-3 text-left font-semibold text-gray-700 whitespace-nowrap min-w-max">
                     {t.stir}

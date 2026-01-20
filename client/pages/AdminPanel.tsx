@@ -174,10 +174,10 @@ export default function AdminPanel() {
       setSelectedPharmacy((prev) =>
         prev
           ? {
-              ...prev,
-              training: status.training,
-              brandedPacket: status.brandedPacket,
-            }
+            ...prev,
+            training: status.training,
+            brandedPacket: status.brandedPacket,
+          }
           : null,
       );
 
@@ -236,10 +236,10 @@ export default function AdminPanel() {
       setSelectedPharmacy((prev) =>
         prev
           ? {
-              ...prev,
-              training: updatedStatus.training,
-              brandedPacket: updatedStatus.brandedPacket,
-            }
+            ...prev,
+            training: updatedStatus.training,
+            brandedPacket: updatedStatus.brandedPacket,
+          }
           : null,
       );
 
@@ -310,6 +310,9 @@ export default function AdminPanel() {
             onSearchChange={setSearchQuery}
             onPharmacyClick={handlePharmacyClick}
             onRefresh={fetchPharmacies}
+            leadStatusFilter={null}
+            onLeadStatusFilterChange={() => { }}
+            leadStatusOptions={[]}
           />
         </div>
       </main>
