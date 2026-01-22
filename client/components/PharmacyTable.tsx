@@ -703,21 +703,30 @@ export function PharmacyTable({
                         {/* New Comment Columns */}
                         {showComments && (
                           <>
+                            {/* Date Column: Just Date */}
                             <td className="px-2 md:px-4 py-2 md:py-3 text-gray-900 text-xs whitespace-nowrap align-top">
                               {(() => {
                                 const last = getLastComment(pharmacy.comments || []);
                                 if (!last) return "-";
                                 return (
-                                  <div className="flex flex-col">
-                                    <span className="font-semibold">{formatDate(last.createdAt)}</span>
-                                    <span className="text-gray-500 text-[10px]">{last.creator?.phone || "-"}</span>
-                                  </div>
+                                  <span className="font-semibold">{formatDate(last.createdAt)}</span>
                                 );
                               })()}
                             </td>
+                            {/* Author Column: Just Phone/Name */}
+                            <td className="px-2 md:px-4 py-2 md:py-3 text-gray-900 text-xs whitespace-nowrap align-top">
+                              {(() => {
+                                const last = getLastComment(pharmacy.comments || []);
+                                if (!last) return "-";
+                                return (
+                                  <span className="text-gray-500 text-xs">{last.creator?.phone || "-"}</span>
+                                );
+                              })()}
+                            </td>
+                            {/* Comment Text Column */}
                             <td className="px-2 md:px-4 py-2 md:py-3 text-gray-900 text-xs align-top">
                               <div className="max-w-[200px] break-words">
-                                {getLastComment(pharmacy.comments || [])?.coment || "-"}
+                                {getLastComment(pharmacy.comments || [])?.coment || getLastComment(pharmacy.comments || [])?.comment || "-"}
                               </div>
                             </td>
                           </>
@@ -761,4 +770,3 @@ export function PharmacyTable({
     </div >
   );
 }
-// Force rebuild to apply styles
