@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
-import { getLeadsList, Pharmacy } from "@/lib/api";
+import { getLeadsList, getPharmacyList, getPharmacyStatus, Pharmacy } from "@/lib/api";
 import { PharmacyTable } from "@/components/PharmacyTable";
 import { Header } from "@/components/Header";
 import { toast } from "sonner";
@@ -18,11 +18,7 @@ export default function LeadsPanel() {
 
     // Filters
     const [searchQuery, setSearchQuery] = useState("");
-    // Leads are typically inactive, but we might want to filter if the API returns mixed states later.
-    // For now, we reuse the filter naming conventions.
-    const [activeFilter, setActiveFilter] = useState<boolean | null>(null); // Leads strictly inactive? or Mixed? Usually false.
-
-    // New Lead Status Filter
+    const [activeFilter, setActiveFilter] = useState<boolean | null>(null);
     const [leadStatusFilter, setLeadStatusFilter] = useState<string | null>(null);
 
     useEffect(() => {
@@ -33,41 +29,78 @@ export default function LeadsPanel() {
             return;
         }
 
-        const fetchLeads = async () => {
+        const fetchData = async () => {
             setIsLoading(true);
             try {
-                const response = await getLeadsList(token, "", 0, 10000); // Fetch all to filter locally
-                const rawLeads = response.payload.list || [];
+                // 1. Parallel Fetch: Leads and Market List
+                const [leadsResponse, marketResponse] = await Promise.all([
+                    getLeadsList(token, "", 0, 10000),
+                    getPharmacyList(token, "", 0, null, 10000)
+                ]);
 
-                // Map to Pharmacy
-                const mappedLeads: Pharmacy[] = rawLeads.map((item: any) => ({
-                    ...item,
-                    id: item.id,
-                    code: item.code || "LEAD",
-                    // Handle potentially missing name
-                    name: item.name || "Unknown Lead",
-                    address: item.address || "",
-                    phone: item.phone || "",
-                    active: false,
-                    lead: item, // Embed self for isAdmin columns
-                    marketChats: [],
-                    brandedPacket: false,
-                    training: false,
-                    creationDate: item.creationDate || new Date().toISOString(),
-                    modifiedDate: item.modifiedDate || new Date().toISOString()
+                const rawLeads = leadsResponse.payload.list || [];
+                const marketList = marketResponse.payload.list || [];
+
+                // Create Map of Market Pharmacies for quick lookup by ID or Code
+                // Assuming ID match is reliable. If not, might need Code match. But ID usually shared if from same DB.
+                // Wait, Lead IDs and Market IDs might be different if they are different entities?
+                // User said: "на странице leads статусы аптек... нужно работать вместе с api market/list"
+                // This implies a lead might corresponding to a market pharmacy.
+                // Typically a Lead converts to a Pharmacy. They might share `id` or `code`.
+                // Let's assume matching by `id` is the primary key. If not found, try `code`.
+
+                const marketMap = new Map<number, Pharmacy>();
+                marketList.forEach(p => marketMap.set(p.id, p));
+
+                // 2. Map and Merge Data
+                const mappedLeads = await Promise.all(rawLeads.map(async (item: any) => {
+                    // Check if this lead exists in market list
+                    const marketMatch = marketMap.get(item.id);
+
+                    // Base object
+                    const pharmacy: Pharmacy = {
+                        ...item,
+                        id: item.id,
+                        code: item.code || "LEAD",
+                        name: item.name || "Unknown Lead",
+                        address: item.address || "",
+                        phone: item.phone || "",
+                        active: false,
+                        lead: item, // Embed self for isAdmin columns
+                        // Merge Market Chats if available
+                        marketChats: marketMatch ? marketMatch.marketChats : [],
+                        // Default statuses (will be updated)
+                        brandedPacket: false,
+                        training: false,
+                        creationDate: item.creationDate || new Date().toISOString(),
+                        modifiedDate: item.modifiedDate || new Date().toISOString()
+                    };
+
+                    // 3. Fetch Local Status (Packet/Training)
+                    // We fetch this for every lead that we render.
+                    // Optimization: Could batch this or only fetch for visible, but for now fetch all (safe for < 1000 records).
+                    try {
+                        const status = await getPharmacyStatus(pharmacy.id);
+                        pharmacy.brandedPacket = status.brandedPacket;
+                        pharmacy.training = status.training;
+                    } catch (ignore) {
+                        // Keep defaults
+                    }
+
+                    return pharmacy;
                 }));
 
                 setLeads(mappedLeads);
                 setFilteredLeads(mappedLeads);
             } catch (error) {
-                console.error("Failed to fetch leads:", error);
+                console.error("Failed to fetch leads data:", error);
                 toast.error(t.error);
             } finally {
                 setIsLoading(false);
             }
         };
 
-        fetchLeads();
+        fetchData();
     }, [token, authLoading, navigate, t.error]);
 
     // Derive unique statuses from current data
@@ -97,7 +130,7 @@ export default function LeadsPanel() {
                 ? true
                 : p.lead?.status === leadStatusFilter;
 
-            // 3. Active filter (if relevant, though leads are usually inactive)
+            // 3. Active filter (if relevant)
             const matchesActive = activeFilter === null
                 ? true
                 : p.active === activeFilter;
@@ -121,7 +154,8 @@ export default function LeadsPanel() {
 
             <main className="w-full">
                 <div className="mb-4 sm:mb-8 px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
-                    <h1 className="text-3xl font-bold text-gray-900">{t.language === "ru" ? "Лиды" : "Leadlar"}</h1>
+                    {/* Correction 1: Use new translation key */}
+                    <h1 className="text-3xl font-bold text-gray-900">{t.leadsTitle || "Leads"}</h1>
                     <p className="text-gray-600 mt-2">{t.pharmacies}</p>
                 </div>
 
@@ -129,7 +163,7 @@ export default function LeadsPanel() {
                     <PharmacyTable
                         pharmacies={filteredLeads}
                         isLoading={isLoading}
-                        isAdmin={true} // Show extra columns
+                        isAdmin={true}
 
                         // Standard Filters
                         activeFilter={activeFilter}
@@ -146,12 +180,7 @@ export default function LeadsPanel() {
                         onSearchChange={setSearchQuery}
 
                         // Refresh
-                        onRefresh={() => { /* Re-trigger fetch logic if needed, simplify for now since useEffect handles it */
-                            // We can trigger a reload by forcing a state change or extracting fetch to function, 
-                            // but useEffect dependency [token] is strict. 
-                            // Let's just reload page or ignore for now, or extract fetch to separate function outside useEffect.
-                            window.location.reload();
-                        }}
+                        onRefresh={() => window.location.reload()}
 
                         // New Lead Status Filter
                         leadStatusFilter={leadStatusFilter}

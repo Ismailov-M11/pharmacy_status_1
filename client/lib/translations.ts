@@ -76,6 +76,7 @@ export const translations = {
     pharmacies: "Аптеки",
     all: "Все",
     action: "Действие",
+    leadsTitle: "Лиды",
 
     // New Pharmacies Page
     newPharmaciesTitle: "Новые аптеки",
@@ -247,6 +248,7 @@ export const translations = {
     pharmacies: "Dorixonalar",
     all: "Barchasi",
     action: "Harakat",
+    leadsTitle: "Leadlar",
 
     // New Pharmacies Page
     newPharmaciesTitle: "Yangi dorixonalar",
