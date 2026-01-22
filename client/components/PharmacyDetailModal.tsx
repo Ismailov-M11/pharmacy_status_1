@@ -38,6 +38,7 @@ interface PharmacyDetailModalProps {
   currentUsername?: string;
   changeHistory?: StatusHistoryRecord[];
   onDeleteHistory?: (ids: number[]) => void;
+  onUpdate?: () => void; // Added matching the usage in LeadsPanel
 }
 
 export function PharmacyDetailModal({
@@ -53,7 +54,7 @@ export function PharmacyDetailModal({
   const { t } = useLanguage();
   const [isUpdating, setIsUpdating] = useState(false);
   const [activeTab, setActiveTab] = useState<
-    "details" | "training" | "package" | "history"
+    "details" | "training" | "package" | "history" | "leadHistory"
   >("details");
   const [trainingComment, setTrainingComment] = useState("");
   const [packageComment, setPackageComment] = useState("");
@@ -113,6 +114,18 @@ export function PharmacyDetailModal({
   };
 
   const pharmacyChangeHistory = changeHistory;
+
+  const formatDate = (dateString: string) => {
+    if (!dateString) return "-";
+    const date = new Date(dateString);
+    return date.toLocaleString("ru-RU", {
+      month: "2-digit",
+      day: "2-digit",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -190,6 +203,16 @@ export function PharmacyDetailModal({
                 }`}
             >
               {t.history || "History"}
+            </button>
+            {/* New Lead History Tab */}
+            <button
+              onClick={() => setActiveTab("leadHistory")}
+              className={`px-2 sm:px-4 py-2 font-medium border-b-2 transition-colors text-xs sm:text-sm whitespace-nowrap ${activeTab === "leadHistory"
+                ? "border-blue-500 text-blue-600"
+                : "border-transparent text-gray-600 hover:text-gray-900"
+                }`}
+            >
+              {t.leadHistory || "Lead History"}
             </button>
           </div>
         </div>
@@ -581,6 +604,54 @@ export function PharmacyDetailModal({
               onDelete={onDeleteHistory}
               isAdmin={isAdmin}
             />
+          )}
+
+          {/* Lead History Tab Content */}
+          {activeTab === "leadHistory" && (
+            <div className="overflow-x-auto border rounded-md">
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      {t.lastCommentDate || "Date"}
+                    </th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      {t.lastCommentUser || "User"}
+                    </th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      {t.lastComment || "Comment"}
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {pharmacy.comments && pharmacy.comments.length > 0 ? (
+                    [...pharmacy.comments]
+                      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+                      .map((comment, index) => (
+                        <tr key={comment.id || index} className="hover:bg-gray-50">
+                          <td className="px-4 py-3 text-sm text-gray-900 whitespace-nowrap align-top">
+                            {formatDate(comment.createdAt)}
+                          </td>
+                          <td className="px-4 py-3 text-sm text-gray-600 whitespace-nowrap align-top">
+                            {comment.creator?.phone || "-"}
+                          </td>
+                          <td className="px-4 py-3 text-sm text-gray-600 align-top">
+                            <div className="break-words max-w-sm whitespace-pre-wrap">
+                              {comment.coment || comment.comment || "-"}
+                            </div>
+                          </td>
+                        </tr>
+                      ))
+                  ) : (
+                    <tr>
+                      <td colSpan={3} className="px-4 py-8 text-center text-gray-500">
+                        {t.noData || "No data"}
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
           )}
         </div>
       </DialogContent>

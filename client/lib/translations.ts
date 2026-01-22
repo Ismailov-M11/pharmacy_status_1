@@ -32,7 +32,7 @@ export const translations = {
     code: "Код",
     pharmacyName: "Название аптеки",
     address: "Адрес",
-    landmark: "Ориентир",
+
     pharmacyPhone: "Телефон аптеки",
     leadPhone: "Телефон ответственного",
     leadStatus: "Статус ответственного",
@@ -55,8 +55,7 @@ export const translations = {
     allPharmacies: "Все аптеки",
     dateTime: "Дата/время изменения",
     phone: "Телефон",
-    datetime: "Дата/время изменения",
-    phone: "Телефон",
+
     timeLabel: "Время",
     lastCommentDate: "Дата посл. комм.",
     lastComment: "Последний комментарий",
@@ -121,7 +120,7 @@ export const translations = {
     year: "Год",
     custom: "Произвольный",
     graphLabel: "Количество аптек",
-    landmark: "Ориентир",
+
     onboardedAt: "Дата ввода",
     noNewPharmaciesSelected: "Нет новых аптек за выбранный период",
     noActivitiesSelected: "Нет событий за выбранный период",
@@ -160,6 +159,7 @@ export const translations = {
     enterComment: "Введите ваш комментарий...",
     commentRequired: "Комментарий обязателен",
     history: "История",
+    leadHistory: "История лида",
     noChanges: "Нет изменений",
     changedTo: "изменено на",
     by: "пользователем",
@@ -211,7 +211,7 @@ export const translations = {
     code: "Kod",
     pharmacyName: "Dorixona nomi",
     address: "Manzil",
-    landmark: "Mo'ljal",
+
     pharmacyPhone: "Dorixona telefoni",
     leadPhone: "Mas'ul telefoni",
     leadStatus: "Mas'ul holati",
@@ -234,8 +234,7 @@ export const translations = {
     allPharmacies: "Barcha dorixonalar",
     dateTime: "O'zgarish sanasi/vaqti",
     phone: "Telefon",
-    datetime: "O'zgarish sanasi/vaqti",
-    phone: "Telefon",
+
     timeLabel: "Vaqt",
     lastCommentDate: "So'nggi izoh sanasi",
     lastComment: "So'nggi izoh",
@@ -302,7 +301,7 @@ export const translations = {
     year: "Yil",
     custom: "Maxsus",
     graphLabel: "Dorixona soni",
-    landmark: "Mo'ljal",
+
     onboardedAt: "Kiritilgan sana",
     noNewPharmaciesSelected: "Tanlangan davr uchun yangi dorixonalar yo'q",
     noActivitiesSelected: "Tanlangan davr uchun voqealar yo'q",
@@ -341,6 +340,7 @@ export const translations = {
     enterComment: "Izohingizni kiriting...",
     commentRequired: "Izoh kerak",
     history: "Tarix",
+    leadHistory: "Lead tarixi",
     noChanges: "O'zgarishlar yo'q",
     changedTo: "o'zgartirildi",
     by: "tomonidan",
