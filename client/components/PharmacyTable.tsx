@@ -31,7 +31,12 @@ interface PharmacyTableProps {
   leadStatusFilter?: string | null;
   onLeadStatusFilterChange?: (value: string | null) => void;
   leadStatusOptions?: string[];
-  showComments?: boolean; // New prop
+  showComments?: boolean;
+  commentUserFilter?: string | null;
+  onCommentUserFilterChange?: (value: string | null) => void;
+  commentUserOptions?: string[];
+  commentDateFilter?: { from: string | null; to: string | null };
+  onCommentDateFilterChange?: (value: { from: string | null; to: string | null }) => void;
 }
 
 export function PharmacyTable({
@@ -54,8 +59,22 @@ export function PharmacyTable({
   onLeadStatusFilterChange,
   leadStatusOptions = [],
   showComments = false,
+  commentUserFilter,
+  onCommentUserFilterChange,
+  commentUserOptions = [],
+  commentDateFilter,
+  onCommentDateFilterChange,
 }: PharmacyTableProps) {
   const { t } = useLanguage();
+
+  const handleDateFilterChange = (type: "from" | "to", value: string) => {
+    if (onCommentDateFilterChange && commentDateFilter) {
+      onCommentDateFilterChange({
+        ...commentDateFilter,
+        [type]: value || null
+      })
+    }
+  }
 
   // ... handlers ...
 
@@ -453,7 +472,77 @@ export function PharmacyTable({
                   {showComments && (
                     <>
                       <th className="px-2 md:px-4 py-2 md:py-3 text-left font-semibold text-gray-700 whitespace-nowrap min-w-max">
-                        {t.lastCommentDate || "Дата"}
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="-ml-3 h-8 data-[state=open]:bg-purple-600 data-[state=open]:text-white"
+                            >
+                              <span>{t.lastCommentDate || "Дата"}</span>
+                              <ChevronDown className="ml-2 h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent className="w-64 p-4" align="start">
+                            <div className="space-y-4">
+                              <div className="space-y-2">
+                                <label className="text-sm font-medium">{t.dateFrom}</label>
+                                <Input
+                                  type="date"
+                                  value={commentDateFilter?.from || ""}
+                                  onChange={(e) => handleDateFilterChange("from", e.target.value)}
+                                />
+                              </div>
+                              <div className="space-y-2">
+                                <label className="text-sm font-medium">{t.dateTo}</label>
+                                <Input
+                                  type="date"
+                                  value={commentDateFilter?.to || ""}
+                                  onChange={(e) => handleDateFilterChange("to", e.target.value)}
+                                />
+                              </div>
+                            </div>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </th>
+                      <th className="px-2 md:px-4 py-2 md:py-3 text-left font-semibold text-gray-700 whitespace-nowrap min-w-max">
+                        {onCommentUserFilterChange && commentUserOptions && commentUserOptions.length > 0 ? (
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="-ml-3 h-8 data-[state=open]:bg-purple-600 data-[state=open]:text-white"
+                              >
+                                <span>{t.lastCommentUser || "Автор"}</span>
+                                <ChevronDown className="ml-2 h-4 w-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="start">
+                              <DropdownMenuRadioGroup
+                                value={commentUserFilter || "null"}
+                                onValueChange={(val) =>
+                                  handleStringFilterChange(val, onCommentUserFilterChange)
+                                }
+                              >
+                                <DropdownMenuRadioItem value="null">
+                                  {t.all || "Все"}
+                                </DropdownMenuRadioItem>
+                                {commentUserOptions.map((user) => (
+                                  <DropdownMenuRadioItem
+                                    key={user}
+                                    value={user}
+                                    className="cursor-pointer"
+                                  >
+                                    {user}
+                                  </DropdownMenuRadioItem>
+                                ))}
+                              </DropdownMenuRadioGroup>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        ) : (
+                          t.lastCommentUser || "Автор"
+                        )}
                       </th>
                       <th className="px-2 md:px-4 py-2 md:py-3 text-left font-semibold text-gray-700 whitespace-nowrap min-w-[200px]">
                         {t.lastComment || "Коммент"}

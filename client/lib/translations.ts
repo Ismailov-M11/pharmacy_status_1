@@ -60,6 +60,9 @@ export const translations = {
     timeLabel: "Время",
     lastCommentDate: "Дата посл. комм.",
     lastComment: "Последний комментарий",
+    lastCommentUser: "Автор комментария",
+    dateFrom: "От",
+    dateTo: "До",
 
     // Status Values
     yes: "ЕСТЬ",
@@ -236,6 +239,9 @@ export const translations = {
     timeLabel: "Vaqt",
     lastCommentDate: "So'nggi izoh sanasi",
     lastComment: "So'nggi izoh",
+    lastCommentUser: "Izoh muallifi",
+    dateFrom: "Dan",
+    dateTo: "Gacha",
 
     // Status Values
     yes: "BOR",
