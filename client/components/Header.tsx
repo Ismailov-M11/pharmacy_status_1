@@ -40,7 +40,7 @@ export function Header() {
   if (role === "ROLE_ADMIN") {
     navigationItems.push(
       { label: t.adminPanel || "Админ", path: "/admin", icon: User },
-      { label: "Лиды", path: "/leads", icon: UserCog }, // Hardcoded label or add to translations
+      { label: t.leadsTitle || "Лиды", path: "/leads", icon: UserCog },
       { label: t.maps || "Карты", path: "/maps", icon: Map },
       {
         label: t.activities || "Активности",
@@ -65,7 +65,7 @@ export function Header() {
         path: "/agent",
         icon: agentIcon,
       },
-      { label: "Лиды", path: "/leads", icon: UserCog },
+      { label: t.leadsTitle || "Лиды", path: "/leads", icon: UserCog },
       { label: t.maps || "Карты", path: "/maps", icon: Map },
       {
         label: t.activities || "Активности",

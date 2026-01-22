@@ -31,6 +31,7 @@ interface PharmacyTableProps {
   leadStatusFilter?: string | null;
   onLeadStatusFilterChange?: (value: string | null) => void;
   leadStatusOptions?: string[];
+  showComments?: boolean; // New prop
 }
 
 export function PharmacyTable({
@@ -52,8 +53,36 @@ export function PharmacyTable({
   leadStatusFilter,
   onLeadStatusFilterChange,
   leadStatusOptions = [],
+  showComments = false,
 }: PharmacyTableProps) {
   const { t } = useLanguage();
+
+  // ... handlers ...
+
+  const getLastComment = (comments: any[]) => {
+    if (!comments || !Array.isArray(comments) || comments.length === 0) return null;
+
+    // Sort by createdAt descending
+    const sorted = [...comments].sort((a, b) => {
+      const dateA = new Date(a.createdAt).getTime();
+      const dateB = new Date(b.createdAt).getTime();
+      return dateB - dateA; // Descending
+    });
+
+    return sorted[0];
+  };
+
+  const formatDate = (dateString: string) => {
+    if (!dateString) return "-";
+    const date = new Date(dateString);
+    return date.toLocaleString("ru-RU", { // Or dynamic locale
+      month: "2-digit",
+      day: "2-digit",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
 
   const handleFilterChange = (
     value: string,
@@ -419,6 +448,18 @@ export function PharmacyTable({
                       t.leadStatus
                     )}
                   </th>
+
+                  {/* New Comment Headers */}
+                  {showComments && (
+                    <>
+                      <th className="px-2 md:px-4 py-2 md:py-3 text-left font-semibold text-gray-700 whitespace-nowrap min-w-max">
+                        {t.lastCommentDate || "Дата"}
+                      </th>
+                      <th className="px-2 md:px-4 py-2 md:py-3 text-left font-semibold text-gray-700 whitespace-nowrap min-w-[200px]">
+                        {t.lastComment || "Коммент"}
+                      </th>
+                    </>
+                  )}
                   <th className="px-2 md:px-4 py-2 md:py-3 text-left font-semibold text-gray-700 whitespace-nowrap min-w-max">
                     {t.stir}
                   </th>
@@ -569,6 +610,30 @@ export function PharmacyTable({
                         <td className="px-2 md:px-4 py-2 md:py-3 text-gray-900 text-xs">
                           {pharmacy.lead?.status || "-"}
                         </td>
+
+                        {/* New Comment Columns */}
+                        {showComments && (
+                          <>
+                            <td className="px-2 md:px-4 py-2 md:py-3 text-gray-900 text-xs whitespace-nowrap align-top">
+                              {(() => {
+                                const last = getLastComment(pharmacy.comments || []);
+                                if (!last) return "-";
+                                return (
+                                  <div className="flex flex-col">
+                                    <span className="font-semibold">{formatDate(last.createdAt)}</span>
+                                    <span className="text-gray-500 text-[10px]">{last.creator?.phone || "-"}</span>
+                                  </div>
+                                );
+                              })()}
+                            </td>
+                            <td className="px-2 md:px-4 py-2 md:py-3 text-gray-900 text-xs align-top">
+                              <div className="max-w-[200px] break-words">
+                                {getLastComment(pharmacy.comments || [])?.coment || "-"}
+                              </div>
+                            </td>
+                          </>
+                        )}
+
                         <td className="px-2 md:px-4 py-2 md:py-3 text-gray-900 text-xs whitespace-nowrap">
                           {(pharmacy.lead as any)?.stir || "-"}
                         </td>

@@ -4,6 +4,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { getLeadsList, getPharmacyList, getPharmacyStatus, Pharmacy } from "@/lib/api";
 import { PharmacyTable } from "@/components/PharmacyTable";
 import { Header } from "@/components/Header";
+import { PharmacyDetailModal } from "@/components/PharmacyDetailModal"; // Added Modal
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 
@@ -15,6 +16,10 @@ export default function LeadsPanel() {
     const [leads, setLeads] = useState<Pharmacy[]>([]);
     const [filteredLeads, setFilteredLeads] = useState<Pharmacy[]>([]);
     const [isLoading, setIsLoading] = useState(true);
+
+    // Modal State
+    const [selectedPharmacy, setSelectedPharmacy] = useState<Pharmacy | null>(null);
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
     // Filters
     const [searchQuery, setSearchQuery] = useState("");
@@ -33,6 +38,7 @@ export default function LeadsPanel() {
             setIsLoading(true);
             try {
                 // 1. Parallel Fetch: Leads and Market List
+                // Note: Leads list usually returns 'comments' in the payload if backend provides it.
                 const [leadsResponse, marketResponse] = await Promise.all([
                     getLeadsList(token, "", 0, 10000),
                     getPharmacyList(token, "", 0, null, 10000)
@@ -42,7 +48,6 @@ export default function LeadsPanel() {
                 const marketList = marketResponse.payload.list || [];
 
                 // Create Map of Market Pharmacies by Lead ID for integration
-                // We match Lead (from leads list) to Pharmacy (from market list) via p.lead.id
                 const marketMap = new Map<number, Pharmacy>();
                 marketList.forEach(p => {
                     if (p.lead && p.lead.id) {
@@ -56,8 +61,6 @@ export default function LeadsPanel() {
                     const marketMatch = marketMap.get(item.id);
 
                     // Fetch Local Status (Packet/Training)
-                    // If we have a matching pharmacy, use its ID. 
-                    // Otherwise, we cannot fetch status as status is keyed by Pharmacy ID.
                     let status = { brandedPacket: false, training: false };
 
                     if (marketMatch) {
@@ -73,21 +76,23 @@ export default function LeadsPanel() {
                     // Construct merged object
                     const pharmacy: Pharmacy = {
                         ...item,
-                        id: item.id, // Keep Lead ID as the primary ID for this row
+                        id: item.id,
                         code: item.code || "LEAD",
                         name: item.name || "Unknown Lead",
                         address: item.address || "",
                         phone: item.phone || "",
                         active: marketMatch ? marketMatch.active : false,
-                        lead: item, // Embed self for isAdmin columns logic
-                        // Merge Market info (Telegram Chats)
+                        lead: item,
                         marketChats: marketMatch ? marketMatch.marketChats : [],
-                        // Merge Local Status
                         brandedPacket: status.brandedPacket,
                         training: status.training,
                         creationDate: item.creationDate || new Date().toISOString(),
                         modifiedDate: item.modifiedDate || new Date().toISOString(),
-                        // Store linked info if strictly needed, but PharmacyTable mainly uses above fields
+                        // Comments should be present in 'item' from getLeadsList response.
+                        // Assuming backend naming is 'comments' or 'messages'. 
+                        // Checks on data structure: user said "response приходит значение с payload/coments/coment" (typo "coments").
+                        // If the key is 'coments', map it to 'comments'.
+                        comments: item.coments || item.comments || []
                     };
 
                     return pharmacy;
@@ -166,6 +171,13 @@ export default function LeadsPanel() {
                         pharmacies={filteredLeads}
                         isLoading={isLoading}
                         isAdmin={true}
+                        showComments={true} // Enable comments columns
+
+                        // Interaction
+                        onPharmacyClick={(pharmacy) => {
+                            setSelectedPharmacy(pharmacy);
+                            setIsModalOpen(true);
+                        }}
 
                         // Standard Filters
                         activeFilter={activeFilter}
@@ -191,6 +203,17 @@ export default function LeadsPanel() {
                     />
                 </div>
             </main>
+
+            {/* Detail Modal */}
+            <PharmacyDetailModal
+                pharmacy={selectedPharmacy}
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                onUpdate={() => {
+                    // Optional: Refresh data if modal triggers updates
+                    // window.location.reload(); 
+                }}
+            />
         </div>
     );
 }

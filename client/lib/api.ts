@@ -55,6 +55,19 @@ export interface MarketChat {
   username: string | null;
 }
 
+export interface CommentCreator {
+  id: number;
+  phone: string;
+  // other fields if needed
+}
+
+export interface Comment {
+  id: number;
+  coment: string;
+  createdAt: string;
+  creator: CommentCreator;
+}
+
 export interface Pharmacy {
   id: number;
   code: string;
@@ -64,6 +77,7 @@ export interface Pharmacy {
   active: boolean;
   lead: Lead;
   marketChats: MarketChat[];
+  comments?: Comment[]; // Added comments
   creationDate: string;
   modifiedDate: string;
   [key: string]: any;

@@ -55,7 +55,11 @@ export const translations = {
     allPharmacies: "Все аптеки",
     dateTime: "Дата/время изменения",
     phone: "Телефон",
+    datetime: "Дата/время изменения",
+    phone: "Телефон",
     timeLabel: "Время",
+    lastCommentDate: "Дата посл. комм.",
+    lastComment: "Последний комментарий",
 
     // Status Values
     yes: "ЕСТЬ",
@@ -227,7 +231,11 @@ export const translations = {
     allPharmacies: "Barcha dorixonalar",
     dateTime: "O'zgarish sanasi/vaqti",
     phone: "Telefon",
+    datetime: "O'zgarish sanasi/vaqti",
+    phone: "Telefon",
     timeLabel: "Vaqt",
+    lastCommentDate: "So'nggi izoh sanasi",
+    lastComment: "So'nggi izoh",
 
     // Status Values
     yes: "BOR",
