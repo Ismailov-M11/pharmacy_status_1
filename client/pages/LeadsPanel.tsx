@@ -78,7 +78,7 @@ export default function LeadsPanel() {
                         name: item.name || "Unknown Lead",
                         address: item.address || "",
                         phone: item.phone || "",
-                        active: false,
+                        active: marketMatch ? marketMatch.active : false,
                         lead: item, // Embed self for isAdmin columns logic
                         // Merge Market info (Telegram Chats)
                         marketChats: marketMatch ? marketMatch.marketChats : [],
