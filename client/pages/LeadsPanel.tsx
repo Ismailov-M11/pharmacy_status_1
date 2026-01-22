@@ -41,51 +41,54 @@ export default function LeadsPanel() {
                 const rawLeads = leadsResponse.payload.list || [];
                 const marketList = marketResponse.payload.list || [];
 
-                // Create Map of Market Pharmacies for quick lookup by ID or Code
-                // Assuming ID match is reliable. If not, might need Code match. But ID usually shared if from same DB.
-                // Wait, Lead IDs and Market IDs might be different if they are different entities?
-                // User said: "на странице leads статусы аптек... нужно работать вместе с api market/list"
-                // This implies a lead might corresponding to a market pharmacy.
-                // Typically a Lead converts to a Pharmacy. They might share `id` or `code`.
-                // Let's assume matching by `id` is the primary key. If not found, try `code`.
-
+                // Create Map of Market Pharmacies by Lead ID for integration
+                // We match Lead (from leads list) to Pharmacy (from market list) via p.lead.id
                 const marketMap = new Map<number, Pharmacy>();
-                marketList.forEach(p => marketMap.set(p.id, p));
+                marketList.forEach(p => {
+                    if (p.lead && p.lead.id) {
+                        marketMap.set(p.lead.id, p);
+                    }
+                });
 
                 // 2. Map and Merge Data
                 const mappedLeads = await Promise.all(rawLeads.map(async (item: any) => {
-                    // Check if this lead exists in market list
+                    // Find corresponding pharmacy in market list using the Lead's ID
                     const marketMatch = marketMap.get(item.id);
 
-                    // Base object
+                    // Fetch Local Status (Packet/Training)
+                    // If we have a matching pharmacy, use its ID. 
+                    // Otherwise, we cannot fetch status as status is keyed by Pharmacy ID.
+                    let status = { brandedPacket: false, training: false };
+
+                    if (marketMatch) {
+                        try {
+                            const fetchedStatus = await getPharmacyStatus(marketMatch.id);
+                            status.brandedPacket = fetchedStatus.brandedPacket;
+                            status.training = fetchedStatus.training;
+                        } catch (ignore) {
+                            // Keep defaults
+                        }
+                    }
+
+                    // Construct merged object
                     const pharmacy: Pharmacy = {
                         ...item,
-                        id: item.id,
+                        id: item.id, // Keep Lead ID as the primary ID for this row
                         code: item.code || "LEAD",
                         name: item.name || "Unknown Lead",
                         address: item.address || "",
                         phone: item.phone || "",
                         active: false,
-                        lead: item, // Embed self for isAdmin columns
-                        // Merge Market Chats if available
+                        lead: item, // Embed self for isAdmin columns logic
+                        // Merge Market info (Telegram Chats)
                         marketChats: marketMatch ? marketMatch.marketChats : [],
-                        // Default statuses (will be updated)
-                        brandedPacket: false,
-                        training: false,
+                        // Merge Local Status
+                        brandedPacket: status.brandedPacket,
+                        training: status.training,
                         creationDate: item.creationDate || new Date().toISOString(),
-                        modifiedDate: item.modifiedDate || new Date().toISOString()
+                        modifiedDate: item.modifiedDate || new Date().toISOString(),
+                        // Store linked info if strictly needed, but PharmacyTable mainly uses above fields
                     };
-
-                    // 3. Fetch Local Status (Packet/Training)
-                    // We fetch this for every lead that we render.
-                    // Optimization: Could batch this or only fetch for visible, but for now fetch all (safe for < 1000 records).
-                    try {
-                        const status = await getPharmacyStatus(pharmacy.id);
-                        pharmacy.brandedPacket = status.brandedPacket;
-                        pharmacy.training = status.training;
-                    } catch (ignore) {
-                        // Keep defaults
-                    }
 
                     return pharmacy;
                 }));
@@ -154,7 +157,6 @@ export default function LeadsPanel() {
 
             <main className="w-full">
                 <div className="mb-4 sm:mb-8 px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
-                    {/* Correction 1: Use new translation key */}
                     <h1 className="text-3xl font-bold text-gray-900">{t.leadsTitle || "Leads"}</h1>
                     <p className="text-gray-600 mt-2">{t.pharmacies}</p>
                 </div>
