@@ -565,7 +565,10 @@ export function PharmacyTable({
                     {t.stir}
                   </th>
                   <th className="px-2 md:px-4 py-2 md:py-3 text-left font-semibold text-gray-700 whitespace-nowrap min-w-max">
-                    {t.additionalPhone}
+                    <div className="flex flex-col items-start">
+                      <span>{t.additionalPhone}</span>
+                      <span className="text-[10px] font-normal text-gray-500">Lead</span>
+                    </div>
                   </th>
                   <th className="px-2 md:px-4 py-2 md:py-3 text-left font-semibold text-gray-700 whitespace-nowrap min-w-[180px]">
                     {t.juridicalName}
