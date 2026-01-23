@@ -7,6 +7,7 @@ import {
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
   DropdownMenuTrigger,
+  DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -193,9 +194,9 @@ export function PharmacyTable({
   return (
     <div className="p-2 sm:p-4 space-y-4 sticky top-[82px] z-30 bg-gray-50">
       {isLeadsPage ? (
-        // Leads page layout: Selection buttons | Centered Search | Settings button
-        <div className="flex items-center justify-between gap-4">
-          {/* Left: Selection buttons */}
+        // Leads page layout
+        <div className="space-y-4">
+          {/* First row: Selection buttons */}
           <div className="flex gap-2">
             <Button
               variant="outline"
@@ -221,24 +222,82 @@ export function PharmacyTable({
             )}
           </div>
 
-          {/* Center: Search field */}
-          <Input
-            type="text"
-            placeholder={`${t.pharmacyName} / ${t.address}...`}
-            value={searchQuery}
-            onChange={(e) => onSearchChange?.(e.target.value)}
-            className="max-w-md"
-          />
+          {/* Second row: Centered search with action buttons */}
+          <div className="flex items-center justify-center gap-4">
+            {/* Centered Search field */}
+            <Input
+              type="text"
+              placeholder={`${t.pharmacyName} / ${t.address}...`}
+              value={searchQuery}
+              onChange={(e) => onSearchChange?.(e.target.value)}
+              className="max-w-md"
+            />
 
-          {/* Right: Settings button */}
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={onSettingsClick}
-            className="flex-shrink-0"
-          >
-            <Settings className="h-4 w-4" />
-          </Button>
+            {/* Action buttons: Refresh, Filter, Settings */}
+            <div className="flex gap-2">
+              {onRefresh && (
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={onRefresh}
+                  className="bg-blue-500 hover:bg-blue-600 text-white border-blue-500 hover:border-blue-600"
+                >
+                  <RefreshCw className="w-4 h-4" />
+                </Button>
+              )}
+
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" className="gap-2">
+                    {t.filter}
+                    <ChevronDown className="w-4 h-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuRadioGroup
+                    value={
+                      activeFilter === true
+                        ? "true"
+                        : activeFilter === false
+                          ? "false"
+                          : "null"
+                    }
+                    onValueChange={(val) => handleFilterChange(val, onFilterChange)}
+                  >
+                    <DropdownMenuRadioItem value="null">
+                      {t.allPharmacies}
+                    </DropdownMenuRadioItem>
+                    <DropdownMenuRadioItem
+                      value="true"
+                      className="bg-emerald-100 text-emerald-800 focus:bg-emerald-200 focus:text-emerald-900 m-1 cursor-pointer"
+                    >
+                      {t.active}
+                    </DropdownMenuRadioItem>
+                    <DropdownMenuRadioItem
+                      value="false"
+                      className="bg-red-100 text-red-800 focus:bg-red-200 focus:text-red-900 m-1 cursor-pointer"
+                    >
+                      {t.inactive}
+                    </DropdownMenuRadioItem>
+                  </DropdownMenuRadioGroup>
+                </DropdownMenuContent>
+              </DropdownMenu>
+
+              {/* Settings dropdown menu */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" size="icon">
+                    <Settings className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem onClick={onSettingsClick}>
+                    {t.columnSettings}
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+          </div>
         </div>
       ) : (
         // Original layout for other pages
