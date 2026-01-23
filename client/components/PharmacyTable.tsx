@@ -479,7 +479,10 @@ export function PharmacyTable({
                               size="sm"
                               className="-ml-3 h-8 data-[state=open]:bg-purple-600 data-[state=open]:text-white"
                             >
-                              <span>{t.lastCommentDate || "Дата"}</span>
+                              <div className="flex flex-col items-start">
+                                <span>{t.lastCommentDate || "Дата"}</span>
+                                <span className="text-[10px] font-normal text-gray-500">Lead</span>
+                              </div>
                               <ChevronDown className="ml-2 h-4 w-4" />
                             </Button>
                           </DropdownMenuTrigger>
@@ -514,7 +517,10 @@ export function PharmacyTable({
                                 size="sm"
                                 className="-ml-3 h-8 data-[state=open]:bg-purple-600 data-[state=open]:text-white"
                               >
-                                <span>{t.lastCommentUser || "Автор"}</span>
+                                <div className="flex flex-col items-start">
+                                  <span>{t.lastCommentUser || "Автор"}</span>
+                                  <span className="text-[10px] font-normal text-gray-500">Lead</span>
+                                </div>
                                 <ChevronDown className="ml-2 h-4 w-4" />
                               </Button>
                             </DropdownMenuTrigger>
@@ -541,11 +547,17 @@ export function PharmacyTable({
                             </DropdownMenuContent>
                           </DropdownMenu>
                         ) : (
-                          t.lastCommentUser || "Автор"
+                          <div className="flex flex-col items-start">
+                            <span>{t.lastCommentUser || "Автор"}</span>
+                            <span className="text-[10px] font-normal text-gray-500">Lead</span>
+                          </div>
                         )}
                       </th>
                       <th className="px-2 md:px-4 py-2 md:py-3 text-left font-semibold text-gray-700 whitespace-nowrap min-w-[200px]">
-                        {t.lastComment || "Коммент"}
+                        <div className="flex flex-col items-start">
+                          <span>{t.lastComment || "Коммент"}</span>
+                          <span className="text-[10px] font-normal text-gray-500">Lead</span>
+                        </div>
                       </th>
                     </>
                   )}
@@ -704,7 +716,7 @@ export function PharmacyTable({
                         {showComments && (
                           <>
                             {/* Date Column: Just Date */}
-                            <td className="px-2 md:px-4 py-2 md:py-3 text-gray-900 text-xs whitespace-nowrap align-top">
+                            <td className="px-2 md:px-4 py-2 md:py-3 text-gray-900 text-xs whitespace-nowrap align-middle">
                               {(() => {
                                 const last = getLastComment(pharmacy.comments || []);
                                 if (!last) return "-";
@@ -714,7 +726,7 @@ export function PharmacyTable({
                               })()}
                             </td>
                             {/* Author Column: Just Phone/Name */}
-                            <td className="px-2 md:px-4 py-2 md:py-3 text-gray-900 text-xs whitespace-nowrap align-top">
+                            <td className="px-2 md:px-4 py-2 md:py-3 text-gray-900 text-xs whitespace-nowrap align-middle">
                               {(() => {
                                 const last = getLastComment(pharmacy.comments || []);
                                 if (!last) return "-";
@@ -724,7 +736,7 @@ export function PharmacyTable({
                               })()}
                             </td>
                             {/* Comment Text Column */}
-                            <td className="px-2 md:px-4 py-2 md:py-3 text-gray-900 text-xs align-top">
+                            <td className="px-2 md:px-4 py-2 md:py-3 text-gray-900 text-xs align-middle">
                               <div className="max-w-[200px] break-words">
                                 {getLastComment(pharmacy.comments || [])?.coment || getLastComment(pharmacy.comments || [])?.comment || "-"}
                               </div>
