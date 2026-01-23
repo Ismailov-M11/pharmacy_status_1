@@ -1,3 +1,4 @@
+// PharmacyTable component
 import { Pharmacy } from "@/lib/api";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useState } from "react";
