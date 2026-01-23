@@ -362,3 +362,72 @@ export async function deleteHistoryRecord(id: number): Promise<void> {
     throw error; // Re-throw so UI can handle it
   }
 }
+
+// ============================================
+// USER COLUMN SETTINGS API
+// ============================================
+
+export interface ColumnSettings {
+  id: string;
+  label: string;
+  visible: boolean;
+  order: number;
+}
+
+export async function getUserColumnSettings(
+  userId: string,
+  page: string = "leads"
+): Promise<ColumnSettings[] | null> {
+  try {
+    const response = await fetch(
+      `${STATUS_API_BASE_URL}/user-settings/${userId}/column-settings?page=${page}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    if (!response.ok) {
+      console.warn("Failed to fetch column settings");
+      return null;
+    }
+
+    const data = await response.json();
+    return data.settings;
+  } catch (error) {
+    console.warn("Error fetching column settings:", error);
+    return null;
+  }
+}
+
+export async function saveUserColumnSettings(
+  userId: string,
+  settings: ColumnSettings[],
+  page: string = "leads"
+): Promise<boolean> {
+  try {
+    const response = await fetch(
+      `${STATUS_API_BASE_URL}/user-settings/${userId}/column-settings`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ page, settings }),
+      }
+    );
+
+    if (!response.ok) {
+      console.warn("Failed to save column settings");
+      return false;
+    }
+
+    return true;
+  } catch (error) {
+    console.warn("Error saving column settings:", error);
+    return false;
+  }
+}
+

@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ChevronDown, RefreshCw } from "lucide-react";
+import { ChevronDown, RefreshCw, Settings, Square, CheckSquare } from "lucide-react";
 
 interface PharmacyTableProps {
   pharmacies: Pharmacy[];
@@ -37,6 +37,11 @@ interface PharmacyTableProps {
   commentUserOptions?: string[];
   commentDateFilter?: { from: string | null; to: string | null };
   onCommentDateFilterChange?: (value: { from: string | null; to: string | null }) => void;
+  // Leads page specific props
+  isLeadsPage?: boolean;
+  selectedRows?: Set<number>;
+  onSelectionChange?: (selectedIds: Set<number>) => void;
+  onSettingsClick?: () => void;
 }
 
 export function PharmacyTable({
@@ -64,6 +69,10 @@ export function PharmacyTable({
   commentUserOptions = [],
   commentDateFilter,
   onCommentDateFilterChange,
+  isLeadsPage = false,
+  selectedRows = new Set(),
+  onSelectionChange,
+  onSettingsClick,
 }: PharmacyTableProps) {
   const { t } = useLanguage();
 

@@ -153,6 +153,21 @@ export const translations = {
     // Filters
     filter: "Фильтр",
 
+    // Bulk Selection
+    select: "Выбрать",
+    selectAll: "Выбрать все",
+    clearSelection: "Очистить",
+    selected: "Выбрано",
+
+    // Column Settings
+    columnSettings: "Настройки колонок",
+    reorderColumns: "Изменить порядок колонок",
+    hideColumn: "Скрыть",
+    showColumn: "Показать",
+    saveChanges: "Сохранить изменения",
+    resetToDefault: "Сбросить",
+    dragToReorder: "Перетащите для изменения порядка",
+
     // Pharmacy Details Modal
     pharmacyDetails: "Детали аптеки",
     details: "Детали",
@@ -334,6 +349,21 @@ export const translations = {
 
     // Filters
     filter: "Filtr",
+
+    // Bulk Selection
+    select: "Tanlash",
+    selectAll: "Hammasini tanlash",
+    clearSelection: "Tozalash",
+    selected: "Tanlangan",
+
+    // Column Settings
+    columnSettings: "Ustunlar sozlamalari",
+    reorderColumns: "Ustunlar tartibini o'zgartirish",
+    hideColumn: "Yashirish",
+    showColumn: "Ko'rsatish",
+    saveChanges: "O'zgarishlarni saqlash",
+    resetToDefault: "Qayta tiklash",
+    dragToReorder: "Tartibni o'zgartirish uchun sudrab oling",
 
     // Pharmacy Details Modal
     pharmacyDetails: "Dorixona tafsilotlari",
