@@ -6,6 +6,7 @@ import { PharmacyTable } from "@/components/PharmacyTable";
 import { Header } from "@/components/Header";
 import { PharmacyDetailModal } from "@/components/PharmacyDetailModal";
 import { ColumnSettingsModal } from "@/components/ColumnSettingsModal";
+import { SettingsMenuModal } from "@/components/SettingsMenuModal";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 
@@ -31,6 +32,7 @@ export default function LeadsPanel() {
 
     // Leads-specific features
     const [selectedRows, setSelectedRows] = useState<Set<number>>(new Set());
+    const [isSettingsMenuOpen, setIsSettingsMenuOpen] = useState(false);
     const [isColumnSettingsOpen, setIsColumnSettingsOpen] = useState(false);
     const [columnSettings, setColumnSettings] = useState<ColumnSettings[]>([]);
 
@@ -263,7 +265,7 @@ export default function LeadsPanel() {
                         isLeadsPage={true}
                         selectedRows={selectedRows}
                         onSelectionChange={setSelectedRows}
-                        onSettingsClick={() => setIsColumnSettingsOpen(true)}
+                        onSettingsClick={() => setIsSettingsMenuOpen(true)}
                     />
                 </div>
             </main>
@@ -273,6 +275,13 @@ export default function LeadsPanel() {
                 pharmacy={selectedPharmacy}
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
+            />
+
+            {/* Settings Menu Modal */}
+            <SettingsMenuModal
+                isOpen={isSettingsMenuOpen}
+                onClose={() => setIsSettingsMenuOpen(false)}
+                onColumnSettingsClick={() => setIsColumnSettingsOpen(true)}
             />
 
             {/* Column Settings Modal */}

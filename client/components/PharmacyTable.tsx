@@ -8,7 +8,6 @@ import {
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
   DropdownMenuTrigger,
-  DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -282,19 +281,14 @@ export function PharmacyTable({
               </DropdownMenuContent>
             </DropdownMenu>
 
-            {/* Settings dropdown menu */}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="icon">
-                  <Settings className="h-4 w-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={onSettingsClick}>
-                  {t.columnSettings}
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            {/* Settings button */}
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={onSettingsClick}
+            >
+              <Settings className="h-4 w-4" />
+            </Button>
           </div>
         </div>
       ) : (
