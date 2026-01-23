@@ -1,10 +1,11 @@
 import { useState, useEffect, useMemo } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
-import { getLeadsList, getPharmacyList, getPharmacyStatus, Pharmacy } from "@/lib/api";
+import { getLeadsList, getPharmacyList, getPharmacyStatus, Pharmacy, getUserColumnSettings, saveUserColumnSettings, ColumnSettings } from "@/lib/api";
 import { PharmacyTable } from "@/components/PharmacyTable";
 import { Header } from "@/components/Header";
 import { PharmacyDetailModal } from "@/components/PharmacyDetailModal";
+import { ColumnSettingsModal } from "@/components/ColumnSettingsModal";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 
@@ -27,6 +28,11 @@ export default function LeadsPanel() {
     const [leadStatusFilter, setLeadStatusFilter] = useState<string | null>(null);
     const [commentUserFilter, setCommentUserFilter] = useState<string | null>(null);
     const [commentDateFilter, setCommentDateFilter] = useState<{ from: string | null, to: string | null }>({ from: null, to: null });
+
+    // Leads-specific features
+    const [selectedRows, setSelectedRows] = useState<Set<number>>(new Set());
+    const [isColumnSettingsOpen, setIsColumnSettingsOpen] = useState(false);
+    const [columnSettings, setColumnSettings] = useState<ColumnSettings[]>([]);
 
     // Derive unique statuses from current data
     const leadStatusOptions = useMemo(() => {
@@ -252,6 +258,12 @@ export default function LeadsPanel() {
                         commentUserOptions={commentUserOptions}
                         commentDateFilter={commentDateFilter}
                         onCommentDateFilterChange={setCommentDateFilter}
+
+                        // Leads-specific props
+                        isLeadsPage={true}
+                        selectedRows={selectedRows}
+                        onSelectionChange={setSelectedRows}
+                        onSettingsClick={() => setIsColumnSettingsOpen(true)}
                     />
                 </div>
             </main>
@@ -261,6 +273,19 @@ export default function LeadsPanel() {
                 pharmacy={selectedPharmacy}
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
+            />
+
+            {/* Column Settings Modal */}
+            <ColumnSettingsModal
+                isOpen={isColumnSettingsOpen}
+                onClose={() => setIsColumnSettingsOpen(false)}
+                columns={columnSettings}
+                onSave={(newSettings) => {
+                    setColumnSettings(newSettings);
+                    setIsColumnSettingsOpen(false);
+                    // TODO: Save to backend when user ID is available
+                    toast.success(t.changesSaved || "Changes saved");
+                }}
             />
         </div>
     );
