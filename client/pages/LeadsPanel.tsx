@@ -75,7 +75,7 @@ export default function LeadsPanel() {
         { id: "comments", label: t.comments || "Comments", visible: true, order: 12 },
         { id: "commentUser", label: t.commentUser || "Comment User", visible: true, order: 13 },
         { id: "commentDate", label: t.commentDate || "Comment Date", visible: true, order: 14 },
-        { id: "creationDate", label: t.date || "Date", visible: false, order: 15 },
+
         { id: "region", label: t.region || "Region", visible: false, order: 16 },
         { id: "district", label: t.district || "District", visible: false, order: 17 },
         { id: "stir", label: t.stir || "СТИР", visible: true, order: 18 },
