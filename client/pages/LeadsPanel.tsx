@@ -91,9 +91,9 @@ export default function LeadsPanel() {
 
         // Initialize Column Settings
         const initColumnSettings = async () => {
-            if (token) {
+            if (token && user?.username) {
                 try {
-                    const savedSettings = await getUserColumnSettings(token);
+                    const savedSettings = await getUserColumnSettings(token, user.username);
                     if (savedSettings && savedSettings.length > 0) {
                         // Merge saved settings with defaults to ensure all columns exist
                         // This handles cases where new columns are added to the app
@@ -379,9 +379,9 @@ export default function LeadsPanel() {
                     setColumnSettings(newSettings);
                     setIsColumnSettingsOpen(false);
 
-                    if (token) {
+                    if (token && user?.username) {
                         try {
-                            await saveUserColumnSettings(token, newSettings);
+                            await saveUserColumnSettings(token, user.username, newSettings);
                             toast.success(t.changesSaved || "Changes saved");
                         } catch (error) {
                             console.error("Failed to save column settings:", error);

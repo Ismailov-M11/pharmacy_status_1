@@ -375,7 +375,8 @@ export interface ColumnSettings {
 }
 
 export async function getUserColumnSettings(
-  userId: string,
+  token: string,
+  userId: string | number,
   page: string = "leads"
 ): Promise<ColumnSettings[] | null> {
   try {
@@ -385,6 +386,7 @@ export async function getUserColumnSettings(
         method: "GET",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
       }
     );
@@ -403,7 +405,8 @@ export async function getUserColumnSettings(
 }
 
 export async function saveUserColumnSettings(
-  userId: string,
+  token: string,
+  userId: string | number,
   settings: ColumnSettings[],
   page: string = "leads"
 ): Promise<boolean> {
@@ -414,6 +417,7 @@ export async function saveUserColumnSettings(
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({ page, settings }),
       }
