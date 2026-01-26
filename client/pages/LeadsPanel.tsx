@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
-import { getLeadsList, getPharmacyList, getPharmacyStatus, Pharmacy, getUserColumnSettings, saveUserColumnSettings, ColumnSettings } from "@/lib/api";
+import { getLeadsList, getPharmacyList, getPharmacyStatus, Pharmacy, getUserColumnSettings, saveUserColumnSettings, ColumnSettings, updatePharmacyStatusLocal } from "@/lib/api";
 import { PharmacyTable } from "@/components/PharmacyTable";
 import { Header } from "@/components/Header";
 import { PharmacyDetailModal } from "@/components/PharmacyDetailModal";
@@ -12,7 +12,7 @@ import { useNavigate } from "react-router-dom";
 
 export default function LeadsPanel() {
     const { t } = useLanguage();
-    const { token, authLoading } = useAuth();
+    const { token, authLoading, user } = useAuth();
     const navigate = useNavigate();
 
     const [leads, setLeads] = useState<Pharmacy[]>([]);
@@ -58,6 +58,28 @@ export default function LeadsPanel() {
         return Array.from(users).sort();
     }, [leads]);
 
+    // Default Columns Definition
+    const defaultColumns: ColumnSettings[] = useMemo(() => [
+        { id: "number", label: t.number || "№", visible: true, order: 0 },
+        { id: "code", label: t.code || "Code", visible: true, order: 1 },
+        { id: "name", label: t.pharmacyName || "Name", visible: true, order: 2 },
+        { id: "address", label: t.address || "Address", visible: true, order: 3 },
+        { id: "landmark", label: t.landmark || "Landmark", visible: true, order: 4 },
+        { id: "pharmacyPhone", label: t.pharmacyPhone || "Phone", visible: true, order: 5 },
+        { id: "leadPhone", label: t.leadPhone || "Lead Phone", visible: true, order: 6 },
+        { id: "telegramBot", label: t.telegramBot || "Bot", visible: true, order: 7 },
+        { id: "training", label: t.training || "Training", visible: true, order: 8 },
+        { id: "brandedPacket", label: t.brandedPacket || "Packet", visible: true, order: 9 },
+        { id: "status", label: t.status || "Status", visible: true, order: 10 },
+        { id: "leadStatus", label: t.leadStatus || "Lead Status", visible: true, order: 11 },
+        { id: "comments", label: t.comments || "Comments", visible: true, order: 12 },
+        { id: "commentUser", label: t.commentUser || "Comment User", visible: true, order: 13 },
+        { id: "commentDate", label: t.commentDate || "Comment Date", visible: true, order: 14 },
+        { id: "creationDate", label: t.date || "Date", visible: true, order: 15 },
+        { id: "region", label: t.region || "Region", visible: false, order: 16 },
+        { id: "district", label: t.district || "District", visible: false, order: 17 },
+    ], [t]);
+
     // Data Fetching
     useEffect(() => {
         // Auth Check
@@ -66,6 +88,34 @@ export default function LeadsPanel() {
             navigate("/login");
             return;
         }
+
+        // Initialize Column Settings
+        const initColumnSettings = async () => {
+            if (token) {
+                try {
+                    const savedSettings = await getUserColumnSettings(token);
+                    if (savedSettings && savedSettings.length > 0) {
+                        // Merge saved settings with defaults to ensure all columns exist
+                        // This handles cases where new columns are added to the app
+                        const mergedSettings = defaultColumns.map(defCol => {
+                            const saved = savedSettings.find((s: ColumnSettings) => s.id === defCol.id);
+                            return saved ? { ...defCol, ...saved } : defCol;
+                        });
+
+                        // Sort by order
+                        mergedSettings.sort((a, b) => a.order - b.order);
+                        setColumnSettings(mergedSettings);
+                    } else {
+                        setColumnSettings(defaultColumns);
+                    }
+                } catch (error) {
+                    console.error("Failed to fetch column settings:", error);
+                    setColumnSettings(defaultColumns);
+                }
+            }
+        };
+
+        initColumnSettings();
 
         const fetchData = async () => {
             setIsLoading(true);
@@ -138,6 +188,40 @@ export default function LeadsPanel() {
 
         fetchData();
     }, [token, authLoading, navigate, t.error]);
+
+    const handleUpdateStatus = async (
+        pharmacyId: number,
+        field: "brandedPacket" | "training",
+        value: boolean,
+        comment: string
+    ) => {
+        try {
+            await updatePharmacyStatusLocal(
+                pharmacyId,
+                field,
+                value,
+                comment,
+                user?.username || "User"
+            );
+
+            // Update local state
+            setLeads(current => current.map(p => {
+                if (p.id === pharmacyId) {
+                    return { ...p, [field]: value };
+                }
+                return p;
+            }));
+
+            // Allow time for DB propagation before refetching or just rely on local state
+            if (selectedPharmacy && selectedPharmacy.id === pharmacyId) {
+                setSelectedPharmacy(prev => prev ? { ...prev, [field]: value } : null);
+            }
+
+        } catch (error) {
+            console.error("Failed to update status", error);
+            throw error;
+        }
+    };
 
     // Filter Logic
     useEffect(() => {
@@ -275,6 +359,8 @@ export default function LeadsPanel() {
                 pharmacy={selectedPharmacy}
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
+                onUpdateStatus={handleUpdateStatus}
+                currentUsername={user?.username || "User"}
             />
 
             {/* Settings Menu Modal */}
@@ -289,11 +375,19 @@ export default function LeadsPanel() {
                 isOpen={isColumnSettingsOpen}
                 onClose={() => setIsColumnSettingsOpen(false)}
                 columns={columnSettings}
-                onSave={(newSettings) => {
+                onSave={async (newSettings) => {
                     setColumnSettings(newSettings);
                     setIsColumnSettingsOpen(false);
-                    // TODO: Save to backend when user ID is available
-                    toast.success(t.changesSaved || "Changes saved");
+
+                    if (token) {
+                        try {
+                            await saveUserColumnSettings(token, newSettings);
+                            toast.success(t.changesSaved || "Changes saved");
+                        } catch (error) {
+                            console.error("Failed to save column settings:", error);
+                            toast.error(t.error || "Error saving settings");
+                        }
+                    }
                 }}
             />
         </div>
