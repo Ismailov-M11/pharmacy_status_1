@@ -80,6 +80,16 @@ export interface Pharmacy {
   comments?: Comment[]; // Added comments
   creationDate: string;
   modifiedDate: string;
+  landmark?: string;
+  training?: boolean;
+  brandedPacket?: boolean;
+  stir?: string;
+  juridicalName?: string;
+  juridicalAddress?: string;
+  bankName?: string;
+  bankAccount?: string;
+  mfo?: string;
+  additionalPhone?: string;
   [key: string]: any;
 }
 

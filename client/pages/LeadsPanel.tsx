@@ -78,6 +78,13 @@ export default function LeadsPanel() {
         { id: "creationDate", label: t.date || "Date", visible: true, order: 15 },
         { id: "region", label: t.region || "Region", visible: false, order: 16 },
         { id: "district", label: t.district || "District", visible: false, order: 17 },
+        { id: "stir", label: t.stir || "СТИР", visible: true, order: 18 },
+        { id: "additionalPhone", label: t.additionalPhone || "Доп. телефон Lead", visible: true, order: 19 },
+        { id: "juridicalName", label: t.juridicalName || "Юридическое название", visible: true, order: 20 },
+        { id: "juridicalAddress", label: t.juridicalAddress || "Юридический адрес", visible: true, order: 21 },
+        { id: "bankName", label: t.bankName || "Название банка", visible: true, order: 22 },
+        { id: "bankAccount", label: t.bankAccount || "Банковский счет", visible: true, order: 23 },
+        { id: "mfo", label: t.mfo || "МФО", visible: true, order: 24 },
     ], [t]);
 
     // Data Fetching

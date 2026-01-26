@@ -275,6 +275,34 @@ export function PharmacyTable({
       case "creationDate":
         return <th key={col.id} className="px-2 md:px-4 py-2 md:py-3 text-left font-semibold text-gray-700 whitespace-nowrap min-w-max">{t.date || "Дата"}</th>;
 
+      case "stir":
+        if (!isAdmin) return null;
+        return <th key={col.id} className="px-2 md:px-4 py-2 md:py-3 text-left font-semibold text-gray-700 whitespace-nowrap min-w-max">{t.stir || "СТИР"}</th>;
+
+      case "additionalPhone":
+        if (!isAdmin) return null;
+        return <th key={col.id} className="px-2 md:px-4 py-2 md:py-3 text-left font-semibold text-gray-700 whitespace-nowrap min-w-max"><div className="flex flex-col items-start"><span>{t.additionalPhone || "Доп. телефон Lead"}</span><span className="text-[10px] font-normal text-gray-500">Lead</span></div></th>;
+
+      case "juridicalName":
+        if (!isAdmin) return null;
+        return <th key={col.id} className="px-2 md:px-4 py-2 md:py-3 text-left font-semibold text-gray-700 whitespace-nowrap min-w-[180px]">{t.juridicalName || "Юридическое название"}</th>;
+
+      case "juridicalAddress":
+        if (!isAdmin) return null;
+        return <th key={col.id} className="px-2 md:px-4 py-2 md:py-3 text-left font-semibold text-gray-700" style={{ width: "200px", minWidth: "200px" }}><div className="break-words">{t.juridicalAddress || "Юридический адрес"}</div></th>;
+
+      case "bankName":
+        if (!isAdmin) return null;
+        return <th key={col.id} className="px-2 md:px-4 py-2 md:py-3 text-left font-semibold text-gray-700 whitespace-nowrap min-w-[150px]">{t.bankName || "Название банка"}</th>;
+
+      case "bankAccount":
+        if (!isAdmin) return null;
+        return <th key={col.id} className="px-2 md:px-4 py-2 md:py-3 text-left font-semibold text-gray-700 whitespace-nowrap min-w-[150px]">{t.bankAccount || "Банковский счет"}</th>;
+
+      case "mfo":
+        if (!isAdmin) return null;
+        return <th key={col.id} className="px-2 md:px-4 py-2 md:py-3 text-left font-semibold text-gray-700 whitespace-nowrap min-w-max">{t.mfo || "МФО"}</th>;
+
       default:
         return null;
     }
@@ -286,7 +314,7 @@ export function PharmacyTable({
       case "code": return <td key={col.id} className="px-2 py-2 md:py-3 text-gray-900 whitespace-nowrap align-top"><button onClick={() => onPharmacyClick?.(pharmacy)} className="text-blue-600 hover:text-blue-800 hover:underline font-medium transition-colors">{pharmacy.code}</button></td>;
       case "name": return <td key={col.id} className="px-2 py-2 md:py-3 text-gray-900 font-medium align-top"><div className="break-words overflow-hidden" style={{ display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical", lineHeight: "1.4em", minHeight: "4.2em" }}>{pharmacy.name}</div></td>;
       case "address": return <td key={col.id} className="px-2 py-2 md:py-3 text-gray-600 align-top"><div className="break-words overflow-hidden" style={{ display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical", lineHeight: "1.4em", minHeight: "4.2em" }}>{pharmacy.address}</div></td>;
-      case "landmark": return <td key={col.id} className="px-2 py-2 md:py-3 text-gray-600 align-top"><div className="break-words" style={{ lineHeight: "1.4em", minHeight: "4.2em" }}>{(pharmacy as any).landmark || "-"}</div></td>;
+      case "landmark": return <td key={col.id} className="px-2 py-2 md:py-3 text-gray-600 align-top"><div className="break-words" style={{ lineHeight: "1.4em", minHeight: "4.2em" }}>{pharmacy.landmark || "-"}</div></td>;
       case "pharmacyPhone": return <td key={col.id} className="px-2 py-2 md:py-3 text-gray-900 whitespace-nowrap align-top">{pharmacy.phone || "-"}</td>;
       case "leadPhone": return <td key={col.id} className="px-2 py-2 md:py-3 text-gray-900 whitespace-nowrap align-top">{pharmacy.lead?.phone || "-"}</td>;
 
@@ -296,8 +324,8 @@ export function PharmacyTable({
         return <td key={col.id} className="px-2 md:px-4 py-2 md:py-3 text-center"><div className={`font-bold text-xs px-2 py-1 rounded inline-block whitespace-nowrap ${hasTelegramBot ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}`}>{getTelegramBotStatus(marketChats)}</div></td>;
       }
 
-      case "training": return <td key={col.id} className="px-2 md:px-4 py-2 md:py-3 text-center"><span className={`px-2 py-1 rounded text-xs font-bold inline-block whitespace-nowrap ${(pharmacy as any).training ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}`}>{getTrainingStatusText((pharmacy as any).training)}</span></td>;
-      case "brandedPacket": return <td key={col.id} className="px-2 md:px-4 py-2 md:py-3 text-center"><span className={`px-2 py-1 rounded text-xs font-bold inline-block whitespace-nowrap ${(pharmacy as any).brandedPacket ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}`}>{getStatusText((pharmacy as any).brandedPacket)}</span></td>;
+      case "training": return <td key={col.id} className="px-2 md:px-4 py-2 md:py-3 text-center"><span className={`px-2 py-1 rounded text-xs font-bold inline-block whitespace-nowrap ${pharmacy.training ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}`}>{getTrainingStatusText(pharmacy.training || false)}</span></td>;
+      case "brandedPacket": return <td key={col.id} className="px-2 md:px-4 py-2 md:py-3 text-center"><span className={`px-2 py-1 rounded text-xs font-bold inline-block whitespace-nowrap ${pharmacy.brandedPacket ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}`}>{getStatusText(pharmacy.brandedPacket || false)}</span></td>;
       case "status": return <td key={col.id} className="px-2 md:px-4 py-2 md:py-3"><span className={`px-2 py-1 rounded text-xs font-bold whitespace-nowrap inline-block ${pharmacy.active ? "bg-emerald-100 text-emerald-800" : "bg-red-100 text-red-800"}`}>{pharmacy.active ? t.active : t.inactive}</span></td>;
 
       case "leadStatus": return isAdmin ? <td key={col.id} className="px-2 md:px-4 py-2 md:py-3 text-gray-900 text-xs">{pharmacy.lead?.status || "-"}</td> : null;
@@ -306,6 +334,15 @@ export function PharmacyTable({
       case "commentUser": return <td key={col.id} className="px-2 md:px-4 py-2 md:py-3 text-gray-900 text-xs whitespace-nowrap align-middle">{(() => { const last = getLastComment(pharmacy.comments || []); if (!last) return "-"; return <span className="text-gray-500 text-xs">{last.creator?.phone || "-"}</span>; })()}</td>;
       case "comments": return <td key={col.id} className="px-2 md:px-4 py-2 md:py-3 text-gray-900 text-xs align-middle"><div className="max-w-[200px] break-words">{getLastComment(pharmacy.comments || [])?.coment || getLastComment(pharmacy.comments || [])?.comment || "-"}</div></td>;
       case "creationDate": return <td key={col.id} className="px-2 md:px-4 py-2 md:py-3 text-gray-900 text-xs whitespace-nowrap align-middle">{formatDate(pharmacy.creationDate)}</td>;
+
+      case "stir": return isAdmin ? <td key={col.id} className="px-2 md:px-4 py-2 md:py-3 text-gray-900 text-xs whitespace-nowrap align-middle">{pharmacy.stir || "-"}</td> : null;
+      case "additionalPhone": return isAdmin ? <td key={col.id} className="px-2 md:px-4 py-2 md:py-3 text-gray-900 text-xs whitespace-nowrap align-middle">{pharmacy.additionalPhone || "-"}</td> : null;
+      case "juridicalName": return isAdmin ? <td key={col.id} className="px-2 md:px-4 py-2 md:py-3 text-gray-900 text-xs align-middle"><div className="break-words">{pharmacy.juridicalName || "-"}</div></td> : null;
+      case "juridicalAddress": return isAdmin ? <td key={col.id} className="px-2 md:px-4 py-2 md:py-3 text-gray-900 text-xs align-middle"><div className="break-words">{pharmacy.juridicalAddress || "-"}</div></td> : null;
+      case "bankName": return isAdmin ? <td key={col.id} className="px-2 md:px-4 py-2 md:py-3 text-gray-900 text-xs align-middle"><div className="break-words">{pharmacy.bankName || "-"}</div></td> : null;
+      case "bankAccount": return isAdmin ? <td key={col.id} className="px-2 md:px-4 py-2 md:py-3 text-gray-900 text-xs whitespace-nowrap align-middle">{pharmacy.bankAccount || "-"}</td> : null;
+      case "mfo": return isAdmin ? <td key={col.id} className="px-2 md:px-4 py-2 md:py-3 text-gray-900 text-xs whitespace-nowrap align-middle">{pharmacy.mfo || "-"}</td> : null;
+
       default: return null;
     }
   };
@@ -1023,6 +1060,7 @@ export function PharmacyTable({
                         )}
                         {orderedColumns.map(col => (
                           <React.Fragment key={col.id}>
+                            {renderDynamicCell(col, pharmacy, index)}
                             {/* Checkbox after Number column to match original layout */}
                             {isLeadsPage && col.id === 'number' && (
                               <td className="px-2 py-2 md:py-3 text-center align-top">
@@ -1042,7 +1080,6 @@ export function PharmacyTable({
                                 />
                               </td>
                             )}
-                            {renderDynamicCell(col, pharmacy, index)}
                           </React.Fragment>
                         ))}
                       </>
