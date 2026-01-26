@@ -350,6 +350,7 @@ export default function LeadsPanel() {
                         selectedRows={selectedRows}
                         onSelectionChange={setSelectedRows}
                         onSettingsClick={() => setIsSettingsMenuOpen(true)}
+                        columnSettings={columnSettings}
                     />
                 </div>
             </main>

@@ -1,7 +1,7 @@
 // PharmacyTable component
-import { Pharmacy } from "@/lib/api";
+import { Pharmacy, ColumnSettings } from "@/lib/api";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { useState } from "react";
+import React, { useState } from "react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -43,6 +43,7 @@ interface PharmacyTableProps {
   selectedRows?: Set<number>;
   onSelectionChange?: (selectedIds: Set<number>) => void;
   onSettingsClick?: () => void;
+  columnSettings?: ColumnSettings[];
 }
 
 export function PharmacyTable({
@@ -74,8 +75,13 @@ export function PharmacyTable({
   selectedRows = new Set(),
   onSelectionChange,
   onSettingsClick,
+  columnSettings,
 }: PharmacyTableProps) {
   const { t } = useLanguage();
+
+  const orderedColumns = isLeadsPage && columnSettings
+    ? columnSettings.filter(c => c.visible).sort((a, b) => a.order - b.order)
+    : null;
 
   const handleDateFilterChange = (type: "from" | "to", value: string) => {
     if (onCommentDateFilterChange && commentDateFilter) {
@@ -99,6 +105,209 @@ export function PharmacyTable({
     });
 
     return sorted[0];
+  };
+
+  const renderDynamicHeader = (col: ColumnSettings) => {
+    switch (col.id) {
+      case "number":
+        return <th key={col.id} className="px-2 py-2 md:py-3 text-left font-semibold text-gray-700 whitespace-nowrap" style={{ width: "50px" }}>{t.number}</th>;
+      case "code":
+        return <th key={col.id} className="px-2 py-2 md:py-3 text-left font-semibold text-gray-700 whitespace-nowrap" style={{ width: "100px" }}>{t.code}</th>;
+      case "name":
+        return <th key={col.id} className="px-2 py-2 md:py-3 text-left font-semibold text-gray-700" style={{ width: "150px", minWidth: "150px" }}><div className="break-words">{t.pharmacyName}</div></th>;
+      case "address":
+        return <th key={col.id} className="px-2 py-2 md:py-3 text-left font-semibold text-gray-700" style={{ width: "170px", minWidth: "170px" }}><div className="break-words">{t.address}</div></th>;
+      case "landmark":
+        return <th key={col.id} className="px-2 py-2 md:py-3 text-left font-semibold text-gray-700" style={{ width: "130px", minWidth: "130px" }}><div className="break-words">{t.landmark}</div></th>;
+      case "pharmacyPhone":
+        return <th key={col.id} className="px-2 py-2 md:py-3 text-left font-semibold text-gray-700 whitespace-nowrap" style={{ width: "110px" }}>{t.pharmacyPhone}</th>;
+      case "leadPhone":
+        return <th key={col.id} className="px-2 py-2 md:py-3 text-left font-semibold text-gray-700 whitespace-nowrap" style={{ width: "110px" }}>{t.leadPhone}</th>;
+
+      case "telegramBot":
+        return (
+          <th key={col.id} className="px-2 md:px-4 py-2 md:py-3 text-center font-semibold text-gray-700 whitespace-nowrap min-w-max">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="sm" className="-ml-3 h-8 data-[state=open]:bg-purple-600 data-[state=open]:text-white">
+                  <span>{t.telegramBot}</span><ChevronDown className="ml-2 h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start">
+                <DropdownMenuRadioGroup value={telegramBotFilter === true ? "true" : telegramBotFilter === false ? "false" : "null"} onValueChange={(val) => handleFilterChange(val, onTelegramBotFilterChange)}>
+                  <DropdownMenuRadioItem value="null">{t.allPharmacies}</DropdownMenuRadioItem>
+                  <DropdownMenuRadioItem value="true" className="bg-emerald-100 text-emerald-800 focus:bg-emerald-200 focus:text-emerald-900 m-1 cursor-pointer">{t.yes}</DropdownMenuRadioItem>
+                  <DropdownMenuRadioItem value="false" className="bg-red-100 text-red-800 focus:bg-red-200 focus:text-red-900 m-1 cursor-pointer">{t.no}</DropdownMenuRadioItem>
+                </DropdownMenuRadioGroup>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </th>
+        );
+
+      case "training":
+        return (
+          <th key={col.id} className="px-2 md:px-4 py-2 md:py-3 text-center font-semibold text-gray-700 whitespace-nowrap min-w-max">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="sm" className="-ml-3 h-8 data-[state=open]:bg-purple-600 data-[state=open]:text-white">
+                  <span>{t.training}</span><ChevronDown className="ml-2 h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start">
+                <DropdownMenuRadioGroup value={trainingFilter === true ? "true" : trainingFilter === false ? "false" : "null"} onValueChange={(val) => handleFilterChange(val, onTrainingFilterChange)}>
+                  <DropdownMenuRadioItem value="null">{t.allPharmacies}</DropdownMenuRadioItem>
+                  <DropdownMenuRadioItem value="true" className="bg-emerald-100 text-emerald-800 focus:bg-emerald-200 focus:text-emerald-900 m-1 cursor-pointer">{t.yes}</DropdownMenuRadioItem>
+                  <DropdownMenuRadioItem value="false" className="bg-red-100 text-red-800 focus:bg-red-200 focus:text-red-900 m-1 cursor-pointer">{t.no}</DropdownMenuRadioItem>
+                </DropdownMenuRadioGroup>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </th>
+        );
+
+      case "brandedPacket":
+        return (
+          <th key={col.id} className="px-2 md:px-4 py-2 md:py-3 text-center font-semibold text-gray-700 whitespace-nowrap min-w-max">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="sm" className="-ml-3 h-8 data-[state=open]:bg-purple-600 data-[state=open]:text-white">
+                  <span>{t.brandedPacket}</span><ChevronDown className="ml-2 h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start">
+                <DropdownMenuRadioGroup value={brandedPacketFilter === true ? "true" : brandedPacketFilter === false ? "false" : "null"} onValueChange={(val) => handleFilterChange(val, onBrandedPacketFilterChange)}>
+                  <DropdownMenuRadioItem value="null">{t.allPharmacies}</DropdownMenuRadioItem>
+                  <DropdownMenuRadioItem value="true" className="bg-emerald-100 text-emerald-800 focus:bg-emerald-200 focus:text-emerald-900 m-1 cursor-pointer">{t.yes}</DropdownMenuRadioItem>
+                  <DropdownMenuRadioItem value="false" className="bg-red-100 text-red-800 focus:bg-red-200 focus:text-red-900 m-1 cursor-pointer">{t.no}</DropdownMenuRadioItem>
+                </DropdownMenuRadioGroup>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </th>
+        );
+
+      case "status":
+        return <th key={col.id} className="px-2 md:px-4 py-2 md:py-3 text-left font-semibold text-gray-700 whitespace-nowrap min-w-max">{t.status}</th>;
+
+      case "leadStatus":
+        if (!isAdmin) return null;
+        return (
+          <th key={col.id} className="px-2 md:px-4 py-2 md:py-3 text-left font-semibold text-gray-700 whitespace-nowrap min-w-max">
+            {onLeadStatusFilterChange && leadStatusOptions && leadStatusOptions.length > 0 ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="sm" className="-ml-3 h-8 data-[state=open]:bg-purple-600 data-[state=open]:text-white">
+                    <span>{t.leadStatus}</span><ChevronDown className="ml-2 h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="start">
+                  <DropdownMenuRadioGroup value={leadStatusFilter || "null"} onValueChange={(val) => handleStringFilterChange(val, onLeadStatusFilterChange)}>
+                    <DropdownMenuRadioItem value="null">{t.all || "Все"}</DropdownMenuRadioItem>
+                    {leadStatusOptions.map((status) => (
+                      <DropdownMenuRadioItem key={status} value={status} className="cursor-pointer">{status}</DropdownMenuRadioItem>
+                    ))}
+                  </DropdownMenuRadioGroup>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : t.leadStatus}
+          </th>
+        );
+
+      case "commentDate":
+        return (
+          <th key={col.id} className="px-2 md:px-4 py-2 md:py-3 text-left font-semibold text-gray-700 whitespace-nowrap min-w-max">
+            {onCommentDateFilterChange ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="sm" className="-ml-3 h-8 data-[state=open]:bg-purple-600 data-[state=open]:text-white">
+                    <div className="flex flex-col items-start">
+                      <span>{t.lastCommentDate || "Дата"}</span>
+                      <span className="text-[10px] font-normal text-gray-500">Lead</span>
+                    </div>
+                    <ChevronDown className="ml-2 h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="start" className="w-64 p-2">
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">{t.dateFrom}</label>
+                      <Input type="date" value={commentDateFilter?.from || ""} onChange={(e) => handleDateFilterChange("from", e.target.value)} />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">{t.dateTo}</label>
+                      <Input type="date" value={commentDateFilter?.to || ""} onChange={(e) => handleDateFilterChange("to", e.target.value)} />
+                    </div>
+                  </div>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : t.lastCommentDate || "Дата"}
+          </th>
+        );
+
+      case "commentUser":
+        return (
+          <th key={col.id} className="px-2 md:px-4 py-2 md:py-3 text-left font-semibold text-gray-700 whitespace-nowrap min-w-max">
+            {onCommentUserFilterChange && commentUserOptions && commentUserOptions.length > 0 ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="sm" className="-ml-3 h-8 data-[state=open]:bg-purple-600 data-[state=open]:text-white">
+                    <div className="flex flex-col items-start">
+                      <span>{t.lastCommentUser || "Автор"}</span>
+                      <span className="text-[10px] font-normal text-gray-500">Lead</span>
+                    </div>
+                    <ChevronDown className="ml-2 h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="start">
+                  <DropdownMenuRadioGroup value={commentUserFilter || "null"} onValueChange={(val) => handleStringFilterChange(val, onCommentUserFilterChange)}>
+                    <DropdownMenuRadioItem value="null">{t.all || "Все"}</DropdownMenuRadioItem>
+                    {commentUserOptions.map((user) => (
+                      <DropdownMenuRadioItem key={user} value={user} className="cursor-pointer">{user}</DropdownMenuRadioItem>
+                    ))}
+                  </DropdownMenuRadioGroup>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : t.lastCommentUser || "Автор"}
+          </th>
+        );
+
+      case "comments":
+        return <th key={col.id} className="px-2 md:px-4 py-2 md:py-3 text-left font-semibold text-gray-700 whitespace-nowrap min-w-[200px]"><div className="flex flex-col items-start"><span>{t.lastComment || "Коммент"}</span><span className="text-[10px] font-normal text-gray-500">Lead</span></div></th>;
+
+      case "creationDate":
+        return <th key={col.id} className="px-2 md:px-4 py-2 md:py-3 text-left font-semibold text-gray-700 whitespace-nowrap min-w-max">{t.date || "Дата"}</th>;
+
+      default:
+        return null;
+    }
+  };
+
+  const renderDynamicCell = (col: ColumnSettings, pharmacy: Pharmacy, index: number) => {
+    switch (col.id) {
+      case "number": return <td key={col.id} className="px-2 py-2 md:py-3 text-gray-900 font-medium whitespace-nowrap align-top">{index + 1}</td>;
+      case "code": return <td key={col.id} className="px-2 py-2 md:py-3 text-gray-900 whitespace-nowrap align-top"><button onClick={() => onPharmacyClick?.(pharmacy)} className="text-blue-600 hover:text-blue-800 hover:underline font-medium transition-colors">{pharmacy.code}</button></td>;
+      case "name": return <td key={col.id} className="px-2 py-2 md:py-3 text-gray-900 font-medium align-top"><div className="break-words overflow-hidden" style={{ display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical", lineHeight: "1.4em", minHeight: "4.2em" }}>{pharmacy.name}</div></td>;
+      case "address": return <td key={col.id} className="px-2 py-2 md:py-3 text-gray-600 align-top"><div className="break-words overflow-hidden" style={{ display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical", lineHeight: "1.4em", minHeight: "4.2em" }}>{pharmacy.address}</div></td>;
+      case "landmark": return <td key={col.id} className="px-2 py-2 md:py-3 text-gray-600 align-top"><div className="break-words" style={{ lineHeight: "1.4em", minHeight: "4.2em" }}>{(pharmacy as any).landmark || "-"}</div></td>;
+      case "pharmacyPhone": return <td key={col.id} className="px-2 py-2 md:py-3 text-gray-900 whitespace-nowrap align-top">{pharmacy.phone || "-"}</td>;
+      case "leadPhone": return <td key={col.id} className="px-2 py-2 md:py-3 text-gray-900 whitespace-nowrap align-top">{pharmacy.lead?.phone || "-"}</td>;
+
+      case "telegramBot": {
+        const marketChats = pharmacy.marketChats;
+        const hasTelegramBot = marketChats && Array.isArray(marketChats) && marketChats.length > 0;
+        return <td key={col.id} className="px-2 md:px-4 py-2 md:py-3 text-center"><div className={`font-bold text-xs px-2 py-1 rounded inline-block whitespace-nowrap ${hasTelegramBot ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}`}>{getTelegramBotStatus(marketChats)}</div></td>;
+      }
+
+      case "training": return <td key={col.id} className="px-2 md:px-4 py-2 md:py-3 text-center"><span className={`px-2 py-1 rounded text-xs font-bold inline-block whitespace-nowrap ${(pharmacy as any).training ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}`}>{getTrainingStatusText((pharmacy as any).training)}</span></td>;
+      case "brandedPacket": return <td key={col.id} className="px-2 md:px-4 py-2 md:py-3 text-center"><span className={`px-2 py-1 rounded text-xs font-bold inline-block whitespace-nowrap ${(pharmacy as any).brandedPacket ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}`}>{getStatusText((pharmacy as any).brandedPacket)}</span></td>;
+      case "status": return <td key={col.id} className="px-2 md:px-4 py-2 md:py-3"><span className={`px-2 py-1 rounded text-xs font-bold whitespace-nowrap inline-block ${pharmacy.active ? "bg-emerald-100 text-emerald-800" : "bg-red-100 text-red-800"}`}>{pharmacy.active ? t.active : t.inactive}</span></td>;
+
+      case "leadStatus": return isAdmin ? <td key={col.id} className="px-2 md:px-4 py-2 md:py-3 text-gray-900 text-xs">{pharmacy.lead?.status || "-"}</td> : null;
+
+      case "commentDate": return <td key={col.id} className="px-2 md:px-4 py-2 md:py-3 text-gray-900 text-xs whitespace-nowrap align-middle">{(() => { const last = getLastComment(pharmacy.comments || []); if (!last) return "-"; return <span className="font-semibold">{formatDate(last.createdAt)}</span>; })()}</td>;
+      case "commentUser": return <td key={col.id} className="px-2 md:px-4 py-2 md:py-3 text-gray-900 text-xs whitespace-nowrap align-middle">{(() => { const last = getLastComment(pharmacy.comments || []); if (!last) return "-"; return <span className="text-gray-500 text-xs">{last.creator?.phone || "-"}</span>; })()}</td>;
+      case "comments": return <td key={col.id} className="px-2 md:px-4 py-2 md:py-3 text-gray-900 text-xs align-middle"><div className="max-w-[200px] break-words">{getLastComment(pharmacy.comments || [])?.coment || getLastComment(pharmacy.comments || [])?.comment || "-"}</div></td>;
+      case "creationDate": return <td key={col.id} className="px-2 md:px-4 py-2 md:py-3 text-gray-900 text-xs whitespace-nowrap align-middle">{formatDate(pharmacy.creationDate)}</td>;
+      default: return null;
+    }
   };
 
   const formatDate = (dateString: string) => {
@@ -359,287 +568,251 @@ export function PharmacyTable({
         <table className="w-full text-xs md:text-sm relative">
           <thead className="bg-gray-50 border-b border-gray-200 sticky top-0 z-40 bg-white shadow-sm">
             <tr>
-              <th
-                className="px-2 py-2 md:py-3 text-left font-semibold text-gray-700 whitespace-nowrap"
-                style={{ width: "50px" }}
-              >
-                {t.number}
-              </th>
-              {isLeadsPage && (
-                <th
-                  className="px-2 py-2 md:py-3 text-center font-semibold text-gray-700"
-                  style={{ width: "40px" }}
-                >
-                  <input
-                    type="checkbox"
-                    checked={selectedRows?.size === pharmacies.length && pharmacies.length > 0}
-                    onChange={(e) => {
-                      if (e.target.checked) {
-                        onSelectionChange?.(new Set(pharmacies.map(p => p.id)));
-                      } else {
-                        onSelectionChange?.(new Set());
-                      }
-                    }}
-                    className="cursor-pointer"
-                  />
-                </th>
-              )}
-              <th
-                className="px-2 py-2 md:py-3 text-left font-semibold text-gray-700 whitespace-nowrap"
-                style={{ width: "100px" }}
-              >
-                {t.code}
-              </th>
-              <th
-                className="px-2 py-2 md:py-3 text-left font-semibold text-gray-700"
-                style={{ width: "150px", minWidth: "150px" }}
-              >
-                <div className="break-words">{t.pharmacyName}</div>
-              </th>
-              <th
-                className="px-2 py-2 md:py-3 text-left font-semibold text-gray-700"
-                style={{ width: "170px", minWidth: "170px" }}
-              >
-                <div className="break-words">{t.address}</div>
-              </th>
-              <th
-                className="px-2 py-2 md:py-3 text-left font-semibold text-gray-700"
-                style={{ width: "130px", minWidth: "130px" }}
-              >
-                <div className="break-words">{t.landmark}</div>
-              </th>
-              <th
-                className="px-2 py-2 md:py-3 text-left font-semibold text-gray-700 whitespace-nowrap"
-                style={{ width: "110px" }}
-              >
-                {t.pharmacyPhone}
-              </th>
-              <th
-                className="px-2 py-2 md:py-3 text-left font-semibold text-gray-700 whitespace-nowrap"
-                style={{ width: "110px" }}
-              >
-                {t.leadPhone}
-              </th>
-
-              <th className="px-2 md:px-4 py-2 md:py-3 text-center font-semibold text-gray-700 whitespace-nowrap min-w-max">
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="-ml-3 h-8 data-[state=open]:bg-purple-600 data-[state=open]:text-white"
-                    >
-                      <span>{t.telegramBot}</span>
-                      <ChevronDown className="ml-2 h-4 w-4" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="start">
-                    <DropdownMenuRadioGroup
-                      value={
-                        telegramBotFilter === true
-                          ? "true"
-                          : telegramBotFilter === false
-                            ? "false"
-                            : "null"
-                      }
-                      onValueChange={(val) =>
-                        handleFilterChange(val, onTelegramBotFilterChange)
-                      }
-                    >
-                      <DropdownMenuRadioItem value="null">
-                        {t.allPharmacies}
-                      </DropdownMenuRadioItem>
-                      <DropdownMenuRadioItem
-                        value="true"
-                        className="bg-emerald-100 text-emerald-800 focus:bg-emerald-200 focus:text-emerald-900 m-1 cursor-pointer"
-                      >
-                        {t.yes}
-                      </DropdownMenuRadioItem>
-                      <DropdownMenuRadioItem
-                        value="false"
-                        className="bg-red-100 text-red-800 focus:bg-red-200 focus:text-red-900 m-1 cursor-pointer"
-                      >
-                        {t.no}
-                      </DropdownMenuRadioItem>
-                    </DropdownMenuRadioGroup>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </th>
-              <th className="px-2 md:px-4 py-2 md:py-3 text-center font-semibold text-gray-700 whitespace-nowrap min-w-max">
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="-ml-3 h-8 data-[state=open]:bg-purple-600 data-[state=open]:text-white"
-                    >
-                      <span>{t.training}</span>
-                      <ChevronDown className="ml-2 h-4 w-4" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="start">
-                    <DropdownMenuRadioGroup
-                      value={
-                        trainingFilter === true
-                          ? "true"
-                          : trainingFilter === false
-                            ? "false"
-                            : "null"
-                      }
-                      onValueChange={(val) =>
-                        handleFilterChange(val, onTrainingFilterChange)
-                      }
-                    >
-                      <DropdownMenuRadioItem value="null">
-                        {t.allPharmacies}
-                      </DropdownMenuRadioItem>
-                      <DropdownMenuRadioItem
-                        value="true"
-                        className="bg-emerald-100 text-emerald-800 focus:bg-emerald-200 focus:text-emerald-900 m-1 cursor-pointer"
-                      >
-                        {t.yes}
-                      </DropdownMenuRadioItem>
-                      <DropdownMenuRadioItem
-                        value="false"
-                        className="bg-red-100 text-red-800 focus:bg-red-200 focus:text-red-900 m-1 cursor-pointer"
-                      >
-                        {t.no}
-                      </DropdownMenuRadioItem>
-                    </DropdownMenuRadioGroup>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </th>
-              <th className="px-2 md:px-4 py-2 md:py-3 text-center font-semibold text-gray-700 whitespace-nowrap min-w-max">
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="-ml-3 h-8 data-[state=open]:bg-purple-600 data-[state=open]:text-white"
-                    >
-                      <span>{t.brandedPacket}</span>
-                      <ChevronDown className="ml-2 h-4 w-4" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="start">
-                    <DropdownMenuRadioGroup
-                      value={
-                        brandedPacketFilter === true
-                          ? "true"
-                          : brandedPacketFilter === false
-                            ? "false"
-                            : "null"
-                      }
-                      onValueChange={(val) =>
-                        handleFilterChange(val, onBrandedPacketFilterChange)
-                      }
-                    >
-                      <DropdownMenuRadioItem value="null">
-                        {t.allPharmacies}
-                      </DropdownMenuRadioItem>
-                      <DropdownMenuRadioItem
-                        value="true"
-                        className="bg-emerald-100 text-emerald-800 focus:bg-emerald-200 focus:text-emerald-900 m-1 cursor-pointer"
-                      >
-                        {t.yes}
-                      </DropdownMenuRadioItem>
-                      <DropdownMenuRadioItem
-                        value="false"
-                        className="bg-red-100 text-red-800 focus:bg-red-200 focus:text-red-900 m-1 cursor-pointer"
-                      >
-                        {t.no}
-                      </DropdownMenuRadioItem>
-                    </DropdownMenuRadioGroup>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </th>
-              <th className="px-2 md:px-4 py-2 md:py-3 text-left font-semibold text-gray-700 whitespace-nowrap min-w-max">
-                {t.status}
-              </th>
-              {isAdmin && (
+              {orderedColumns ? (
                 <>
-                  <th className="px-2 md:px-4 py-2 md:py-3 text-left font-semibold text-gray-700 whitespace-nowrap min-w-max">
-                    {onLeadStatusFilterChange && leadStatusOptions && leadStatusOptions.length > 0 ? (
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="-ml-3 h-8 data-[state=open]:bg-purple-600 data-[state=open]:text-white"
-                          >
-                            <span>{t.leadStatus}</span>
-                            <ChevronDown className="ml-2 h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="start">
-                          <DropdownMenuRadioGroup
-                            value={leadStatusFilter || "null"}
-                            onValueChange={(val) =>
-                              handleStringFilterChange(val, onLeadStatusFilterChange)
-                            }
-                          >
-                            <DropdownMenuRadioItem value="null">
-                              {t.all || "Все"}
-                            </DropdownMenuRadioItem>
-                            {leadStatusOptions.map((status) => (
-                              <DropdownMenuRadioItem
-                                key={status}
-                                value={status}
-                                className="cursor-pointer"
-                              >
-                                {status}
-                              </DropdownMenuRadioItem>
-                            ))}
-                          </DropdownMenuRadioGroup>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    ) : (
-                      t.leadStatus
-                    )}
+                  {/* Fallback Checkbox if 'number' is hidden */}
+                  {isLeadsPage && !orderedColumns.some(c => c.id === 'number') && (
+                    <th className="px-2 py-2 md:py-3 text-center font-semibold text-gray-700" style={{ width: "40px" }}>
+                      <input
+                        type="checkbox"
+                        checked={selectedRows?.size === pharmacies.length && pharmacies.length > 0}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            onSelectionChange?.(new Set(pharmacies.map(p => p.id)));
+                          } else {
+                            onSelectionChange?.(new Set());
+                          }
+                        }}
+                        className="cursor-pointer"
+                      />
+                    </th>
+                  )}
+                  {orderedColumns.map(col => (
+                    <React.Fragment key={col.id}>
+                      {renderDynamicHeader(col)}
+                      {/* Checkbox after Number column to match original layout */}
+                      {isLeadsPage && col.id === 'number' && (
+                        <th className="px-2 py-2 md:py-3 text-center font-semibold text-gray-700" style={{ width: "40px" }}>
+                          <input
+                            type="checkbox"
+                            checked={selectedRows?.size === pharmacies.length && pharmacies.length > 0}
+                            onChange={(e) => {
+                              if (e.target.checked) {
+                                onSelectionChange?.(new Set(pharmacies.map(p => p.id)));
+                              } else {
+                                onSelectionChange?.(new Set());
+                              }
+                            }}
+                            className="cursor-pointer"
+                          />
+                        </th>
+                      )}
+                    </React.Fragment>
+                  ))}
+                </>
+              ) : (
+                <>
+                  <th
+                    className="px-2 py-2 md:py-3 text-left font-semibold text-gray-700 whitespace-nowrap"
+                    style={{ width: "50px" }}
+                  >
+                    {t.number}
+                  </th>
+                  {isLeadsPage && (
+                    <th
+                      className="px-2 py-2 md:py-3 text-center font-semibold text-gray-700"
+                      style={{ width: "40px" }}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={selectedRows?.size === pharmacies.length && pharmacies.length > 0}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            onSelectionChange?.(new Set(pharmacies.map(p => p.id)));
+                          } else {
+                            onSelectionChange?.(new Set());
+                          }
+                        }}
+                        className="cursor-pointer"
+                      />
+                    </th>
+                  )}
+                  <th
+                    className="px-2 py-2 md:py-3 text-left font-semibold text-gray-700 whitespace-nowrap"
+                    style={{ width: "100px" }}
+                  >
+                    {t.code}
+                  </th>
+                  <th
+                    className="px-2 py-2 md:py-3 text-left font-semibold text-gray-700"
+                    style={{ width: "150px", minWidth: "150px" }}
+                  >
+                    <div className="break-words">{t.pharmacyName}</div>
+                  </th>
+                  <th
+                    className="px-2 py-2 md:py-3 text-left font-semibold text-gray-700"
+                    style={{ width: "170px", minWidth: "170px" }}
+                  >
+                    <div className="break-words">{t.address}</div>
+                  </th>
+                  <th
+                    className="px-2 py-2 md:py-3 text-left font-semibold text-gray-700"
+                    style={{ width: "130px", minWidth: "130px" }}
+                  >
+                    <div className="break-words">{t.landmark}</div>
+                  </th>
+                  <th
+                    className="px-2 py-2 md:py-3 text-left font-semibold text-gray-700 whitespace-nowrap"
+                    style={{ width: "110px" }}
+                  >
+                    {t.pharmacyPhone}
+                  </th>
+                  <th
+                    className="px-2 py-2 md:py-3 text-left font-semibold text-gray-700 whitespace-nowrap"
+                    style={{ width: "110px" }}
+                  >
+                    {t.leadPhone}
                   </th>
 
-                  {/* New Comment Headers */}
-                  {showComments && (
+                  <th className="px-2 md:px-4 py-2 md:py-3 text-center font-semibold text-gray-700 whitespace-nowrap min-w-max">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="-ml-3 h-8 data-[state=open]:bg-purple-600 data-[state=open]:text-white"
+                        >
+                          <span>{t.telegramBot}</span>
+                          <ChevronDown className="ml-2 h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="start">
+                        <DropdownMenuRadioGroup
+                          value={
+                            telegramBotFilter === true
+                              ? "true"
+                              : telegramBotFilter === false
+                                ? "false"
+                                : "null"
+                          }
+                          onValueChange={(val) =>
+                            handleFilterChange(val, onTelegramBotFilterChange)
+                          }
+                        >
+                          <DropdownMenuRadioItem value="null">
+                            {t.allPharmacies}
+                          </DropdownMenuRadioItem>
+                          <DropdownMenuRadioItem
+                            value="true"
+                            className="bg-emerald-100 text-emerald-800 focus:bg-emerald-200 focus:text-emerald-900 m-1 cursor-pointer"
+                          >
+                            {t.yes}
+                          </DropdownMenuRadioItem>
+                          <DropdownMenuRadioItem
+                            value="false"
+                            className="bg-red-100 text-red-800 focus:bg-red-200 focus:text-red-900 m-1 cursor-pointer"
+                          >
+                            {t.no}
+                          </DropdownMenuRadioItem>
+                        </DropdownMenuRadioGroup>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </th>
+                  <th className="px-2 md:px-4 py-2 md:py-3 text-center font-semibold text-gray-700 whitespace-nowrap min-w-max">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="-ml-3 h-8 data-[state=open]:bg-purple-600 data-[state=open]:text-white"
+                        >
+                          <span>{t.training}</span>
+                          <ChevronDown className="ml-2 h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="start">
+                        <DropdownMenuRadioGroup
+                          value={
+                            trainingFilter === true
+                              ? "true"
+                              : trainingFilter === false
+                                ? "false"
+                                : "null"
+                          }
+                          onValueChange={(val) =>
+                            handleFilterChange(val, onTrainingFilterChange)
+                          }
+                        >
+                          <DropdownMenuRadioItem value="null">
+                            {t.allPharmacies}
+                          </DropdownMenuRadioItem>
+                          <DropdownMenuRadioItem
+                            value="true"
+                            className="bg-emerald-100 text-emerald-800 focus:bg-emerald-200 focus:text-emerald-900 m-1 cursor-pointer"
+                          >
+                            {t.yes}
+                          </DropdownMenuRadioItem>
+                          <DropdownMenuRadioItem
+                            value="false"
+                            className="bg-red-100 text-red-800 focus:bg-red-200 focus:text-red-900 m-1 cursor-pointer"
+                          >
+                            {t.no}
+                          </DropdownMenuRadioItem>
+                        </DropdownMenuRadioGroup>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </th>
+                  <th className="px-2 md:px-4 py-2 md:py-3 text-center font-semibold text-gray-700 whitespace-nowrap min-w-max">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="-ml-3 h-8 data-[state=open]:bg-purple-600 data-[state=open]:text-white"
+                        >
+                          <span>{t.brandedPacket}</span>
+                          <ChevronDown className="ml-2 h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="start">
+                        <DropdownMenuRadioGroup
+                          value={
+                            brandedPacketFilter === true
+                              ? "true"
+                              : brandedPacketFilter === false
+                                ? "false"
+                                : "null"
+                          }
+                          onValueChange={(val) =>
+                            handleFilterChange(val, onBrandedPacketFilterChange)
+                          }
+                        >
+                          <DropdownMenuRadioItem value="null">
+                            {t.allPharmacies}
+                          </DropdownMenuRadioItem>
+                          <DropdownMenuRadioItem
+                            value="true"
+                            className="bg-emerald-100 text-emerald-800 focus:bg-emerald-200 focus:text-emerald-900 m-1 cursor-pointer"
+                          >
+                            {t.yes}
+                          </DropdownMenuRadioItem>
+                          <DropdownMenuRadioItem
+                            value="false"
+                            className="bg-red-100 text-red-800 focus:bg-red-200 focus:text-red-900 m-1 cursor-pointer"
+                          >
+                            {t.no}
+                          </DropdownMenuRadioItem>
+                        </DropdownMenuRadioGroup>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </th>
+                  <th className="px-2 md:px-4 py-2 md:py-3 text-left font-semibold text-gray-700 whitespace-nowrap min-w-max">
+                    {t.status}
+                  </th>
+                  {isAdmin && (
                     <>
                       <th className="px-2 md:px-4 py-2 md:py-3 text-left font-semibold text-gray-700 whitespace-nowrap min-w-max">
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="-ml-3 h-8 data-[state=open]:bg-purple-600 data-[state=open]:text-white"
-                            >
-                              <div className="flex flex-col items-start">
-                                <span>{t.lastCommentDate || "Дата"}</span>
-                                <span className="text-[10px] font-normal text-gray-500">Lead</span>
-                              </div>
-                              <ChevronDown className="ml-2 h-4 w-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent className="w-64 p-4" align="start">
-                            <div className="space-y-4">
-                              <div className="space-y-2">
-                                <label className="text-sm font-medium">{t.dateFrom}</label>
-                                <Input
-                                  type="date"
-                                  value={commentDateFilter?.from || ""}
-                                  onChange={(e) => handleDateFilterChange("from", e.target.value)}
-                                />
-                              </div>
-                              <div className="space-y-2">
-                                <label className="text-sm font-medium">{t.dateTo}</label>
-                                <Input
-                                  type="date"
-                                  value={commentDateFilter?.to || ""}
-                                  onChange={(e) => handleDateFilterChange("to", e.target.value)}
-                                />
-                              </div>
-                            </div>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </th>
-                      <th className="px-2 md:px-4 py-2 md:py-3 text-left font-semibold text-gray-700 whitespace-nowrap min-w-max">
-                        {onCommentUserFilterChange && commentUserOptions && commentUserOptions.length > 0 ? (
+                        {onLeadStatusFilterChange && leadStatusOptions && leadStatusOptions.length > 0 ? (
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                               <Button
@@ -647,77 +820,159 @@ export function PharmacyTable({
                                 size="sm"
                                 className="-ml-3 h-8 data-[state=open]:bg-purple-600 data-[state=open]:text-white"
                               >
-                                <div className="flex flex-col items-start">
-                                  <span>{t.lastCommentUser || "Автор"}</span>
-                                  <span className="text-[10px] font-normal text-gray-500">Lead</span>
-                                </div>
+                                <span>{t.leadStatus}</span>
                                 <ChevronDown className="ml-2 h-4 w-4" />
                               </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="start">
                               <DropdownMenuRadioGroup
-                                value={commentUserFilter || "null"}
+                                value={leadStatusFilter || "null"}
                                 onValueChange={(val) =>
-                                  handleStringFilterChange(val, onCommentUserFilterChange)
+                                  handleStringFilterChange(val, onLeadStatusFilterChange)
                                 }
                               >
                                 <DropdownMenuRadioItem value="null">
                                   {t.all || "Все"}
                                 </DropdownMenuRadioItem>
-                                {commentUserOptions.map((user) => (
+                                {leadStatusOptions.map((status) => (
                                   <DropdownMenuRadioItem
-                                    key={user}
-                                    value={user}
+                                    key={status}
+                                    value={status}
                                     className="cursor-pointer"
                                   >
-                                    {user}
+                                    {status}
                                   </DropdownMenuRadioItem>
                                 ))}
                               </DropdownMenuRadioGroup>
                             </DropdownMenuContent>
                           </DropdownMenu>
                         ) : (
-                          <div className="flex flex-col items-start">
-                            <span>{t.lastCommentUser || "Автор"}</span>
-                            <span className="text-[10px] font-normal text-gray-500">Lead</span>
-                          </div>
+                          t.leadStatus
                         )}
                       </th>
-                      <th className="px-2 md:px-4 py-2 md:py-3 text-left font-semibold text-gray-700 whitespace-nowrap min-w-[200px]">
+
+                      {/* New Comment Headers */}
+                      {showComments && (
+                        <>
+                          <th className="px-2 md:px-4 py-2 md:py-3 text-left font-semibold text-gray-700 whitespace-nowrap min-w-max">
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className="-ml-3 h-8 data-[state=open]:bg-purple-600 data-[state=open]:text-white"
+                                >
+                                  <div className="flex flex-col items-start">
+                                    <span>{t.lastCommentDate || "Дата"}</span>
+                                    <span className="text-[10px] font-normal text-gray-500">Lead</span>
+                                  </div>
+                                  <ChevronDown className="ml-2 h-4 w-4" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent className="w-64 p-4" align="start">
+                                <div className="space-y-4">
+                                  <div className="space-y-2">
+                                    <label className="text-sm font-medium">{t.dateFrom}</label>
+                                    <Input
+                                      type="date"
+                                      value={commentDateFilter?.from || ""}
+                                      onChange={(e) => handleDateFilterChange("from", e.target.value)}
+                                    />
+                                  </div>
+                                  <div className="space-y-2">
+                                    <label className="text-sm font-medium">{t.dateTo}</label>
+                                    <Input
+                                      type="date"
+                                      value={commentDateFilter?.to || ""}
+                                      onChange={(e) => handleDateFilterChange("to", e.target.value)}
+                                    />
+                                  </div>
+                                </div>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </th>
+                          <th className="px-2 md:px-4 py-2 md:py-3 text-left font-semibold text-gray-700 whitespace-nowrap min-w-max">
+                            {onCommentUserFilterChange && commentUserOptions && commentUserOptions.length > 0 ? (
+                              <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className="-ml-3 h-8 data-[state=open]:bg-purple-600 data-[state=open]:text-white"
+                                  >
+                                    <div className="flex flex-col items-start">
+                                      <span>{t.lastCommentUser || "Автор"}</span>
+                                      <span className="text-[10px] font-normal text-gray-500">Lead</span>
+                                    </div>
+                                    <ChevronDown className="ml-2 h-4 w-4" />
+                                  </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="start">
+                                  <DropdownMenuRadioGroup
+                                    value={commentUserFilter || "null"}
+                                    onValueChange={(val) =>
+                                      handleStringFilterChange(val, onCommentUserFilterChange)
+                                    }
+                                  >
+                                    <DropdownMenuRadioItem value="null">
+                                      {t.all || "Все"}
+                                    </DropdownMenuRadioItem>
+                                    {commentUserOptions.map((user) => (
+                                      <DropdownMenuRadioItem
+                                        key={user}
+                                        value={user}
+                                        className="cursor-pointer"
+                                      >
+                                        {user}
+                                      </DropdownMenuRadioItem>
+                                    ))}
+                                  </DropdownMenuRadioGroup>
+                                </DropdownMenuContent>
+                              </DropdownMenu>
+                            ) : (
+                              <div className="flex flex-col items-start">
+                                <span>{t.lastCommentUser || "Автор"}</span>
+                                <span className="text-[10px] font-normal text-gray-500">Lead</span>
+                              </div>
+                            )}
+                          </th>
+                          <th className="px-2 md:px-4 py-2 md:py-3 text-left font-semibold text-gray-700 whitespace-nowrap min-w-[200px]">
+                            <div className="flex flex-col items-start">
+                              <span>{t.lastComment || "Коммент"}</span>
+                              <span className="text-[10px] font-normal text-gray-500">Lead</span>
+                            </div>
+                          </th>
+                        </>
+                      )}
+                      <th className="px-2 md:px-4 py-2 md:py-3 text-left font-semibold text-gray-700 whitespace-nowrap min-w-max">
+                        {t.stir}
+                      </th>
+                      <th className="px-2 md:px-4 py-2 md:py-3 text-left font-semibold text-gray-700 whitespace-nowrap min-w-max">
                         <div className="flex flex-col items-start">
-                          <span>{t.lastComment || "Коммент"}</span>
+                          <span>{t.additionalPhone}</span>
                           <span className="text-[10px] font-normal text-gray-500">Lead</span>
                         </div>
                       </th>
+                      <th className="px-2 md:px-4 py-2 md:py-3 text-left font-semibold text-gray-700 whitespace-nowrap min-w-[180px]">
+                        {t.juridicalName}
+                      </th>
+                      <th
+                        className="px-2 md:px-4 py-2 md:py-3 text-left font-semibold text-gray-700"
+                        style={{ width: "200px", minWidth: "200px" }}
+                      >
+                        <div className="break-words">{t.juridicalAddress}</div>
+                      </th>
+                      <th className="px-2 md:px-4 py-2 md:py-3 text-left font-semibold text-gray-700 whitespace-nowrap min-w-[150px]">
+                        {t.bankName}
+                      </th>
+                      <th className="px-2 md:px-4 py-2 md:py-3 text-left font-semibold text-gray-700 whitespace-nowrap min-w-[150px]">
+                        {t.bankAccount}
+                      </th>
+                      <th className="px-2 md:px-4 py-2 md:py-3 text-left font-semibold text-gray-700 whitespace-nowrap min-w-max">
+                        {t.mfo}
+                      </th>
                     </>
                   )}
-                  <th className="px-2 md:px-4 py-2 md:py-3 text-left font-semibold text-gray-700 whitespace-nowrap min-w-max">
-                    {t.stir}
-                  </th>
-                  <th className="px-2 md:px-4 py-2 md:py-3 text-left font-semibold text-gray-700 whitespace-nowrap min-w-max">
-                    <div className="flex flex-col items-start">
-                      <span>{t.additionalPhone}</span>
-                      <span className="text-[10px] font-normal text-gray-500">Lead</span>
-                    </div>
-                  </th>
-                  <th className="px-2 md:px-4 py-2 md:py-3 text-left font-semibold text-gray-700 whitespace-nowrap min-w-[180px]">
-                    {t.juridicalName}
-                  </th>
-                  <th
-                    className="px-2 md:px-4 py-2 md:py-3 text-left font-semibold text-gray-700"
-                    style={{ width: "200px", minWidth: "200px" }}
-                  >
-                    <div className="break-words">{t.juridicalAddress}</div>
-                  </th>
-                  <th className="px-2 md:px-4 py-2 md:py-3 text-left font-semibold text-gray-700 whitespace-nowrap min-w-[150px]">
-                    {t.bankName}
-                  </th>
-                  <th className="px-2 md:px-4 py-2 md:py-3 text-left font-semibold text-gray-700 whitespace-nowrap min-w-[150px]">
-                    {t.bankAccount}
-                  </th>
-                  <th className="px-2 md:px-4 py-2 md:py-3 text-left font-semibold text-gray-700 whitespace-nowrap min-w-max">
-                    {t.mfo}
-                  </th>
                 </>
               )}
             </tr>
@@ -745,182 +1000,232 @@ export function PharmacyTable({
                     key={pharmacy.id}
                     className="hover:bg-gray-50 transition-colors"
                   >
-                    <td className="px-2 py-2 md:py-3 text-gray-900 font-medium whitespace-nowrap align-top">
-                      {index + 1}
-                    </td>
-                    {isLeadsPage && (
-                      <td className="px-2 py-2 md:py-3 text-center align-top">
-                        <input
-                          type="checkbox"
-                          checked={selectedRows?.has(pharmacy.id) || false}
-                          onChange={(e) => {
-                            const newSelection = new Set(selectedRows);
-                            if (e.target.checked) {
-                              newSelection.add(pharmacy.id);
-                            } else {
-                              newSelection.delete(pharmacy.id);
-                            }
-                            onSelectionChange?.(newSelection);
-                          }}
-                          className="cursor-pointer"
-                        />
-                      </td>
-                    )}
-                    <td className="px-2 py-2 md:py-3 text-gray-900 whitespace-nowrap align-top">
-                      <button
-                        onClick={() => onPharmacyClick?.(pharmacy)}
-                        className="text-blue-600 hover:text-blue-800 hover:underline font-medium transition-colors"
-                      >
-                        {pharmacy.code}
-                      </button>
-                    </td>
-                    <td className="px-2 py-2 md:py-3 text-gray-900 font-medium align-top">
-                      <div
-                        className="break-words overflow-hidden"
-                        style={{
-                          display: "-webkit-box",
-                          WebkitLineClamp: 3,
-                          WebkitBoxOrient: "vertical",
-                          lineHeight: "1.4em",
-                          minHeight: "4.2em",
-                        }}
-                      >
-                        {pharmacy.name}
-                      </div>
-                    </td>
-                    <td className="px-2 py-2 md:py-3 text-gray-600 align-top">
-                      <div
-                        className="break-words overflow-hidden"
-                        style={{
-                          display: "-webkit-box",
-                          WebkitLineClamp: 3,
-                          WebkitBoxOrient: "vertical",
-                          lineHeight: "1.4em",
-                          minHeight: "4.2em",
-                        }}
-                      >
-                        {pharmacy.address}
-                      </div>
-                    </td>
-                    <td className="px-2 py-2 md:py-3 text-gray-600 align-top">
-                      <div
-                        className="break-words"
-                        style={{ lineHeight: "1.4em", minHeight: "4.2em" }}
-                      >
-                        {(pharmacy as any).landmark || "-"}
-                      </div>
-                    </td>
-                    <td className="px-2 py-2 md:py-3 text-gray-900 whitespace-nowrap align-top">
-                      {pharmacy.phone || "-"}
-                    </td>
-                    <td className="px-2 py-2 md:py-3 text-gray-900 whitespace-nowrap align-top">
-                      {pharmacy.lead?.phone || "-"}
-                    </td>
-
-                    <td className="px-2 md:px-4 py-2 md:py-3 text-center">
-                      <div
-                        className={`font-bold text-xs px-2 py-1 rounded inline-block whitespace-nowrap ${hasTelegramBot
-                          ? "bg-green-100 text-green-800"
-                          : "bg-red-100 text-red-800"
-                          }`}
-                      >
-                        {getTelegramBotStatus(marketChats)}
-                      </div>
-                    </td>
-                    <td className="px-2 md:px-4 py-2 md:py-3 text-center">
-                      <span
-                        className={`px-2 py-1 rounded text-xs font-bold inline-block whitespace-nowrap ${(pharmacy as any).training
-                          ? "bg-green-100 text-green-800"
-                          : "bg-red-100 text-red-800"
-                          }`}
-                      >
-                        {getTrainingStatusText((pharmacy as any).training)}
-                      </span>
-                    </td>
-                    <td className="px-2 md:px-4 py-2 md:py-3 text-center">
-                      <span
-                        className={`px-2 py-1 rounded text-xs font-bold inline-block whitespace-nowrap ${(pharmacy as any).brandedPacket
-                          ? "bg-green-100 text-green-800"
-                          : "bg-red-100 text-red-800"
-                          }`}
-                      >
-                        {getStatusText((pharmacy as any).brandedPacket)}
-                      </span>
-                    </td>
-                    <td className="px-2 md:px-4 py-2 md:py-3">
-                      <span
-                        className={`px-2 py-1 rounded text-xs font-bold whitespace-nowrap inline-block ${pharmacy.active
-                          ? "bg-emerald-100 text-emerald-800"
-                          : "bg-red-100 text-red-800"
-                          }`}
-                      >
-                        {pharmacy.active ? t.active : t.inactive}
-                      </span>
-                    </td>
-                    {isAdmin && (
+                    {orderedColumns ? (
                       <>
-                        <td className="px-2 md:px-4 py-2 md:py-3 text-gray-900 text-xs">
-                          {pharmacy.lead?.status || "-"}
-                        </td>
-
-                        {/* New Comment Columns */}
-                        {showComments && (
-                          <>
-                            {/* Date Column: Just Date */}
-                            <td className="px-2 md:px-4 py-2 md:py-3 text-gray-900 text-xs whitespace-nowrap align-middle">
-                              {(() => {
-                                const last = getLastComment(pharmacy.comments || []);
-                                if (!last) return "-";
-                                return (
-                                  <span className="font-semibold">{formatDate(last.createdAt)}</span>
-                                );
-                              })()}
-                            </td>
-                            {/* Author Column: Just Phone/Name */}
-                            <td className="px-2 md:px-4 py-2 md:py-3 text-gray-900 text-xs whitespace-nowrap align-middle">
-                              {(() => {
-                                const last = getLastComment(pharmacy.comments || []);
-                                if (!last) return "-";
-                                return (
-                                  <span className="text-gray-500 text-xs">{last.creator?.phone || "-"}</span>
-                                );
-                              })()}
-                            </td>
-                            {/* Comment Text Column */}
-                            <td className="px-2 md:px-4 py-2 md:py-3 text-gray-900 text-xs align-middle">
-                              <div className="max-w-[200px] break-words">
-                                {getLastComment(pharmacy.comments || [])?.coment || getLastComment(pharmacy.comments || [])?.comment || "-"}
-                              </div>
-                            </td>
-                          </>
+                        {/* Fallback Checkbox if 'number' is hidden */}
+                        {isLeadsPage && !orderedColumns.some(c => c.id === 'number') && (
+                          <td className="px-2 py-2 md:py-3 text-center align-top">
+                            <input
+                              type="checkbox"
+                              checked={selectedRows?.has(pharmacy.id) || false}
+                              onChange={(e) => {
+                                const newSelection = new Set(selectedRows);
+                                if (e.target.checked) {
+                                  newSelection.add(pharmacy.id);
+                                } else {
+                                  newSelection.delete(pharmacy.id);
+                                }
+                                onSelectionChange?.(newSelection);
+                              }}
+                              className="cursor-pointer"
+                            />
+                          </td>
                         )}
-
-                        <td className="px-2 md:px-4 py-2 md:py-3 text-gray-900 text-xs whitespace-nowrap">
-                          {(pharmacy.lead as any)?.stir || "-"}
+                        {orderedColumns.map(col => (
+                          <React.Fragment key={col.id}>
+                            {/* Checkbox after Number column to match original layout */}
+                            {isLeadsPage && col.id === 'number' && (
+                              <td className="px-2 py-2 md:py-3 text-center align-top">
+                                <input
+                                  type="checkbox"
+                                  checked={selectedRows?.has(pharmacy.id) || false}
+                                  onChange={(e) => {
+                                    const newSelection = new Set(selectedRows);
+                                    if (e.target.checked) {
+                                      newSelection.add(pharmacy.id);
+                                    } else {
+                                      newSelection.delete(pharmacy.id);
+                                    }
+                                    onSelectionChange?.(newSelection);
+                                  }}
+                                  className="cursor-pointer"
+                                />
+                              </td>
+                            )}
+                            {renderDynamicCell(col, pharmacy, index)}
+                          </React.Fragment>
+                        ))}
+                      </>
+                    ) : (
+                      <>
+                        <td className="px-2 py-2 md:py-3 text-gray-900 font-medium whitespace-nowrap align-top">
+                          {index + 1}
                         </td>
-                        <td className="px-2 md:px-4 py-2 md:py-3 text-gray-900 text-xs whitespace-nowrap">
-                          {(pharmacy.lead as any)?.additionalPhone || "-"}
+                        {isLeadsPage && (
+                          <td className="px-2 py-2 md:py-3 text-center align-top">
+                            <input
+                              type="checkbox"
+                              checked={selectedRows?.has(pharmacy.id) || false}
+                              onChange={(e) => {
+                                const newSelection = new Set(selectedRows);
+                                if (e.target.checked) {
+                                  newSelection.add(pharmacy.id);
+                                } else {
+                                  newSelection.delete(pharmacy.id);
+                                }
+                                onSelectionChange?.(newSelection);
+                              }}
+                              className="cursor-pointer"
+                            />
+                          </td>
+                        )}
+                        <td className="px-2 py-2 md:py-3 text-gray-900 whitespace-nowrap align-top">
+                          <button
+                            onClick={() => onPharmacyClick?.(pharmacy)}
+                            className="text-blue-600 hover:text-blue-800 hover:underline font-medium transition-colors"
+                          >
+                            {pharmacy.code}
+                          </button>
                         </td>
-                        <td className="px-2 md:px-4 py-2 md:py-3 text-gray-600 text-xs max-w-xs truncate">
-                          {(pharmacy.lead as any)?.juridicalName || "-"}
+                        <td className="px-2 py-2 md:py-3 text-gray-900 font-medium align-top">
+                          <div
+                            className="break-words overflow-hidden"
+                            style={{
+                              display: "-webkit-box",
+                              WebkitLineClamp: 3,
+                              WebkitBoxOrient: "vertical",
+                              lineHeight: "1.4em",
+                              minHeight: "4.2em",
+                            }}
+                          >
+                            {pharmacy.name}
+                          </div>
                         </td>
-                        <td className="px-2 md:px-4 py-2 md:py-3 text-gray-600 text-xs align-top">
+                        <td className="px-2 py-2 md:py-3 text-gray-600 align-top">
+                          <div
+                            className="break-words overflow-hidden"
+                            style={{
+                              display: "-webkit-box",
+                              WebkitLineClamp: 3,
+                              WebkitBoxOrient: "vertical",
+                              lineHeight: "1.4em",
+                              minHeight: "4.2em",
+                            }}
+                          >
+                            {pharmacy.address}
+                          </div>
+                        </td>
+                        <td className="px-2 py-2 md:py-3 text-gray-600 align-top">
                           <div
                             className="break-words"
                             style={{ lineHeight: "1.4em", minHeight: "4.2em" }}
                           >
-                            {(pharmacy.lead as any)?.juridicalAddress || "-"}
+                            {(pharmacy as any).landmark || "-"}
                           </div>
                         </td>
-                        <td className="px-2 md:px-4 py-2 md:py-3 text-gray-600 text-xs max-w-xs truncate">
-                          {(pharmacy.lead as any)?.bankName || "-"}
+                        <td className="px-2 py-2 md:py-3 text-gray-900 whitespace-nowrap align-top">
+                          {pharmacy.phone || "-"}
                         </td>
-                        <td className="px-2 md:px-4 py-2 md:py-3 text-gray-900 text-xs font-mono whitespace-nowrap">
-                          {(pharmacy.lead as any)?.bankAccount || "-"}
+                        <td className="px-2 py-2 md:py-3 text-gray-900 whitespace-nowrap align-top">
+                          {pharmacy.lead?.phone || "-"}
                         </td>
-                        <td className="px-2 md:px-4 py-2 md:py-3 text-gray-900 text-xs whitespace-nowrap">
-                          {(pharmacy.lead as any)?.mfo || "-"}
+
+                        <td className="px-2 md:px-4 py-2 md:py-3 text-center">
+                          <div
+                            className={`font-bold text-xs px-2 py-1 rounded inline-block whitespace-nowrap ${hasTelegramBot
+                              ? "bg-green-100 text-green-800"
+                              : "bg-red-100 text-red-800"
+                              }`}
+                          >
+                            {getTelegramBotStatus(marketChats)}
+                          </div>
                         </td>
+                        <td className="px-2 md:px-4 py-2 md:py-3 text-center">
+                          <span
+                            className={`px-2 py-1 rounded text-xs font-bold inline-block whitespace-nowrap ${(pharmacy as any).training
+                              ? "bg-green-100 text-green-800"
+                              : "bg-red-100 text-red-800"
+                              }`}
+                          >
+                            {getTrainingStatusText((pharmacy as any).training)}
+                          </span>
+                        </td>
+                        <td className="px-2 md:px-4 py-2 md:py-3 text-center">
+                          <span
+                            className={`px-2 py-1 rounded text-xs font-bold inline-block whitespace-nowrap ${(pharmacy as any).brandedPacket
+                              ? "bg-green-100 text-green-800"
+                              : "bg-red-100 text-red-800"
+                              }`}
+                          >
+                            {getStatusText((pharmacy as any).brandedPacket)}
+                          </span>
+                        </td>
+                        <td className="px-2 md:px-4 py-2 md:py-3">
+                          <span
+                            className={`px-2 py-1 rounded text-xs font-bold whitespace-nowrap inline-block ${pharmacy.active
+                              ? "bg-emerald-100 text-emerald-800"
+                              : "bg-red-100 text-red-800"
+                              }`}
+                          >
+                            {pharmacy.active ? t.active : t.inactive}
+                          </span>
+                        </td>
+                        {isAdmin && (
+                          <>
+                            <td className="px-2 md:px-4 py-2 md:py-3 text-gray-900 text-xs">
+                              {pharmacy.lead?.status || "-"}
+                            </td>
+
+                            {/* New Comment Columns */}
+                            {showComments && (
+                              <>
+                                {/* Date Column: Just Date */}
+                                <td className="px-2 md:px-4 py-2 md:py-3 text-gray-900 text-xs whitespace-nowrap align-middle">
+                                  {(() => {
+                                    const last = getLastComment(pharmacy.comments || []);
+                                    if (!last) return "-";
+                                    return (
+                                      <span className="font-semibold">{formatDate(last.createdAt)}</span>
+                                    );
+                                  })()}
+                                </td>
+                                {/* Author Column: Just Phone/Name */}
+                                <td className="px-2 md:px-4 py-2 md:py-3 text-gray-900 text-xs whitespace-nowrap align-middle">
+                                  {(() => {
+                                    const last = getLastComment(pharmacy.comments || []);
+                                    if (!last) return "-";
+                                    return (
+                                      <span className="text-gray-500 text-xs">{last.creator?.phone || "-"}</span>
+                                    );
+                                  })()}
+                                </td>
+                                {/* Comment Text Column */}
+                                <td className="px-2 md:px-4 py-2 md:py-3 text-gray-900 text-xs align-middle">
+                                  <div className="max-w-[200px] break-words">
+                                    {getLastComment(pharmacy.comments || [])?.coment || getLastComment(pharmacy.comments || [])?.comment || "-"}
+                                  </div>
+                                </td>
+                              </>
+                            )}
+
+                            <td className="px-2 md:px-4 py-2 md:py-3 text-gray-900 text-xs whitespace-nowrap">
+                              {(pharmacy.lead as any)?.stir || "-"}
+                            </td>
+                            <td className="px-2 md:px-4 py-2 md:py-3 text-gray-900 text-xs whitespace-nowrap">
+                              {(pharmacy.lead as any)?.additionalPhone || "-"}
+                            </td>
+                            <td className="px-2 md:px-4 py-2 md:py-3 text-gray-600 text-xs max-w-xs truncate">
+                              {(pharmacy.lead as any)?.juridicalName || "-"}
+                            </td>
+                            <td className="px-2 md:px-4 py-2 md:py-3 text-gray-600 text-xs align-top">
+                              <div
+                                className="break-words"
+                                style={{ lineHeight: "1.4em", minHeight: "4.2em" }}
+                              >
+                                {(pharmacy.lead as any)?.juridicalAddress || "-"}
+                              </div>
+                            </td>
+                            <td className="px-2 md:px-4 py-2 md:py-3 text-gray-600 text-xs max-w-xs truncate">
+                              {(pharmacy.lead as any)?.bankName || "-"}
+                            </td>
+                            <td className="px-2 md:px-4 py-2 md:py-3 text-gray-900 text-xs font-mono whitespace-nowrap">
+                              {(pharmacy.lead as any)?.bankAccount || "-"}
+                            </td>
+                            <td className="px-2 md:px-4 py-2 md:py-3 text-gray-900 text-xs whitespace-nowrap">
+                              {(pharmacy.lead as any)?.mfo || "-"}
+                            </td>
+                          </>
+                        )}
                       </>
                     )}
                   </tr>
