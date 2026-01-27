@@ -149,11 +149,6 @@ export default function PharmacyMaps() {
         behaviors: ["default", "scrollZoom"],
       });
 
-      // Set map theme based on current theme
-      if (theme === 'dark') {
-        mapRef.current.options.set('theme', 'dark');
-      }
-
       console.log("✅ Map initialized successfully");
       console.log(
         `🌍 API Backend URL: ${import.meta.env.VITE_BACKEND_URL || "default"}`,
