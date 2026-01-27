@@ -1,5 +1,6 @@
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
+import { useTheme } from "@/contexts/ThemeContext";
 import { useNavigate, useLocation } from "react-router-dom";
 import {
   ChevronDown,
@@ -13,6 +14,8 @@ import {
   Activity,
   Store,
   Menu,
+  Moon,
+  Sun,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -25,6 +28,7 @@ import { Button } from "@/components/ui/button";
 export function Header() {
   const { language, setLanguage, t } = useLanguage();
   const { logout, role } = useAuth(); // Destructure role here
+  const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -81,7 +85,7 @@ export function Header() {
   }
 
   return (
-    <header className="bg-white border-b border-gray-200 shadow-sm sticky top-0 z-50">
+    <header className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 shadow-sm sticky top-0 z-50 transition-colors">
       <div className="w-full max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-3 md:py-4 flex flex-wrap items-center justify-between gap-y-3">
         {/* Hamburger Menu - Top Left */}
         <div className="order-1">
@@ -90,7 +94,7 @@ export function Header() {
               <Button
                 variant="ghost"
                 size="icon"
-                className="text-gray-600 hover:text-purple-700 h-9 w-9 md:h-10 md:w-10"
+                className="text-gray-600 dark:text-gray-300 hover:text-purple-700 dark:hover:text-purple-400 h-9 w-9 md:h-10 md:w-10"
                 aria-label="Navigation menu"
               >
                 <Menu className="h-5 w-5" />
@@ -104,7 +108,7 @@ export function Header() {
                   <DropdownMenuItem
                     key={item.path}
                     onClick={() => navigate(item.path)}
-                    className={`cursor-pointer ${isActive ? "bg-purple-50 text-purple-700" : ""
+                    className={`cursor-pointer ${isActive ? "bg-purple-50 text-purple-700 dark:bg-purple-900 dark:text-purple-300" : ""
                       }`}
                   >
                     <Icon className="h-4 w-4 mr-2" />
@@ -124,20 +128,35 @@ export function Header() {
             className="w-10 h-10 md:w-12 md:h-12"
           />
           <div>
-            <div className="font-bold text-lg md:text-xl text-purple-700">
+            <div className="font-bold text-lg md:text-xl text-purple-700 dark:text-purple-400">
               {t.siteTitle || "Aptekalar holati"}
             </div>
           </div>
         </div>
 
-        {/* Language & Logout - Order 2 Mobile, Order 3 Desktop (Right aligned) */}
+        {/* Theme, Language & Logout - Order 2 Mobile, Order 3 Desktop (Right aligned) */}
         <div className="flex items-center gap-2 order-2 md:order-3">
+          {/* Theme Toggle Button */}
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={toggleTheme}
+            className="text-gray-600 dark:text-gray-300 hover:text-purple-700 dark:hover:text-purple-400 h-9 w-9 md:h-10 md:w-10"
+            aria-label="Toggle theme"
+          >
+            {theme === 'light' ? (
+              <Moon className="h-5 w-5" />
+            ) : (
+              <Sun className="h-5 w-5" />
+            )}
+          </Button>
+
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
                 variant="ghost"
                 size="icon"
-                className="text-gray-600 hover:text-purple-700 h-9 w-9 md:h-10 md:w-10"
+                className="text-gray-600 dark:text-gray-300 hover:text-purple-700 dark:hover:text-purple-400 h-9 w-9 md:h-10 md:w-10"
               >
                 <Globe className="h-5 w-5" />
               </Button>
@@ -146,7 +165,7 @@ export function Header() {
               <DropdownMenuItem
                 onClick={() => setLanguage("ru")}
                 className={
-                  language === "ru" ? "bg-purple-50 text-purple-700" : ""
+                  language === "ru" ? "bg-purple-50 text-purple-700 dark:bg-purple-900 dark:text-purple-300" : ""
                 }
               >
                 🇷🇺 Русский
@@ -154,7 +173,7 @@ export function Header() {
               <DropdownMenuItem
                 onClick={() => setLanguage("uz")}
                 className={
-                  language === "uz" ? "bg-purple-50 text-purple-700" : ""
+                  language === "uz" ? "bg-purple-50 text-purple-700 dark:bg-purple-900 dark:text-purple-300" : ""
                 }
               >
                 🇺🇿 O'zbekcha
@@ -165,7 +184,7 @@ export function Header() {
           <Button
             onClick={handleLogout}
             variant="outline"
-            className="h-9 w-9 md:w-auto md:px-3 p-0 md:py-2 text-purple-700 border-purple-700 hover:bg-purple-50 hover:text-purple-700 text-sm justify-center"
+            className="h-9 w-9 md:w-auto md:px-3 p-0 md:py-2 text-purple-700 dark:text-purple-400 border-purple-700 dark:border-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900 hover:text-purple-700 dark:hover:text-purple-300 text-sm justify-center"
           >
             <LogOut className="h-5 w-5 md:mr-2 md:h-4 md:w-4" />
             <span className="hidden md:block">{t.logout}</span>
