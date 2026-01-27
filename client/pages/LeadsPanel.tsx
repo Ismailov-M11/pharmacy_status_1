@@ -7,6 +7,7 @@ import { Header } from "@/components/Header";
 import { PharmacyDetailModal } from "@/components/PharmacyDetailModal";
 import { ColumnSettingsModal } from "@/components/ColumnSettingsModal";
 import { SettingsMenuModal } from "@/components/SettingsMenuModal";
+import { StirFilterModal } from "@/components/StirFilterModal";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 
@@ -29,6 +30,9 @@ export default function LeadsPanel() {
     const [leadStatusFilter, setLeadStatusFilter] = useState<string | null>(null);
     const [commentUserFilter, setCommentUserFilter] = useState<string | null>(null);
     const [commentDateFilter, setCommentDateFilter] = useState<{ from: string | null, to: string | null }>({ from: null, to: null });
+    const [stirFilter, setStirFilter] = useState<string[]>([]);
+    const [stirSortOrder, setStirSortOrder] = useState<'asc' | 'desc' | null>(null);
+    const [isStirModalOpen, setIsStirModalOpen] = useState(false);
 
     // Leads-specific features
     const [selectedRows, setSelectedRows] = useState<Set<number>>(new Set());
@@ -57,6 +61,19 @@ export default function LeadsPanel() {
         });
         return Array.from(users).sort();
     }, [leads]);
+
+    // Unique STIR values for filtering
+    const uniqueStirs = useMemo(() => {
+        const stirs: string[] = [];
+        leads.forEach(l => {
+            if (l.stir) stirs.push(l.stir);
+        });
+        return stirs; // Keep duplicates for counting
+    }, [leads]);
+
+    const uniqueStirSet = useMemo(() => {
+        return Array.from(new Set(uniqueStirs)).sort();
+    }, [uniqueStirs]);
 
     // Default Columns Definition
     const defaultColumns: ColumnSettings[] = useMemo(() => [
@@ -295,10 +312,29 @@ export default function LeadsPanel() {
                 }
             }
 
-            return matchesSearch && matchesLeadStatus && matchesActive && matchesCommentUser && matchesCommentDate;
+            // 6. STIR Filter
+            const matchesStir = stirFilter.length === 0
+                ? true
+                : p.stir && stirFilter.includes(p.stir);
+
+            return matchesSearch && matchesLeadStatus && matchesActive && matchesCommentUser && matchesCommentDate && matchesStir;
         });
+
+        // Apply STIR sorting if enabled
+        if (stirSortOrder) {
+            filtered.sort((a, b) => {
+                const stirA = a.stir || '';
+                const stirB = b.stir || '';
+                if (stirSortOrder === 'asc') {
+                    return stirA.localeCompare(stirB);
+                } else {
+                    return stirB.localeCompare(stirA);
+                }
+            });
+        }
+
         setFilteredLeads(filtered);
-    }, [searchQuery, leads, leadStatusFilter, activeFilter, commentUserFilter, commentDateFilter]);
+    }, [searchQuery, leads, leadStatusFilter, activeFilter, commentUserFilter, commentDateFilter, stirFilter, stirSortOrder]);
 
     if (authLoading) {
         return (
@@ -366,6 +402,11 @@ export default function LeadsPanel() {
                         onSelectionChange={setSelectedRows}
                         onSettingsClick={() => setIsSettingsMenuOpen(true)}
                         columnSettings={columnSettings}
+
+                        // STIR Filter
+                        stirFilter={stirFilter}
+                        stirSortOrder={stirSortOrder}
+                        onStirFilterClick={() => setIsStirModalOpen(true)}
                     />
                 </div>
             </main>
@@ -404,6 +445,20 @@ export default function LeadsPanel() {
                             toast.error(t.error || "Error saving settings");
                         }
                     }
+                }}
+            />
+
+            {/* STIR Filter Modal */}
+            <StirFilterModal
+                isOpen={isStirModalOpen}
+                onClose={() => setIsStirModalOpen(false)}
+                allStirValues={uniqueStirs}
+                selectedStirs={stirFilter}
+                sortOrder={stirSortOrder}
+                onApply={(selected, sort) => {
+                    setStirFilter(selected);
+                    setStirSortOrder(sort);
+                    setIsStirModalOpen(false);
                 }}
             />
         </div>

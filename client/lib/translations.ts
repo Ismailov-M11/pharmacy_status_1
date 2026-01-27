@@ -12,6 +12,14 @@ export const translations = {
     close: "Закрыть",
     apply: "Применить",
     reset: "Сброс",
+    search: "Поиск",
+    sortAscending: "По возрастанию",
+    sortDescending: "По убыванию",
+    clearSort: "Сбросить сортировку",
+    selectAll: "Выбрать все",
+    deselectAll: "Снять все",
+    filterByStir: "Фильтр по СТИР",
+    noResults: "Нет результатов",
 
     // Navigation
     activities: "Активности",
@@ -207,6 +215,14 @@ export const translations = {
     close: "Yopish",
     apply: "Qo'llash",
     reset: "Tozalash",
+    search: "Qidiruv",
+    sortAscending: "O'sish bo'yicha",
+    sortDescending: "Kamayish bo'yicha",
+    clearSort: "Saralashni bekor qilish",
+    selectAll: "Hammasini tanlash",
+    deselectAll: "Hammasini bekor qilish",
+    filterByStir: "STIR bo'yicha filtr",
+    noResults: "Natija topilmadi",
 
     // Navigation
     activities: "Faoliyyatlar",
