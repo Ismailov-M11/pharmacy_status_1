@@ -106,23 +106,23 @@ export default function NewPharmacies() {
 
   if (authLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <span className="text-gray-500">Загрузка...</span>
+      <div className="flex items-center justify-center min-h-screen bg-gray-50 dark:bg-gray-900">
+        <span className="text-gray-500 dark:text-gray-400">Загрузка...</span>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <Header />
 
       <main className="w-full">
         {/* Header Section */}
         <div className="mb-4 sm:mb-8 px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
-          <h1 className="text-3xl font-bold text-gray-900">
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
             {t.newPharmaciesTitle}
           </h1>
-          <p className="text-gray-600 mt-2">{t.newPharmaciesDescription}</p>
+          <p className="text-gray-600 dark:text-gray-400 mt-2">{t.newPharmaciesDescription}</p>
         </div>
 
         <div className="px-4 sm:px-6 lg:px-8 pb-8">

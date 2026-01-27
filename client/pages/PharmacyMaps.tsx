@@ -587,31 +587,31 @@ export default function PharmacyMaps() {
 
   if (authLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <span className="text-gray-500">{t.loading}</span>
+      <div className="flex items-center justify-center min-h-screen bg-gray-50 dark:bg-gray-900">
+        <span className="text-gray-500 dark:text-gray-400">{t.loading}</span>
       </div>
     );
   }
 
   // Layout Render
   return (
-    <div className="flex flex-col h-screen bg-gray-50 overflow-hidden">
+    <div className="flex flex-col h-screen bg-gray-50 dark:bg-gray-900 overflow-hidden">
       <Header />
 
       <main className="flex-1 flex flex-col lg:flex-row overflow-hidden relative">
         {/* Left Panel - Pharmacy List */}
-        <div className="w-full lg:w-[400px] bg-white border-r border-gray-200 flex flex-col z-10 shadow-lg shrink-0 h-[45vh] lg:h-full">
-          <div className="px-4 py-4 border-b border-gray-200 bg-white shrink-0">
-            <h1 className="text-xl font-bold text-gray-900">
+        <div className="w-full lg:w-[400px] bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col z-10 shadow-lg shrink-0 h-[45vh] lg:h-full">
+          <div className="px-4 py-4 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shrink-0">
+            <h1 className="text-xl font-bold text-gray-900 dark:text-gray-100">
               {t.maps || "Карты"}
             </h1>
-            <p className="text-gray-500 text-sm">
+            <p className="text-gray-500 dark:text-gray-400 text-sm">
               {t.pharmacyMap || "Аптеки на карте"}
             </p>
           </div>
 
           {/* Search & Filter Grid */}
-          <div className="p-4 border-b border-gray-200 bg-white shrink-0 gap-4 flex flex-col shadow-sm z-20">
+          <div className="p-4 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shrink-0 gap-4 flex flex-col shadow-sm z-20">
             <div className="flex gap-2">
               <Input
                 placeholder={`${t.pharmacyName || "Поиск аптеки"}...`}

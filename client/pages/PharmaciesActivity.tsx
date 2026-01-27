@@ -109,23 +109,23 @@ export default function PharmaciesActivity() {
 
   if (authLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <span className="text-gray-500">Загрузка...</span>
+      <div className="flex items-center justify-center min-h-screen bg-gray-50 dark:bg-gray-900">
+        <span className="text-gray-500 dark:text-gray-400">Загрузка...</span>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <Header />
 
       <main className="w-full">
         {/* Header Section */}
         <div className="mb-4 sm:mb-8 px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
-          <h1 className="text-3xl font-bold text-gray-900">
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
             {t.activitiesTitle}
           </h1>
-          <p className="text-gray-600 mt-2">{t.activitiesDescription}</p>
+          <p className="text-gray-600 dark:text-gray-400 mt-2">{t.activitiesDescription}</p>
         </div>
 
         <div className="px-4 sm:px-6 lg:px-8 pb-8">
@@ -173,17 +173,17 @@ export default function PharmaciesActivity() {
               >
                 {/* Modal Content */}
                 <Card
-                  className="w-full max-w-4xl max-h-[80vh] overflow-hidden flex flex-col border-blue-200 bg-white"
+                  className="w-full max-w-4xl max-h-[80vh] overflow-hidden flex flex-col border-blue-200 dark:border-blue-800 bg-white dark:bg-gray-800"
                   onClick={(e) => e.stopPropagation()}
                 >
-                  <div className="flex items-center justify-between p-6 border-b border-blue-200 bg-blue-50">
-                    <h3 className="text-lg font-semibold text-gray-900">
+                  <div className="flex items-center justify-between p-6 border-b border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-900">
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
                       {t.eventsLabel}{" "}
                       {format(new Date(selectedDateFilter), "dd.MM.yyyy")}
                     </h3>
                     <button
                       onClick={() => setSelectedDateFilter(null)}
-                      className="inline-flex items-center justify-center w-8 h-8 rounded-full text-gray-500 hover:bg-blue-100 hover:text-gray-700 transition-colors"
+                      className="inline-flex items-center justify-center w-8 h-8 rounded-full text-gray-500 dark:text-gray-400 hover:bg-blue-100 dark:hover:bg-blue-800 hover:text-gray-700 dark:hover:text-gray-200 transition-colors"
                       aria-label="Закрыть"
                     >
                       <X className="w-5 h-5" />
