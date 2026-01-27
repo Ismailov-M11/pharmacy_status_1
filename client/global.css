@@ -190,7 +190,7 @@
 
 /* Yandex Maps Dark Mode */
 .yandex-map-dark [class*="ymaps-2"][class*="-ground-pane"] {
-  filter: invert(100%) hue-rotate(180deg) brightness(0.95) contrast(1.1) grayscale(20%);
+  filter: invert(100%) hue-rotate(180deg) brightness(1.1) contrast(1.2) saturate(1.5);
 }
 
 .yandex-map-dark [class*="ymaps-2"][class*="-copyrights-promo"] {
