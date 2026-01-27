@@ -71,29 +71,29 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-cyan-50 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-cyan-50 dark:from-gray-900 dark:via-gray-900 dark:to-gray-800 flex items-center justify-center p-4 transition-colors duration-300">
       <div className="w-full max-w-md">
-        <div className="bg-white rounded-2xl shadow-xl p-8">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 transition-colors duration-300">
           <div className="flex flex-col items-center mb-8">
             <img
               src="/logo.png"
               alt={t.siteTitle || "Aptekalar holati"}
               className="w-20 h-20 mb-4"
             />
-            <h1 className="text-3xl font-bold text-center text-purple-700">
+            <h1 className="text-3xl font-bold text-center text-purple-700 dark:text-purple-400">
               {t.siteTitle || "Aptekalar holati"}
             </h1>
-            <p className="text-gray-500 text-sm mt-2">
+            <p className="text-gray-500 dark:text-gray-400 text-sm mt-2">
               Pharmacy Management System
             </p>
           </div>
 
-          <div className="flex items-center gap-2 bg-gray-100 rounded-lg p-1 mb-6">
+          <div className="flex items-center gap-2 bg-gray-100 dark:bg-gray-700 rounded-lg p-1 mb-6">
             <button
               onClick={() => setLanguage("ru")}
               className={`flex-1 px-3 py-2 rounded font-medium text-sm transition-colors ${language === "ru"
-                ? "bg-white text-purple-700 shadow-sm"
-                : "text-gray-600 hover:text-gray-900"
+                ? "bg-white dark:bg-gray-600 text-purple-700 dark:text-purple-300 shadow-sm"
+                : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200"
                 }`}
             >
               RU 🇷🇺
@@ -101,8 +101,8 @@ export default function Login() {
             <button
               onClick={() => setLanguage("uz")}
               className={`flex-1 px-3 py-2 rounded font-medium text-sm transition-colors ${language === "uz"
-                ? "bg-white text-purple-700 shadow-sm"
-                : "text-gray-600 hover:text-gray-900"
+                ? "bg-white dark:bg-gray-600 text-purple-700 dark:text-purple-300 shadow-sm"
+                : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200"
                 }`}
             >
               UZ 🇺🇿
@@ -111,7 +111,7 @@ export default function Login() {
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 {t.login}
               </label>
               <Input
@@ -120,12 +120,12 @@ export default function Login() {
                 onChange={(e) => setUsername(e.target.value)}
                 placeholder={t.enterLogin}
                 disabled={isLoading}
-                className="w-full"
+                className="w-full dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 {t.password}
               </label>
               <Input
@@ -134,12 +134,12 @@ export default function Login() {
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder={t.enterPassword}
                 disabled={isLoading}
-                className="w-full"
+                className="w-full dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
               />
             </div>
 
             {error && (
-              <div className="bg-red-50 border border-red-200 rounded-lg p-3 text-red-700 text-sm">
+              <div className="bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-lg p-3 text-red-700 dark:text-red-300 text-sm">
                 {error}
               </div>
             )}
@@ -147,7 +147,7 @@ export default function Login() {
             <Button
               type="submit"
               disabled={isLoading || !username || !password}
-              className="w-full bg-purple-700 hover:bg-purple-800 text-white font-semibold py-2.5 rounded-lg transition-colors"
+              className="w-full bg-purple-700 hover:bg-purple-800 text-white font-semibold py-2.5 rounded-lg transition-colors dark:bg-purple-600 dark:hover:bg-purple-700"
             >
               {isLoading ? t.loading : t.loginButton}
             </Button>
