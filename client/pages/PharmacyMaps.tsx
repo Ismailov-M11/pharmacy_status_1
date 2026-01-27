@@ -32,7 +32,6 @@ const TASHKENT_CENTER = [41.2995, 69.2401];
 declare global {
   interface Window {
     ymaps: any;
-    ymaps3: any;
   }
 }
 
