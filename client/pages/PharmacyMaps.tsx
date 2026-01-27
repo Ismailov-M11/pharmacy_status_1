@@ -669,31 +669,31 @@ export default function PharmacyMaps() {
           </div>
 
           {/* Scrollable List */}
-          <div className="flex-1 overflow-y-auto min-h-0 bg-white">
+          <div className="flex-1 overflow-y-auto min-h-0 bg-white dark:bg-gray-800">
             {filteredPharmacies.length === 0 ? (
-              <div className="p-8 text-center text-gray-500 text-sm">
+              <div className="p-8 text-center text-gray-500 dark:text-gray-400 text-sm">
                 {t.noData || "Аптеки не найдены"}
               </div>
             ) : (
-              <div className="divide-y divide-gray-100">
+              <div className="divide-y divide-gray-100 dark:divide-gray-700">
                 {filteredPharmacies.map((pharmacy, index) => (
                   <div
                     key={pharmacy.id}
                     onClick={() => handlePharmacyClick(pharmacy)}
-                    className={`px-4 py-3 hover:bg-purple-50 cursor-pointer transition-colors ${selectedPharmacy?.id === pharmacy.id ? 'bg-purple-50 border-l-4 border-purple-600' : 'border-l-4 border-transparent'}`}
+                    className={`px-4 py-3 hover:bg-purple-50 dark:hover:bg-gray-700 cursor-pointer transition-colors ${selectedPharmacy?.id === pharmacy.id ? 'bg-purple-50 dark:bg-gray-700 border-l-4 border-purple-600' : 'border-l-4 border-transparent dark:border-transparent'}`}
                   >
                     <div className="flex justify-between items-center mb-1">
-                      <span className="font-medium text-gray-900 text-sm line-clamp-1">{pharmacy.name}</span>
-                      <div className={`w-3 h-3 rounded-full border-2 border-white ring-1 ${pharmacy.active ? 'bg-emerald-500 ring-emerald-500' : 'bg-red-500 ring-red-500'} shadow-sm`} title={pharmacy.active ? 'Active' : 'Inactive'} />
+                      <span className="font-medium text-gray-900 dark:text-gray-100 text-sm line-clamp-1">{pharmacy.name}</span>
+                      <div className={`w-3 h-3 rounded-full border-2 border-white dark:border-gray-600 ring-1 ${pharmacy.active ? 'bg-emerald-500 ring-emerald-500' : 'bg-red-500 ring-red-500'} shadow-sm`} title={pharmacy.active ? 'Active' : 'Inactive'} />
                     </div>
-                    <p className="text-xs text-gray-500 line-clamp-2">{pharmacy.address}</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 line-clamp-2">{pharmacy.address}</p>
                   </div>
                 ))}
               </div>
             )}
           </div>
 
-          <div className="p-3 border-t border-gray-200 bg-gray-50 text-xs text-center text-gray-400">
+          <div className="p-3 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 text-xs text-center text-gray-400">
             {t.shown || "Показано"} {filteredPharmacies.length} {t.from || "из"} {pharmacies.length}
           </div>
         </div>

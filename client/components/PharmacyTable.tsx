@@ -318,7 +318,7 @@ export function PharmacyTable({
         return (
           <th
             key={col.id}
-            className={`px-2 md:px-4 py-2 md:py-3 text-left font-semibold text-gray-700 whitespace-nowrap min-w-max ${onStirFilterClick ? 'cursor-pointer hover:bg-gray-100' : ''}`}
+            className={`px-2 md:px-4 py-2 md:py-3 text-left font-semibold text-gray-700 whitespace-nowrap min-w-max ${onStirFilterClick ? 'cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700' : ''}`}
             onClick={onStirFilterClick ? (e) => onStirFilterClick(e) : undefined}
           >
             <div className="flex items-center gap-2">
@@ -383,12 +383,12 @@ export function PharmacyTable({
       case "telegramBot": {
         const marketChats = pharmacy.marketChats;
         const hasTelegramBot = marketChats && Array.isArray(marketChats) && marketChats.length > 0;
-        return <td key={col.id} className="px-2 md:px-4 py-2 md:py-3 text-center"><div className={`font-bold text-xs px-2 py-1 rounded inline-block whitespace-nowrap ${hasTelegramBot ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}`}>{getTelegramBotStatus(marketChats)}</div></td>;
+        return <td key={col.id} className="px-2 md:px-4 py-2 md:py-3 text-center"><div className={`font-bold text-xs px-2 py-1 rounded inline-block whitespace-nowrap ${hasTelegramBot ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300" : "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300"}`}>{getTelegramBotStatus(marketChats)}</div></td>;
       }
 
-      case "training": return <td key={col.id} className="px-2 md:px-4 py-2 md:py-3 text-center"><span className={`px-2 py-1 rounded text-xs font-bold inline-block whitespace-nowrap ${pharmacy.training ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}`}>{getTrainingStatusText(pharmacy.training || false)}</span></td>;
-      case "brandedPacket": return <td key={col.id} className="px-2 md:px-4 py-2 md:py-3 text-center"><span className={`px-2 py-1 rounded text-xs font-bold inline-block whitespace-nowrap ${pharmacy.brandedPacket ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}`}>{getStatusText(pharmacy.brandedPacket || false)}</span></td>;
-      case "status": return <td key={col.id} className="px-2 md:px-4 py-2 md:py-3"><span className={`px-2 py-1 rounded text-xs font-bold whitespace-nowrap inline-block ${pharmacy.active ? "bg-emerald-100 text-emerald-800" : "bg-red-100 text-red-800"}`}>{pharmacy.active ? t.active : t.inactive}</span></td>;
+      case "training": return <td key={col.id} className="px-2 md:px-4 py-2 md:py-3 text-center"><span className={`px-2 py-1 rounded text-xs font-bold inline-block whitespace-nowrap ${pharmacy.training ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300" : "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300"}`}>{getTrainingStatusText(pharmacy.training || false)}</span></td>;
+      case "brandedPacket": return <td key={col.id} className="px-2 md:px-4 py-2 md:py-3 text-center"><span className={`px-2 py-1 rounded text-xs font-bold inline-block whitespace-nowrap ${pharmacy.brandedPacket ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300" : "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300"}`}>{getStatusText(pharmacy.brandedPacket || false)}</span></td>;
+      case "status": return <td key={col.id} className="px-2 md:px-4 py-2 md:py-3"><span className={`px-2 py-1 rounded text-xs font-bold whitespace-nowrap inline-block ${pharmacy.active ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-300" : "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300"}`}>{pharmacy.active ? t.active : t.inactive}</span></td>;
 
       case "leadStatus": return isAdmin ? <td key={col.id} className="px-2 md:px-4 py-2 md:py-3 text-gray-900 text-xs">{pharmacy.lead?.status || "-"}</td> : null;
 

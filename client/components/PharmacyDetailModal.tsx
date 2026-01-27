@@ -129,22 +129,22 @@ export function PharmacyDetailModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="w-[95vw] max-w-2xl max-h-[90vh] overflow-y-auto sm:w-full p-0">
+      <DialogContent className="w-[95vw] max-w-2xl max-h-[90vh] overflow-y-auto sm:w-full p-0 bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
         {/* Sticky header with tabs */}
-        <div className="sticky top-0 bg-white z-20 border-b">
+        <div className="sticky top-0 bg-white dark:bg-gray-800 z-20 border-b dark:border-gray-700">
           <DialogHeader className="px-4 sm:px-6 pt-4 sm:pt-6 pb-2">
             <div className="flex items-start justify-between gap-2">
               <div className="flex-1 min-w-0">
-                <DialogTitle className="break-words text-base sm:text-lg">
+                <DialogTitle className="break-words text-base sm:text-lg text-gray-900 dark:text-gray-100">
                   {t.pharmacyDetails || "Pharmacy Details"}
                 </DialogTitle>
-                <DialogDescription className="break-words text-xs sm:text-sm">
+                <DialogDescription className="break-words text-xs sm:text-sm text-gray-500 dark:text-gray-400">
                   {t.code || "Code"}: {pharmacy.code}
                 </DialogDescription>
               </div>
               <button
                 onClick={onClose}
-                className="rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground"
+                className="rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground text-gray-500 dark:text-gray-400"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -167,12 +167,12 @@ export function PharmacyDetailModal({
           </DialogHeader>
 
           {/* Tabs */}
-          <div className="flex gap-1 border-t overflow-x-auto px-4 sm:px-6">
+          <div className="flex gap-1 border-t dark:border-gray-700 overflow-x-auto px-4 sm:px-6">
             <button
               onClick={() => setActiveTab("details")}
               className={`px-2 sm:px-4 py-2 font-medium border-b-2 transition-colors text-xs sm:text-sm whitespace-nowrap ${activeTab === "details"
-                ? "border-blue-500 text-blue-600"
-                : "border-transparent text-gray-600 hover:text-gray-900"
+                ? "border-blue-500 text-blue-600 dark:text-blue-400"
+                : "border-transparent text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200"
                 }`}
             >
               {t.details || "Details"}
@@ -180,8 +180,8 @@ export function PharmacyDetailModal({
             <button
               onClick={() => setActiveTab("training")}
               className={`px-2 sm:px-4 py-2 font-medium border-b-2 transition-colors text-xs sm:text-sm whitespace-nowrap ${activeTab === "training"
-                ? "border-blue-500 text-blue-600"
-                : "border-transparent text-gray-600 hover:text-gray-900"
+                ? "border-blue-500 text-blue-600 dark:text-blue-400"
+                : "border-transparent text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200"
                 }`}
             >
               {t.training || "Training"}
@@ -189,8 +189,8 @@ export function PharmacyDetailModal({
             <button
               onClick={() => setActiveTab("package")}
               className={`px-2 sm:px-4 py-2 font-medium border-b-2 transition-colors text-xs sm:text-sm whitespace-nowrap ${activeTab === "package"
-                ? "border-blue-500 text-blue-600"
-                : "border-transparent text-gray-600 hover:text-gray-900"
+                ? "border-blue-500 text-blue-600 dark:text-blue-400"
+                : "border-transparent text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200"
                 }`}
             >
               {t.brandedPacket || "Branded Packet"}
@@ -198,8 +198,8 @@ export function PharmacyDetailModal({
             <button
               onClick={() => setActiveTab("history")}
               className={`px-2 sm:px-4 py-2 font-medium border-b-2 transition-colors text-xs sm:text-sm whitespace-nowrap ${activeTab === "history"
-                ? "border-blue-500 text-blue-600"
-                : "border-transparent text-gray-600 hover:text-gray-900"
+                ? "border-blue-500 text-blue-600 dark:text-blue-400"
+                : "border-transparent text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200"
                 }`}
             >
               {t.history || "History"}
@@ -208,8 +208,8 @@ export function PharmacyDetailModal({
             <button
               onClick={() => setActiveTab("leadHistory")}
               className={`px-2 sm:px-4 py-2 font-medium border-b-2 transition-colors text-xs sm:text-sm whitespace-nowrap ${activeTab === "leadHistory"
-                ? "border-blue-500 text-blue-600"
-                : "border-transparent text-gray-600 hover:text-gray-900"
+                ? "border-blue-500 text-blue-600 dark:text-blue-400"
+                : "border-transparent text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200"
                 }`}
             >
               {t.leadHistory || "Lead History"}
@@ -217,29 +217,29 @@ export function PharmacyDetailModal({
           </div>
         </div>
 
-        <div className="p-4 sm:p-6 space-y-4">
+        <div className="p-4 sm:p-6 space-y-4 bg-white dark:bg-gray-800">
 
           {/* Details Tab */}
           {activeTab === "details" && (
             <div className="space-y-3 sm:space-y-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                 <div>
-                  <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     {t.code || "Code"}
                   </label>
-                  <div className="p-2 bg-gray-50 rounded border border-gray-200 text-xs sm:text-sm break-words">
+                  <div className="p-2 bg-gray-50 dark:bg-gray-900 rounded border border-gray-200 dark:border-gray-700 text-xs sm:text-sm break-words text-gray-900 dark:text-gray-100">
                     {pharmacy.code}
                   </div>
                 </div>
                 <div>
-                  <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     {t.status || "Status"}
                   </label>
-                  <div className="p-2 bg-gray-50 rounded border border-gray-200">
+                  <div className="p-2 bg-gray-50 dark:bg-gray-900 rounded border border-gray-200 dark:border-gray-700">
                     <span
                       className={`px-2 py-1 rounded text-xs font-medium inline-block ${pharmacy.active
-                        ? "bg-emerald-100 text-emerald-800"
-                        : "bg-amber-100 text-amber-800"
+                        ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-300"
+                        : "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300"
                         }`}
                     >
                       {pharmacy.active ? t.active : t.inactive}
@@ -249,29 +249,29 @@ export function PharmacyDetailModal({
               </div>
 
               <div>
-                <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   {t.pharmacyName || "Pharmacy Name"}
                 </label>
-                <div className="p-2 bg-gray-50 rounded border border-gray-200 text-xs sm:text-sm break-words">
+                <div className="p-2 bg-gray-50 dark:bg-gray-900 rounded border border-gray-200 dark:border-gray-700 text-xs sm:text-sm break-words text-gray-900 dark:text-gray-100">
                   {pharmacy.name}
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   {t.address || "Address"}
                 </label>
-                <div className="p-2 bg-gray-50 rounded border border-gray-200 text-xs sm:text-sm break-words">
+                <div className="p-2 bg-gray-50 dark:bg-gray-900 rounded border border-gray-200 dark:border-gray-700 text-xs sm:text-sm break-words text-gray-900 dark:text-gray-100">
                   {pharmacy.address}
                 </div>
               </div>
 
               {(pharmacy as any).landmark && (
                 <div>
-                  <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     {t.landmark || "Landmark"}
                   </label>
-                  <div className="p-2 bg-gray-50 rounded border border-gray-200 text-xs sm:text-sm break-words">
+                  <div className="p-2 bg-gray-50 dark:bg-gray-900 rounded border border-gray-200 dark:border-gray-700 text-xs sm:text-sm break-words text-gray-900 dark:text-gray-100">
                     {(pharmacy as any).landmark}
                   </div>
                 </div>
@@ -279,18 +279,18 @@ export function PharmacyDetailModal({
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     {t.pharmacyPhone || "Pharmacy Phone"}
                   </label>
-                  <div className="p-2 bg-gray-50 rounded border border-gray-200 text-xs sm:text-sm">
+                  <div className="p-2 bg-gray-50 dark:bg-gray-900 rounded border border-gray-200 dark:border-gray-700 text-xs sm:text-sm text-gray-900 dark:text-gray-100">
                     {pharmacy.phone || "-"}
                   </div>
                 </div>
                 <div>
-                  <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     {t.leadPhone || "Lead Phone"}
                   </label>
-                  <div className="p-2 bg-gray-50 rounded border border-gray-200 text-xs sm:text-sm break-words">
+                  <div className="p-2 bg-gray-50 dark:bg-gray-900 rounded border border-gray-200 dark:border-gray-700 text-xs sm:text-sm break-words text-gray-900 dark:text-gray-100">
                     {pharmacy.lead?.phone || "-"}
                   </div>
                 </div>
@@ -298,34 +298,34 @@ export function PharmacyDetailModal({
 
               <div className="grid grid-cols-3 gap-2">
                 <div className="flex flex-col h-full">
-                  <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1 flex-grow">
+                  <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 flex-grow">
                     {t.telegramBot || "Telegram Bot"}
                   </label>
-                  <div className={`p-2 rounded border border-gray-200 text-center text-xs sm:text-sm mt-auto ${(pharmacy as any).marketChats?.length > 0
-                    ? "bg-green-100 text-green-800 border-green-200"
-                    : "bg-red-100 text-red-800 border-red-200"
+                  <div className={`p-2 rounded border border-gray-200 dark:border-gray-700 text-center text-xs sm:text-sm mt-auto ${(pharmacy as any).marketChats?.length > 0
+                    ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300 border-green-200"
+                    : "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300 border-red-200"
                     }`}>
                     {(pharmacy as any).marketChats?.length > 0 ? t.yes : t.no}
                   </div>
                 </div>
                 <div className="flex flex-col h-full">
-                  <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1 flex-grow">
+                  <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 flex-grow">
                     {t.training || "Training"}
                   </label>
-                  <div className={`p-2 rounded border border-gray-200 text-center text-xs sm:text-sm mt-auto ${(pharmacy as any).training
-                    ? "bg-green-100 text-green-800 border-green-200"
-                    : "bg-red-100 text-red-800 border-red-200"
+                  <div className={`p-2 rounded border border-gray-200 dark:border-gray-700 text-center text-xs sm:text-sm mt-auto ${(pharmacy as any).training
+                    ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300 border-green-200"
+                    : "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300 border-red-200"
                     }`}>
                     {(pharmacy as any).training ? t.yesTraining : t.noTraining}
                   </div>
                 </div>
                 <div className="flex flex-col h-full">
-                  <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1 flex-grow">
+                  <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 flex-grow">
                     {t.brandedPacket || "Branded Packet"}
                   </label>
-                  <div className={`p-2 rounded border border-gray-200 text-center text-xs sm:text-sm mt-auto ${(pharmacy as any).brandedPacket
-                    ? "bg-green-100 text-green-800 border-green-200"
-                    : "bg-red-100 text-red-800 border-red-200"
+                  <div className={`p-2 rounded border border-gray-200 dark:border-gray-700 text-center text-xs sm:text-sm mt-auto ${(pharmacy as any).brandedPacket
+                    ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300 border-green-200"
+                    : "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300 border-red-200"
                     }`}>
                     {(pharmacy as any).brandedPacket ? t.yes : t.no}
                   </div>
@@ -335,40 +335,40 @@ export function PharmacyDetailModal({
               {/* Telegram Bot Users Section - shown for all users */}
               {(pharmacy as any).marketChats && (pharmacy as any).marketChats.length > 0 && (
                 <div>
-                  <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     {t.telegramUsers || "Telegram Bot Users"}
                   </label>
                   <div className="overflow-x-auto">
-                    <table className="min-w-full divide-y divide-gray-200 border border-gray-200 rounded">
-                      <thead className="bg-gray-50">
+                    <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700 border border-gray-200 dark:border-gray-700 rounded">
+                      <thead className="bg-gray-50 dark:bg-gray-700">
                         <tr>
-                          <th className="px-3 py-2 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
+                          <th className="px-3 py-2 text-left text-xs font-medium text-gray-700 dark:text-gray-200 uppercase tracking-wider">
                             №
                           </th>
-                          <th className="px-3 py-2 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
+                          <th className="px-3 py-2 text-left text-xs font-medium text-gray-700 dark:text-gray-200 uppercase tracking-wider">
                             {t.name || "Name"}
                           </th>
-                          <th className="px-3 py-2 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
+                          <th className="px-3 py-2 text-left text-xs font-medium text-gray-700 dark:text-gray-200 uppercase tracking-wider">
                             {t.username || "Username"}
                           </th>
-                          <th className="px-3 py-2 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
+                          <th className="px-3 py-2 text-left text-xs font-medium text-gray-700 dark:text-gray-200 uppercase tracking-wider">
                             {t.chatId || "Chat ID"}
                           </th>
                         </tr>
                       </thead>
-                      <tbody className="bg-white divide-y divide-gray-200">
+                      <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                         {(pharmacy as any).marketChats.map((chat: any, index: number) => (
-                          <tr key={chat.id || index} className="hover:bg-gray-50">
-                            <td className="px-3 py-2 text-xs sm:text-sm text-gray-500">
+                          <tr key={chat.id || index} className="hover:bg-gray-50 dark:hover:bg-gray-700">
+                            <td className="px-3 py-2 text-xs sm:text-sm text-gray-500 dark:text-gray-400">
                               {index + 1}
                             </td>
-                            <td className="px-3 py-2 text-xs sm:text-sm text-gray-900">
+                            <td className="px-3 py-2 text-xs sm:text-sm text-gray-900 dark:text-gray-100">
                               {chat.name || "-"}
                             </td>
-                            <td className="px-3 py-2 text-xs sm:text-sm text-gray-900">
+                            <td className="px-3 py-2 text-xs sm:text-sm text-gray-900 dark:text-gray-100">
                               @{chat.username || "-"}
                             </td>
-                            <td className="px-3 py-2 text-xs sm:text-sm text-gray-900 font-mono">
+                            <td className="px-3 py-2 text-xs sm:text-sm text-gray-900 dark:text-gray-100 font-mono">
                               {chat.id}
                             </td>
                           </tr>
@@ -382,10 +382,10 @@ export function PharmacyDetailModal({
               {/* Lead Status - shown for admins only */}
               {isAdmin && (
                 <div>
-                  <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     {t.leadStatus || "Lead Status"}
                   </label>
-                  <div className="p-2 bg-gray-50 rounded border border-gray-200 text-xs sm:text-sm">
+                  <div className="p-2 bg-gray-50 dark:bg-gray-900 rounded border border-gray-200 dark:border-gray-700 text-xs sm:text-sm text-gray-900 dark:text-gray-100">
                     {pharmacy.lead?.status || "-"}
                   </div>
                 </div>
@@ -396,18 +396,18 @@ export function PharmacyDetailModal({
 
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
+                      <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                         {t.stir || "STIR"}
                       </label>
-                      <div className="p-2 bg-gray-50 rounded border border-gray-200 text-xs sm:text-sm">
+                      <div className="p-2 bg-gray-50 dark:bg-gray-900 rounded border border-gray-200 dark:border-gray-700 text-xs sm:text-sm text-gray-900 dark:text-gray-100">
                         {(pharmacy.lead as any)?.stir || "-"}
                       </div>
                     </div>
                     <div>
-                      <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
+                      <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                         {t.additionalPhone || "Additional Phone"}
                       </label>
-                      <div className="p-2 bg-gray-50 rounded border border-gray-200 text-xs sm:text-sm">
+                      <div className="p-2 bg-gray-50 dark:bg-gray-900 rounded border border-gray-200 dark:border-gray-700 text-xs sm:text-sm text-gray-900 dark:text-gray-100">
                         {(pharmacy.lead as any)?.additionalPhone || "-"}
                       </div>
                     </div>
