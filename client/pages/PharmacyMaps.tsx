@@ -161,10 +161,14 @@ export default function PharmacyMaps() {
     }
   };
 
-  // Update theme dynamically
+  // Update theme handling for V2.1 (CSS Class)
   useEffect(() => {
-    if (mapRef.current && mapRef.current.update) {
-      mapRef.current.update({ theme: theme === 'dark' ? 'dark' : 'light' });
+    if (containerRef.current) {
+      if (theme === 'dark') {
+        containerRef.current.classList.add('yandex-map-dark');
+      } else {
+        containerRef.current.classList.remove('yandex-map-dark');
+      }
     }
   }, [theme]);
 
@@ -236,59 +240,76 @@ export default function PharmacyMaps() {
   // Fix color: Use explicit specific color
 
   const addPlacemarks = (pharmaciesToPlace: PharmacyWithCoords[]) => {
-    if (!mapRef.current || !window.ymaps3) return;
-
-    // Clear existing markers?
-    // In V3, we should manage children. 
-    // A simple way is to remove all markers and re-add.
-    // However, mapRef.current.children includes layers and controls.
-    // We should keep references to marker objects or use a specific collection entity if we create one.
-    // But V3 core is lightweight. 
-
-    // Better approach: clear everything that is a marker.
-    // Ideally we store markers in a ref.
-    // For now, let's assume we can clear specific children types or just keep it simple:
-
-    // We need a ref to store added markers to remove them later.
-    // Let's add markersRef.
-    if (!mapRef.current.s_markers) {
-      mapRef.current.s_markers = [];
+    if (!mapRef.current || !window.ymaps) {
+      return;
     }
 
-    // Remove old markers
-    mapRef.current.s_markers.forEach((m: any) => mapRef.current.removeChild(m));
-    mapRef.current.s_markers = [];
+    try {
+      const geoObjects = mapRef.current.geoObjects;
+      geoObjects.removeAll();
 
-    const { YMapMarker } = window.ymaps3;
-    const newMarkers: any[] = [];
+      // Create a collection for better performance
+      const collection = new window.ymaps.GeoObjectCollection(null, {
+        preset: 'islands#violetDotIcon'
+      });
 
+      pharmaciesToPlace.forEach((pharmacy) => {
+        const coords =
+          pharmacy.latitude && pharmacy.longitude
+            ? [pharmacy.latitude, pharmacy.longitude]
+            : TASHKENT_CENTER;
+
+        const placemark = new window.ymaps.Placemark(
+          coords,
+          {
+            balloonContent: `
+              <div style="padding: 12px; font-family: Arial, sans-serif; max-width: 300px;">
+                <div style="font-weight: bold; font-size: 14px; margin-bottom: 8px; color: #1f2937;">${pharmacy.name}</div>
+                <div style="font-size: 12px; margin-bottom: 4px;"><strong>${t.code || "Код"}:</strong> ${pharmacy.code}</div>
+                <div style="font-size: 12px; margin-bottom: 4px;"><strong>${t.address || "Адрес"}:</strong> ${pharmacy.address}</div>
+                <div style="font-size: 12px; margin-bottom: 4px;"><strong>${t.status || "Статус"}:</strong> <span style="color: ${pharmacy.active ? "#059669" : "#d97706"}">${pharmacy.active ? (t.active || "Активна") : (t.inactive || "Неактивна")}</span></div>
+                ${pharmacy.phone ? `<div style="font-size: 12px; margin-bottom: 8px;"><strong>${t.pharmacyPhone || "Телефон"}:</strong> <a href="tel:${pharmacy.phone}" style="color: #2563eb;">${pharmacy.phone}</a></div>` : ""}
+                
+                 <div style="margin-top: 8px; border-top: 1px solid #eee; padding-top: 8px; display: flex; flex-direction: column; gap: 4px;">
+                    <div style="font-size: 12px; display: flex; justify-content: space-between;">
+                        <span style="color: #6b7280;">${t.telegramBot || "Telegram Bot"}:</span>
+                        <span style="font-weight: bold; color: ${pharmacy.marketChats?.length ? '#059669' : '#dc2626'};">${pharmacy.marketChats?.length ? (t.yes || "ЕСТЬ") : (t.no || "НЕТ")}</span>
+                    </div>
+                    <div style="font-size: 12px; display: flex; justify-content: space-between;">
+                        <span style="color: #6b7280;">${t.brandedPacket || "Пакет"}:</span>
+                        <span style="font-weight: bold; color: ${pharmacy.brandedPacket ? '#059669' : '#dc2626'};">${pharmacy.brandedPacket ? (t.yes || "ЕСТЬ") : (t.no || "НЕТ")}</span>
+                    </div>
+                    <div style="font-size: 12px; display: flex; justify-content: space-between;">
+                         <span style="color: #6b7280;">${t.training || "Обучение"}:</span>
+                         <span style="font-weight: bold; color: ${pharmacy.training ? '#059669' : '#dc2626'};">${pharmacy.training ? (t.yes || "ЕСТЬ") : (t.no || "НЕТ")}</span>
+                    </div>
+                 </div>
+              </div>
+            `,
+          },
+          {
+            preset: 'islands#violetDotIcon'
+          }
+        );
+
+        collection.add(placemark);
+      });
+
+      geoObjects.add(collection);
+
+    } catch (error) {
+      console.error("Error adding placemarks:", error);
+    }
+
+    // Trigger geocoding for those missing coords (background process)
     pharmaciesToPlace.forEach((pharmacy) => {
-      const coords =
-        pharmacy.latitude && pharmacy.longitude
-          ? [pharmacy.longitude, pharmacy.latitude] // V3 uses [lng, lat] order!
-          : [TASHKENT_CENTER[1], TASHKENT_CENTER[0]];
-
-      if (!pharmacy.latitude || !pharmacy.longitude) return; // Skip if no coords
-
-      const content = document.createElement('div');
-      content.className = `w-4 h-4 rounded-full border-2 border-white shadow-md cursor-pointer transform hover:scale-110 transition-transform ${pharmacy.active ? 'bg-emerald-500' : 'bg-red-500'}`;
-      content.title = pharmacy.name;
-
-      content.onclick = () => handlePharmacyClick(pharmacy);
-
-      const marker = new YMapMarker(
-        {
-          coordinates: coords,
-          draggable: false
-        },
-        content
-      );
-
-      mapRef.current.addChild(marker);
-      newMarkers.push(marker);
+      // Check cache again just in case (though fetchPharmacies should have handled it) 
+      // AND check ref to prevent session duplicates
+      if ((!pharmacy.latitude || !pharmacy.longitude) && !geocodedRef.current.has(pharmacy.id)) {
+        geocodedRef.current.add(pharmacy.id); // Mark as attempted
+        geocodeAndUpdatePlacemark(pharmacy);
+      }
     });
-
-    mapRef.current.s_markers = newMarkers;
   };
 
   const geocodeAndUpdatePlacemark = (pharmacy: PharmacyWithCoords) => {
