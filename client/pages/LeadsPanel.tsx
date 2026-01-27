@@ -241,7 +241,15 @@ export default function LeadsPanel() {
                 (p.phone && p.phone.includes(q)) ||
                 (p.lead?.phone && p.lead.phone.includes(q)) ||
                 p.code.toLowerCase().includes(q) ||
-                (p.lead?.status && p.lead.status.toLowerCase().includes(q));
+                (p.lead?.status && p.lead.status.toLowerCase().includes(q)) ||
+                (p.landmark && p.landmark.toLowerCase().includes(q)) ||
+                (p.stir && p.stir.includes(q)) ||
+                (p.additionalPhone && p.additionalPhone.includes(q)) ||
+                (p.juridicalName && p.juridicalName.toLowerCase().includes(q)) ||
+                (p.juridicalAddress && p.juridicalAddress.toLowerCase().includes(q)) ||
+                (p.bankName && p.bankName.toLowerCase().includes(q)) ||
+                (p.bankAccount && p.bankAccount.includes(q)) ||
+                (p.mfo && p.mfo.includes(q));
 
             // 2. Lead Status Filter
             const matchesLeadStatus = leadStatusFilter === null

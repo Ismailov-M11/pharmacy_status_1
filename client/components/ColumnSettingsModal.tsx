@@ -93,14 +93,7 @@ export function ColumnSettingsModal({
                 <DialogHeader>
                     <div className="flex items-center justify-between">
                         <DialogTitle>{t.columnSettings}</DialogTitle>
-                        <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={onClose}
-                            className="h-6 w-6"
-                        >
-                            <X className="h-4 w-4" />
-                        </Button>
+
                     </div>
                 </DialogHeader>
 
@@ -136,8 +129,8 @@ export function ColumnSettingsModal({
                                     size="sm"
                                     onClick={() => toggleVisibility(column.id)}
                                     className={`gap-2 ${column.visible
-                                            ? "text-blue-600 hover:text-blue-700"
-                                            : "text-gray-400 hover:text-gray-600"
+                                        ? "text-blue-600 hover:text-blue-700"
+                                        : "text-gray-400 hover:text-gray-600"
                                         }`}
                                 >
                                     {column.visible ? (

@@ -58,31 +58,31 @@ export default function AdminPanel() {
         p.address.toLowerCase().includes(searchQuery.toLowerCase()) ||
         (p.phone && p.phone.includes(searchQuery)) ||
         (p.lead?.phone && p.lead.phone.includes(searchQuery)) ||
-        ((p as any).landmark &&
-          (p as any).landmark
+        (p.landmark &&
+          p.landmark
             .toLowerCase()
             .includes(searchQuery.toLowerCase())) ||
         p.code.toLowerCase().includes(searchQuery.toLowerCase()) ||
         (p.lead?.status &&
           p.lead.status.toLowerCase().includes(searchQuery.toLowerCase())) ||
-        ((p as any).stir && (p as any).stir.includes(searchQuery)) ||
-        ((p as any).additionalPhone &&
-          (p as any).additionalPhone.includes(searchQuery)) ||
-        ((p as any).juridicalName &&
-          (p as any).juridicalName
+        (p.stir && p.stir.includes(searchQuery)) ||
+        (p.additionalPhone &&
+          p.additionalPhone.includes(searchQuery)) ||
+        (p.juridicalName &&
+          p.juridicalName
             .toLowerCase()
             .includes(searchQuery.toLowerCase())) ||
-        ((p as any).juridicalAddress &&
-          (p as any).juridicalAddress
+        (p.juridicalAddress &&
+          p.juridicalAddress
             .toLowerCase()
             .includes(searchQuery.toLowerCase())) ||
-        ((p as any).bankName &&
-          (p as any).bankName
+        (p.bankName &&
+          p.bankName
             .toLowerCase()
             .includes(searchQuery.toLowerCase())) ||
-        ((p as any).bankAccount &&
-          (p as any).bankAccount.includes(searchQuery)) ||
-        ((p as any).mfo && (p as any).mfo.includes(searchQuery));
+        (p.bankAccount &&
+          p.bankAccount.includes(searchQuery)) ||
+        (p.mfo && p.mfo.includes(searchQuery));
 
       const matchesTelegramBot =
         telegramBotFilter === null
