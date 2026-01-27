@@ -121,4 +121,69 @@
     overflow-x: auto;
     white-space: pre;
   }
+
+  /* Dark mode table styles */
+  [data-theme="dark"] table {
+    @apply bg-gray-800;
+  }
+
+  [data-theme="dark"] th {
+    @apply text-gray-300 border-gray-700;
+  }
+
+  [data-theme="dark"] td {
+    @apply text-gray-300 border-gray-700;
+  }
+
+  [data-theme="dark"] tbody {
+    @apply divide-gray-700;
+  }
+
+  [data-theme="dark"] tr:hover {
+    @apply bg-gray-700;
+  }
+
+  /* Dark mode input styles */
+  [data-theme="dark"] input[type="text"],
+  [data-theme="dark"] input[type="search"],
+  [data-theme="dark"] input[type="date"] {
+    @apply bg-gray-700 text-gray-100 border-gray-600;
+  }
+
+  [data-theme="dark"] input[type="text"]:focus,
+  [data-theme="dark"] input[type="search"]:focus,
+  [data-theme="dark"] input[type="date"]:focus {
+    @apply bg-gray-600 border-purple-500;
+  }
+
+  [data-theme="dark"] input::placeholder {
+    @apply text-gray-400;
+  }
+
+  /* Dark mode for specific text colors */
+  [data-theme="dark"] .text-gray-700 {
+    @apply text-gray-300;
+  }
+
+  [data-theme="dark"] .text-gray-600 {
+    @apply text-gray-400;
+  }
+
+  [data-theme="dark"] .text-gray-500 {
+    @apply text-gray-400;
+  }
+
+  [data-theme="dark"] .text-gray-900 {
+    @apply text-gray-100;
+  }
+
+  /* Dark mode for dividers */
+  [data-theme="dark"] .divide-gray-200>*+* {
+    @apply border-gray-700;
+  }
+
+  /* Dark mode for hover states */
+  [data-theme="dark"] .hover\:bg-gray-50:hover {
+    @apply bg-gray-700;
+  }
 }
