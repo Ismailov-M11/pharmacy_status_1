@@ -575,13 +575,13 @@ export function PharmacyTable({
                   </DropdownMenuRadioItem>
                   <DropdownMenuRadioItem
                     value="true"
-                    className="bg-emerald-100 text-emerald-800 focus:bg-emerald-200 focus:text-emerald-900 m-1 cursor-pointer"
+                    className="bg-emerald-100 dark:bg-emerald-900/30 text-emerald-800 dark:text-emerald-300 focus:bg-emerald-200 dark:focus:bg-emerald-800 focus:text-emerald-900 dark:focus:text-emerald-200 m-1 cursor-pointer"
                   >
                     {t.active}
                   </DropdownMenuRadioItem>
                   <DropdownMenuRadioItem
                     value="false"
-                    className="bg-red-100 text-red-800 focus:bg-red-200 focus:text-red-900 m-1 cursor-pointer"
+                    className="bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300 focus:bg-red-200 dark:focus:bg-red-800 focus:text-red-900 dark:focus:text-red-200 m-1 cursor-pointer"
                   >
                     {t.inactive}
                   </DropdownMenuRadioItem>
@@ -643,13 +643,13 @@ export function PharmacyTable({
                   </DropdownMenuRadioItem>
                   <DropdownMenuRadioItem
                     value="true"
-                    className="bg-emerald-100 text-emerald-800 focus:bg-emerald-200 focus:text-emerald-900 m-1 cursor-pointer"
+                    className="bg-emerald-100 dark:bg-emerald-900/30 text-emerald-800 dark:text-emerald-300 focus:bg-emerald-200 dark:focus:bg-emerald-800 focus:text-emerald-900 dark:focus:text-emerald-200 m-1 cursor-pointer"
                   >
                     {t.active}
                   </DropdownMenuRadioItem>
                   <DropdownMenuRadioItem
                     value="false"
-                    className="bg-red-100 text-red-800 focus:bg-red-200 focus:text-red-900 m-1 cursor-pointer"
+                    className="bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300 focus:bg-red-200 dark:focus:bg-red-800 focus:text-red-900 dark:focus:text-red-200 m-1 cursor-pointer"
                   >
                     {t.inactive}
                   </DropdownMenuRadioItem>
