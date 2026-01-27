@@ -32,6 +32,7 @@ const TASHKENT_CENTER = [41.2995, 69.2401];
 declare global {
   interface Window {
     ymaps: any;
+    ymaps3: any;
   }
 }
 
@@ -92,7 +93,7 @@ export default function PharmacyMaps() {
   const mapRef = useRef<any>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Load Yandex Maps API and initialize
+  // Load Yandex Maps API v3
   useEffect(() => {
     if (authLoading) return;
     if (!token) {
@@ -100,67 +101,73 @@ export default function PharmacyMaps() {
       return;
     }
 
-    // Load Yandex Maps API script
+    // Check if script already exists
+    if (document.getElementById('ymaps3-script')) {
+      initializeMap();
+      return;
+    }
+
     const script = document.createElement("script");
-    script.src =
-      `https://api-maps.yandex.ru/2.1/?apikey=${import.meta.env.VITE_YANDEX_MAP_KEY}&lang=ru_RU`;
+    script.id = 'ymaps3-script';
+    script.src = `https://api-maps.yandex.ru/v3/?apikey=${import.meta.env.VITE_YANDEX_MAP_KEY}&lang=ru_RU`;
     script.type = "text/javascript";
     script.async = true;
 
     script.onload = () => {
-      console.log("✅ Yandex Maps API script loaded successfully");
-      if (window.ymaps) {
-        console.log("📍 ymaps object available, waiting for ready...");
-        window.ymaps.ready(() => {
-          console.log("📍 ymaps ready, initializing map");
-          initializeMap();
-        });
-      } else {
-        console.error("❌ ymaps object not available after script load");
-      }
+      console.log("✅ Yandex Maps V3 script loaded");
+      initializeMap();
     };
 
     script.onerror = () => {
-      console.error("❌ Failed to load Yandex Maps API script");
-      toast.error("Не удалось загрузить Yandex Maps");
+      console.error("❌ Failed to load Yandex Maps V3");
+      toast.error("Не удалось загрузить карты");
     };
 
-    console.log("📌 Adding Yandex Maps script to document");
     document.head.appendChild(script);
 
     return () => {
-      // Cleanup script on unmount if needed
+      // Cleanup if needed
     };
   }, [token, authLoading, navigate]);
 
-  const initializeMap = () => {
-    if (!containerRef.current) {
-      console.error("❌ Map container not found");
-      return;
-    }
+  const initializeMap = async () => {
+    if (!containerRef.current || !window.ymaps3) return;
 
     try {
-      console.log("📍 Initializing Yandex Map...");
+      await window.ymaps3.ready;
 
-      mapRef.current = new window.ymaps.Map(containerRef.current, {
-        center: TASHKENT_CENTER,
-        zoom: 11,
-        controls: ["zoomControl", "fullscreenControl"],
-        behaviors: ["default", "scrollZoom"],
-      });
+      const { YMap, YMapDefaultSchemeLayer, YMapDefaultFeaturesLayer, YMapControls, YMapZoomControl } = window.ymaps3;
 
-      console.log("✅ Map initialized successfully");
-      console.log(
-        `🌍 API Backend URL: ${import.meta.env.VITE_BACKEND_URL || "default"}`,
-      );
+      if (!mapRef.current) {
+        mapRef.current = new YMap(containerRef.current, {
+          location: {
+            center: TASHKENT_CENTER,
+            zoom: 11
+          },
+          theme: theme === 'dark' ? 'dark' : 'light'
+        });
 
-      // Fetch pharmacies after map is initialized
-      fetchPharmacies();
+        mapRef.current.addChild(new YMapDefaultSchemeLayer({}));
+        mapRef.current.addChild(new YMapDefaultFeaturesLayer({}));
+
+        const controls = new YMapControls({ position: 'right' });
+        controls.addChild(new YMapZoomControl({}));
+        mapRef.current.addChild(controls);
+
+        console.log("✅ Map V3 initialized");
+        fetchPharmacies();
+      }
     } catch (error) {
-      console.error("❌ Failed to initialize map:", error);
-      toast.error("Не удалось инициализировать карту");
+      console.error("❌ Failed to initialize V3 map:", error);
     }
   };
+
+  // Update theme dynamically
+  useEffect(() => {
+    if (mapRef.current && mapRef.current.update) {
+      mapRef.current.update({ theme: theme === 'dark' ? 'dark' : 'light' });
+    }
+  }, [theme]);
 
   const fetchPharmacies = async () => {
     try {
@@ -230,80 +237,59 @@ export default function PharmacyMaps() {
   // Fix color: Use explicit specific color
 
   const addPlacemarks = (pharmaciesToPlace: PharmacyWithCoords[]) => {
-    if (!mapRef.current || !window.ymaps) {
-      return;
+    if (!mapRef.current || !window.ymaps3) return;
+
+    // Clear existing markers?
+    // In V3, we should manage children. 
+    // A simple way is to remove all markers and re-add.
+    // However, mapRef.current.children includes layers and controls.
+    // We should keep references to marker objects or use a specific collection entity if we create one.
+    // But V3 core is lightweight. 
+
+    // Better approach: clear everything that is a marker.
+    // Ideally we store markers in a ref.
+    // For now, let's assume we can clear specific children types or just keep it simple:
+
+    // We need a ref to store added markers to remove them later.
+    // Let's add markersRef.
+    if (!mapRef.current.s_markers) {
+      mapRef.current.s_markers = [];
     }
 
-    try {
-      const geoObjects = mapRef.current.geoObjects;
-      geoObjects.removeAll();
+    // Remove old markers
+    mapRef.current.s_markers.forEach((m: any) => mapRef.current.removeChild(m));
+    mapRef.current.s_markers = [];
 
-      // Create a collection for better performance
-      const collection = new window.ymaps.GeoObjectCollection(null, {
-        preset: 'islands#violetDotIcon'
-      });
+    const { YMapMarker } = window.ymaps3;
+    const newMarkers: any[] = [];
 
-      pharmaciesToPlace.forEach((pharmacy) => {
-        const coords =
-          pharmacy.latitude && pharmacy.longitude
-            ? [pharmacy.latitude, pharmacy.longitude]
-            : TASHKENT_CENTER;
-
-        const placemark = new window.ymaps.Placemark(
-          coords,
-          {
-            balloonContent: `
-              <div style="padding: 12px; font-family: Arial, sans-serif; max-width: 300px;">
-                <div style="font-weight: bold; font-size: 14px; margin-bottom: 8px; color: #1f2937;">${pharmacy.name}</div>
-                <div style="font-size: 12px; margin-bottom: 4px;"><strong>${t.code || "Код"}:</strong> ${pharmacy.code}</div>
-                <div style="font-size: 12px; margin-bottom: 4px;"><strong>${t.address || "Адрес"}:</strong> ${pharmacy.address}</div>
-                <div style="font-size: 12px; margin-bottom: 4px;"><strong>${t.status || "Статус"}:</strong> <span style="color: ${pharmacy.active ? "#059669" : "#d97706"}">${pharmacy.active ? (t.active || "Активна") : (t.inactive || "Неактивна")}</span></div>
-                ${pharmacy.phone ? `<div style="font-size: 12px; margin-bottom: 8px;"><strong>${t.pharmacyPhone || "Телефон"}:</strong> <a href="tel:${pharmacy.phone}" style="color: #2563eb;">${pharmacy.phone}</a></div>` : ""}
-                
-                 <div style="margin-top: 8px; border-top: 1px solid #eee; padding-top: 8px; display: flex; flex-direction: column; gap: 4px;">
-                    <div style="font-size: 12px; display: flex; justify-content: space-between;">
-                        <span style="color: #6b7280;">${t.telegramBot || "Telegram Bot"}:</span>
-                        <span style="font-weight: bold; color: ${pharmacy.marketChats?.length ? '#059669' : '#dc2626'};">${pharmacy.marketChats?.length ? (t.yes || "ЕСТЬ") : (t.no || "НЕТ")}</span>
-                    </div>
-                    <div style="font-size: 12px; display: flex; justify-content: space-between;">
-                        <span style="color: #6b7280;">${t.brandedPacket || "Пакет"}:</span>
-                        <span style="font-weight: bold; color: ${pharmacy.brandedPacket ? '#059669' : '#dc2626'};">${pharmacy.brandedPacket ? (t.yes || "ЕСТЬ") : (t.no || "НЕТ")}</span>
-                    </div>
-                    <div style="font-size: 12px; display: flex; justify-content: space-between;">
-                         <span style="color: #6b7280;">${t.training || "Обучение"}:</span>
-                         <span style="font-weight: bold; color: ${pharmacy.training ? '#059669' : '#dc2626'};">${pharmacy.training ? (t.yes || "ЕСТЬ") : (t.no || "НЕТ")}</span>
-                    </div>
-                 </div>
-              </div>
-            `,
-          },
-          {
-            preset: 'islands#violetDotIcon'
-          }
-        );
-
-        // Click listener removed - balloon will open automatically
-
-        collection.add(placemark);
-      });
-
-      geoObjects.add(collection);
-
-      // If filtering, re-center map if needed? (Optional)
-
-    } catch (error) {
-      console.error("Error adding placemarks:", error);
-    }
-
-    // Trigger geocoding for those missing coords (background process)
     pharmaciesToPlace.forEach((pharmacy) => {
-      // Check cache again just in case (though fetchPharmacies should have handled it) 
-      // AND check ref to prevent session duplicates
-      if ((!pharmacy.latitude || !pharmacy.longitude) && !geocodedRef.current.has(pharmacy.id)) {
-        geocodedRef.current.add(pharmacy.id); // Mark as attempted
-        geocodeAndUpdatePlacemark(pharmacy);
-      }
+      const coords =
+        pharmacy.latitude && pharmacy.longitude
+          ? [pharmacy.longitude, pharmacy.latitude] // V3 uses [lng, lat] order!
+          : [TASHKENT_CENTER[1], TASHKENT_CENTER[0]];
+
+      if (!pharmacy.latitude || !pharmacy.longitude) return; // Skip if no coords
+
+      const content = document.createElement('div');
+      content.className = `w-4 h-4 rounded-full border-2 border-white shadow-md cursor-pointer transform hover:scale-110 transition-transform ${pharmacy.active ? 'bg-emerald-500' : 'bg-red-500'}`;
+      content.title = pharmacy.name;
+
+      content.onclick = () => handlePharmacyClick(pharmacy);
+
+      const marker = new YMapMarker(
+        {
+          coordinates: coords,
+          draggable: false
+        },
+        content
+      );
+
+      mapRef.current.addChild(marker);
+      newMarkers.push(marker);
     });
+
+    mapRef.current.s_markers = newMarkers;
   };
 
   const geocodeAndUpdatePlacemark = (pharmacy: PharmacyWithCoords) => {
