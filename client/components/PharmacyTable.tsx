@@ -500,7 +500,7 @@ export function PharmacyTable({
   }
 
   return (
-    <div className="p-2 sm:p-4 space-y-4 sticky top-[82px] z-30 bg-gray-50">
+    <div className="p-2 sm:p-4 space-y-4 sticky top-[82px] z-30 bg-gray-50 dark:bg-gray-800">
       {isLeadsPage ? (
         // Leads page layout: Single row with selection | centered search | action buttons
         <div className="flex items-center justify-between gap-4">
