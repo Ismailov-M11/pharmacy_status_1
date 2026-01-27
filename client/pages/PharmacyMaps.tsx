@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
+import { useTheme } from "@/contexts/ThemeContext";
 import { Header } from "@/components/Header";
 import { PharmacyDetailModal } from "@/components/PharmacyDetailModal";
 import {
@@ -65,6 +66,7 @@ const saveCachedCoords = (id: number, lat: number, lon: number) => {
 export default function PharmacyMaps() {
   const { t } = useLanguage();
   const { token, user, isLoading: authLoading } = useAuth();
+  const { theme } = useTheme();
   const navigate = useNavigate();
 
   const [pharmacies, setPharmacies] = useState<PharmacyWithCoords[]>([]);
@@ -146,6 +148,11 @@ export default function PharmacyMaps() {
         controls: ["zoomControl", "fullscreenControl"],
         behaviors: ["default", "scrollZoom"],
       });
+
+      // Set map theme based on current theme
+      if (theme === 'dark') {
+        mapRef.current.options.set('theme', 'dark');
+      }
 
       console.log("✅ Map initialized successfully");
       console.log(
