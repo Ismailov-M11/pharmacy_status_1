@@ -355,23 +355,23 @@ export default function LeadsPanel() {
 
     if (authLoading) {
         return (
-            <div className="flex items-center justify-center min-h-screen">
-                <span className="text-gray-500">{t.loading}</span>
+            <div className="flex items-center justify-center min-h-screen bg-gray-50 dark:bg-gray-900">
+                <span className="text-gray-500 dark:text-gray-400">{t.loading}</span>
             </div>
         );
     }
 
     return (
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
             <Header />
 
             <main className="w-full">
                 <div className="mb-4 sm:mb-8 px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
-                    <h1 className="text-3xl font-bold text-gray-900">{t.leadsTitle || "Leads"}</h1>
-                    <p className="text-gray-600 mt-2">{t.pharmacies}</p>
+                    <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">{t.leadsTitle || "Leads"}</h1>
+                    <p className="text-gray-600 dark:text-gray-400 mt-2">{t.pharmacies}</p>
                 </div>
 
-                <div className="bg-white shadow">
+                <div className="bg-white dark:bg-gray-800 shadow">
                     <PharmacyTable
                         pharmacies={filteredLeads}
                         isLoading={isLoading}
