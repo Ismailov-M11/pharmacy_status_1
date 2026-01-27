@@ -149,8 +149,8 @@ export function PharmacyTable({
               <DropdownMenuContent align="start">
                 <DropdownMenuRadioGroup value={telegramBotFilter === true ? "true" : telegramBotFilter === false ? "false" : "null"} onValueChange={(val) => handleFilterChange(val, onTelegramBotFilterChange)}>
                   <DropdownMenuRadioItem value="null">{t.allPharmacies}</DropdownMenuRadioItem>
-                  <DropdownMenuRadioItem value="true" className="bg-emerald-100 text-emerald-800 focus:bg-emerald-200 focus:text-emerald-900 m-1 cursor-pointer">{t.yes}</DropdownMenuRadioItem>
-                  <DropdownMenuRadioItem value="false" className="bg-red-100 text-red-800 focus:bg-red-200 focus:text-red-900 m-1 cursor-pointer">{t.no}</DropdownMenuRadioItem>
+                  <DropdownMenuRadioItem value="true" className="bg-emerald-100 dark:bg-emerald-900/30 text-emerald-800 dark:text-emerald-300 focus:bg-emerald-200 dark:focus:bg-emerald-800 focus:text-emerald-900 dark:focus:text-emerald-200 m-1 cursor-pointer">{t.yes}</DropdownMenuRadioItem>
+                  <DropdownMenuRadioItem value="false" className="bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300 focus:bg-red-200 dark:focus:bg-red-800 focus:text-red-900 dark:focus:text-red-200 m-1 cursor-pointer">{t.no}</DropdownMenuRadioItem>
                 </DropdownMenuRadioGroup>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -167,7 +167,7 @@ export function PharmacyTable({
                   <div className="flex items-center gap-2">
                     <span>{t.training}</span>
                     {hasTrainingFilter && (
-                      <span className="text-xs bg-blue-100 text-blue-800 px-1.5 py-0.5 rounded">1</span>
+                      <span className="text-xs bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 px-1.5 py-0.5 rounded">1</span>
                     )}
                   </div>
                 </Button>
@@ -175,8 +175,8 @@ export function PharmacyTable({
               <DropdownMenuContent align="start">
                 <DropdownMenuRadioGroup value={trainingFilter === true ? "true" : trainingFilter === false ? "false" : "null"} onValueChange={(val) => handleFilterChange(val, onTrainingFilterChange)}>
                   <DropdownMenuRadioItem value="null">{t.allPharmacies}</DropdownMenuRadioItem>
-                  <DropdownMenuRadioItem value="true" className="bg-emerald-100 text-emerald-800 focus:bg-emerald-200 focus:text-emerald-900 m-1 cursor-pointer">{t.yes}</DropdownMenuRadioItem>
-                  <DropdownMenuRadioItem value="false" className="bg-red-100 text-red-800 focus:bg-red-200 focus:text-red-900 m-1 cursor-pointer">{t.no}</DropdownMenuRadioItem>
+                  <DropdownMenuRadioItem value="true" className="bg-emerald-100 dark:bg-emerald-900/30 text-emerald-800 dark:text-emerald-300 focus:bg-emerald-200 dark:focus:bg-emerald-800 focus:text-emerald-900 dark:focus:text-emerald-200 m-1 cursor-pointer">{t.yes}</DropdownMenuRadioItem>
+                  <DropdownMenuRadioItem value="false" className="bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300 focus:bg-red-200 dark:focus:bg-red-800 focus:text-red-900 dark:focus:text-red-200 m-1 cursor-pointer">{t.no}</DropdownMenuRadioItem>
                 </DropdownMenuRadioGroup>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -193,7 +193,7 @@ export function PharmacyTable({
                   <div className="flex items-center gap-2">
                     <span>{t.brandedPacket}</span>
                     {hasBrandedPacketFilter && (
-                      <span className="text-xs bg-blue-100 text-blue-800 px-1.5 py-0.5 rounded">1</span>
+                      <span className="text-xs bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 px-1.5 py-0.5 rounded">1</span>
                     )}
                   </div>
                 </Button>
@@ -661,11 +661,11 @@ export function PharmacyTable({
       )}
 
       <div
-        className="border rounded-md bg-white shadow-sm overflow-auto"
+        className="border dark:border-gray-700 rounded-md bg-white dark:bg-gray-800 shadow-sm overflow-auto"
         style={{ maxHeight: "calc(100vh - 100px)" }}
       >
         <table className="w-full text-xs md:text-sm relative">
-          <thead className="bg-gray-50 border-b border-gray-200 sticky top-0 z-40 bg-white shadow-sm">
+          <thead className="bg-gray-50 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600 sticky top-0 z-40 bg-white dark:bg-gray-800 shadow-sm">
             <tr>
               {orderedColumns ? (
                 <>
