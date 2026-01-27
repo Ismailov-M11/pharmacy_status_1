@@ -137,7 +137,7 @@ export function PharmacyTable({
           <th key={col.id} className="px-2 md:px-4 py-2 md:py-3 text-center font-semibold text-gray-700 whitespace-nowrap min-w-max">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm" className="-ml-3 h-8 data-[state=open]:bg-purple-600 data-[state=open]:text-white hover:bg-gray-100">
+                <Button variant="ghost" size="sm" className="-ml-3 h-8 data-[state=open]:bg-purple-600 data-[state=open]:text-white">
                   <div className="flex items-center gap-2">
                     <span>{t.telegramBot}</span>
                     {hasTelegramFilter && (
@@ -163,7 +163,7 @@ export function PharmacyTable({
           <th key={col.id} className="px-2 md:px-4 py-2 md:py-3 text-center font-semibold text-gray-700 whitespace-nowrap min-w-max">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm" className="-ml-3 h-8 data-[state=open]:bg-purple-600 data-[state=open]:text-white hover:bg-gray-100">
+                <Button variant="ghost" size="sm" className="-ml-3 h-8 data-[state=open]:bg-purple-600 data-[state=open]:text-white">
                   <div className="flex items-center gap-2">
                     <span>{t.training}</span>
                     {hasTrainingFilter && (
@@ -189,7 +189,7 @@ export function PharmacyTable({
           <th key={col.id} className="px-2 md:px-4 py-2 md:py-3 text-center font-semibold text-gray-700 whitespace-nowrap min-w-max">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm" className="-ml-3 h-8 data-[state=open]:bg-purple-600 data-[state=open]:text-white hover:bg-gray-100">
+                <Button variant="ghost" size="sm" className="-ml-3 h-8 data-[state=open]:bg-purple-600 data-[state=open]:text-white">
                   <div className="flex items-center gap-2">
                     <span>{t.brandedPacket}</span>
                     {hasBrandedPacketFilter && (
