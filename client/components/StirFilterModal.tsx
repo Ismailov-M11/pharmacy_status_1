@@ -1,14 +1,13 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import {
-    Dialog,
-    DialogContent,
-    DialogHeader,
-    DialogTitle,
-} from "@/components/ui/dialog";
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ArrowUp, ArrowDown, Search } from "lucide-react";
+import { ArrowUp, ArrowDown } from "lucide-react";
 
 interface StirFilterModalProps {
     isOpen: boolean;
@@ -17,6 +16,7 @@ interface StirFilterModalProps {
     selectedStirs: string[];
     sortOrder: 'asc' | 'desc' | null;
     onApply: (selected: string[], sort: 'asc' | 'desc' | null) => void;
+    triggerElement?: HTMLElement | null;
 }
 
 export function StirFilterModal({
@@ -26,6 +26,7 @@ export function StirFilterModal({
     selectedStirs,
     sortOrder,
     onApply,
+    triggerElement,
 }: StirFilterModalProps) {
     const { t } = useLanguage();
     const [localSelected, setLocalSelected] = useState<string[]>(selectedStirs);
@@ -33,9 +34,12 @@ export function StirFilterModal({
     const [searchQuery, setSearchQuery] = useState("");
 
     // Update local state when props change
-    useMemo(() => {
-        setLocalSelected(selectedStirs);
-        setLocalSort(sortOrder);
+    useEffect(() => {
+        if (isOpen) {
+            setLocalSelected(selectedStirs);
+            setLocalSort(sortOrder);
+            setSearchQuery("");
+        }
     }, [selectedStirs, sortOrder, isOpen]);
 
     // Filter STIR values based on search
@@ -44,15 +48,6 @@ export function StirFilterModal({
             stir.toLowerCase().includes(searchQuery.toLowerCase())
         );
     }, [allStirValues, searchQuery]);
-
-    // Count occurrences of each STIR
-    const stirCounts = useMemo(() => {
-        const counts = new Map<string, number>();
-        allStirValues.forEach(stir => {
-            counts.set(stir, (counts.get(stir) || 0) + 1);
-        });
-        return counts;
-    }, [allStirValues]);
 
     const handleToggle = (stir: string) => {
         setLocalSelected(prev =>
@@ -79,114 +74,115 @@ export function StirFilterModal({
         setLocalSelected([]);
         setLocalSort(null);
         setSearchQuery("");
+        onApply([], null);
+        onClose();
     };
 
+    if (!isOpen) return null;
+
     return (
-        <Dialog open={isOpen} onOpenChange={onClose}>
-            <DialogContent className="max-w-md max-h-[80vh] overflow-hidden flex flex-col">
-                <DialogHeader>
-                    <DialogTitle>{t.filterByStir}</DialogTitle>
-                </DialogHeader>
+        <div className="fixed inset-0 z-50" onClick={onClose}>
+            <div
+                className="absolute bg-white rounded-lg shadow-lg border border-gray-200 w-80"
+                style={{
+                    top: triggerElement ? `${triggerElement.getBoundingClientRect().bottom + 5}px` : '50%',
+                    left: triggerElement ? `${triggerElement.getBoundingClientRect().left}px` : '50%',
+                    transform: triggerElement ? 'none' : 'translate(-50%, -50%)',
+                }}
+                onClick={(e) => e.stopPropagation()}
+            >
+                {/* Header with Sort Controls */}
+                <div className="p-3 border-b border-gray-200">
+                    <div className="flex gap-2 mb-2">
+                        <Button
+                            variant={localSort === 'asc' ? 'default' : 'outline'}
+                            size="sm"
+                            onClick={() => setLocalSort(localSort === 'asc' ? null : 'asc')}
+                            className="flex-1 text-xs h-8"
+                        >
+                            <ArrowUp className="h-3 w-3 mr-1" />
+                            {t.sortAscending}
+                        </Button>
+                        <Button
+                            variant={localSort === 'desc' ? 'default' : 'outline'}
+                            size="sm"
+                            onClick={() => setLocalSort(localSort === 'desc' ? null : 'desc')}
+                            className="flex-1 text-xs h-8"
+                        >
+                            <ArrowDown className="h-3 w-3 mr-1" />
+                            {t.sortDescending}
+                        </Button>
+                    </div>
 
-                {/* Sort Controls */}
-                <div className="flex gap-2 mb-4">
-                    <Button
-                        variant={localSort === 'asc' ? 'default' : 'outline'}
-                        size="sm"
-                        onClick={() => setLocalSort(localSort === 'asc' ? null : 'asc')}
-                        className="flex-1"
-                    >
-                        <ArrowUp className="h-4 w-4 mr-2" />
-                        {t.sortAscending}
-                    </Button>
-                    <Button
-                        variant={localSort === 'desc' ? 'default' : 'outline'}
-                        size="sm"
-                        onClick={() => setLocalSort(localSort === 'desc' ? null : 'desc')}
-                        className="flex-1"
-                    >
-                        <ArrowDown className="h-4 w-4 mr-2" />
-                        {t.sortDescending}
-                    </Button>
-                </div>
-
-                {/* Search */}
-                <div className="relative mb-4">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                    {/* Search */}
                     <Input
                         type="text"
                         placeholder={t.search}
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        className="pl-10"
+                        className="h-8 text-sm"
                     />
                 </div>
 
                 {/* Select/Deselect All */}
-                <div className="flex gap-2 mb-2">
-                    <Button
-                        variant="ghost"
-                        size="sm"
+                <div className="flex gap-2 px-3 py-2 border-b border-gray-100">
+                    <button
                         onClick={handleSelectAll}
-                        className="flex-1 text-xs"
+                        className="flex-1 text-xs text-blue-600 hover:text-blue-800"
                     >
                         {t.selectAll}
-                    </Button>
-                    <Button
-                        variant="ghost"
-                        size="sm"
+                    </button>
+                    <button
                         onClick={handleDeselectAll}
-                        className="flex-1 text-xs"
+                        className="flex-1 text-xs text-gray-600 hover:text-gray-800"
                     >
                         {t.deselectAll}
-                    </Button>
+                    </button>
                 </div>
 
                 {/* STIR List */}
-                <div className="flex-1 overflow-y-auto border rounded-lg p-2 space-y-1">
+                <div className="max-h-60 overflow-y-auto p-2">
                     {filteredStirs.length === 0 ? (
-                        <div className="text-center text-gray-500 py-4">
+                        <div className="text-center text-gray-500 py-4 text-sm">
                             {t.noResults}
                         </div>
                     ) : (
-                        filteredStirs.map((stir) => {
-                            const count = stirCounts.get(stir) || 1;
-                            return (
-                                <label
-                                    key={stir}
-                                    className="flex items-center gap-2 p-2 hover:bg-gray-50 rounded cursor-pointer"
-                                >
-                                    <input
-                                        type="checkbox"
-                                        checked={localSelected.includes(stir)}
-                                        onChange={() => handleToggle(stir)}
-                                        className="cursor-pointer"
-                                    />
-                                    <span className="flex-1 text-sm">{stir}</span>
-                                    {count > 1 && (
-                                        <span className="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded">
-                                            x{count}
-                                        </span>
-                                    )}
-                                </label>
-                            );
-                        })
+                        filteredStirs.map((stir) => (
+                            <label
+                                key={stir}
+                                className="flex items-center gap-2 p-1.5 hover:bg-gray-50 rounded cursor-pointer"
+                            >
+                                <input
+                                    type="checkbox"
+                                    checked={localSelected.includes(stir)}
+                                    onChange={() => handleToggle(stir)}
+                                    className="cursor-pointer"
+                                />
+                                <span className="flex-1 text-sm">{stir}</span>
+                            </label>
+                        ))
                     )}
                 </div>
 
                 {/* Actions */}
-                <div className="flex justify-between gap-3 pt-4 border-t">
-                    <Button variant="outline" onClick={handleReset}>
+                <div className="flex gap-2 p-3 border-t border-gray-200">
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={handleReset}
+                        className="flex-1 h-8 text-xs"
+                    >
                         {t.reset}
                     </Button>
-                    <div className="flex gap-3">
-                        <Button variant="outline" onClick={onClose}>
-                            {t.close}
-                        </Button>
-                        <Button onClick={handleApply}>{t.apply}</Button>
-                    </div>
+                    <Button
+                        size="sm"
+                        onClick={handleApply}
+                        className="flex-1 h-8 text-xs"
+                    >
+                        {t.apply}
+                    </Button>
                 </div>
-            </DialogContent>
-        </Dialog>
+            </div>
+        </div>
     );
 }

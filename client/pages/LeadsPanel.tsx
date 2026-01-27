@@ -33,6 +33,7 @@ export default function LeadsPanel() {
     const [stirFilter, setStirFilter] = useState<string[]>([]);
     const [stirSortOrder, setStirSortOrder] = useState<'asc' | 'desc' | null>(null);
     const [isStirModalOpen, setIsStirModalOpen] = useState(false);
+    const [stirHeaderRef, setStirHeaderRef] = useState<HTMLElement | null>(null);
 
     // Leads-specific features
     const [selectedRows, setSelectedRows] = useState<Set<number>>(new Set());
@@ -62,18 +63,14 @@ export default function LeadsPanel() {
         return Array.from(users).sort();
     }, [leads]);
 
-    // Unique STIR values for filtering
+    // Unique STIR values for filtering - from FILTERED leads
     const uniqueStirs = useMemo(() => {
-        const stirs: string[] = [];
-        leads.forEach(l => {
-            if (l.stir) stirs.push(l.stir);
+        const stirSet = new Set<string>();
+        filteredLeads.forEach(l => {
+            if (l.stir) stirSet.add(l.stir);
         });
-        return stirs; // Keep duplicates for counting
-    }, [leads]);
-
-    const uniqueStirSet = useMemo(() => {
-        return Array.from(new Set(uniqueStirs)).sort();
-    }, [uniqueStirs]);
+        return Array.from(stirSet).sort();
+    }, [filteredLeads]);
 
     // Default Columns Definition
     const defaultColumns: ColumnSettings[] = useMemo(() => [
@@ -406,7 +403,10 @@ export default function LeadsPanel() {
                         // STIR Filter
                         stirFilter={stirFilter}
                         stirSortOrder={stirSortOrder}
-                        onStirFilterClick={() => setIsStirModalOpen(true)}
+                        onStirFilterClick={(e) => {
+                            setStirHeaderRef(e.currentTarget as HTMLElement);
+                            setIsStirModalOpen(true);
+                        }}
                     />
                 </div>
             </main>
@@ -455,6 +455,7 @@ export default function LeadsPanel() {
                 allStirValues={uniqueStirs}
                 selectedStirs={stirFilter}
                 sortOrder={stirSortOrder}
+                triggerElement={stirHeaderRef}
                 onApply={(selected, sort) => {
                     setStirFilter(selected);
                     setStirSortOrder(sort);

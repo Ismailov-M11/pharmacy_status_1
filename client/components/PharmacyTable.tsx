@@ -47,7 +47,7 @@ interface PharmacyTableProps {
   // STIR Filter props
   stirFilter?: string[];
   stirSortOrder?: 'asc' | 'desc' | null;
-  onStirFilterClick?: () => void;
+  onStirFilterClick?: (e: React.MouseEvent<HTMLTableCellElement>) => void;
 }
 
 export function PharmacyTable({
@@ -290,7 +290,7 @@ export function PharmacyTable({
           <th
             key={col.id}
             className={`px-2 md:px-4 py-2 md:py-3 text-left font-semibold text-gray-700 whitespace-nowrap min-w-max ${onStirFilterClick ? 'cursor-pointer hover:bg-gray-100' : ''}`}
-            onClick={onStirFilterClick}
+            onClick={onStirFilterClick ? (e) => onStirFilterClick(e) : undefined}
           >
             <div className="flex items-center gap-2">
               <span>{t.stir || "СТИР"}</span>
