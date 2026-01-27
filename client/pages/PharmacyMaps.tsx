@@ -267,24 +267,24 @@ export default function PharmacyMaps() {
           {
             balloonContent: `
               <div style="padding: 12px; font-family: Arial, sans-serif; max-width: 300px;">
-                <div style="font-weight: bold; font-size: 14px; margin-bottom: 8px; color: #1f2937;">${pharmacy.name}</div>
+                <div style="font-weight: bold; font-size: 14px; margin-bottom: 8px;">${pharmacy.name}</div>
                 <div style="font-size: 12px; margin-bottom: 4px;"><strong>${t.code || "Код"}:</strong> ${pharmacy.code}</div>
                 <div style="font-size: 12px; margin-bottom: 4px;"><strong>${t.address || "Адрес"}:</strong> ${pharmacy.address}</div>
-                <div style="font-size: 12px; margin-bottom: 4px;"><strong>${t.status || "Статус"}:</strong> <span style="color: ${pharmacy.active ? "#059669" : "#d97706"}">${pharmacy.active ? (t.active || "Активна") : (t.inactive || "Неактивна")}</span></div>
-                ${pharmacy.phone ? `<div style="font-size: 12px; margin-bottom: 8px;"><strong>${t.pharmacyPhone || "Телефон"}:</strong> <a href="tel:${pharmacy.phone}" style="color: #2563eb;">${pharmacy.phone}</a></div>` : ""}
+                <div style="font-size: 12px; margin-bottom: 4px;"><strong>${t.status || "Статус"}:</strong> <span style="font-weight: bold; color: ${pharmacy.active ? "#10b981" : "#f59e0b"}">${pharmacy.active ? (t.active || "Активна") : (t.inactive || "Неактивна")}</span></div>
+                ${pharmacy.phone ? `<div style="font-size: 12px; margin-bottom: 8px;"><strong>${t.pharmacyPhone || "Телефон"}:</strong> <a href="tel:${pharmacy.phone}" style="color: #3b82f6;">${pharmacy.phone}</a></div>` : ""}
                 
-                 <div style="margin-top: 8px; border-top: 1px solid #eee; padding-top: 8px; display: flex; flex-direction: column; gap: 4px;">
+                 <div style="margin-top: 8px; border-top: 1px solid #e5e7eb; padding-top: 8px; display: flex; flex-direction: column; gap: 4px;">
                     <div style="font-size: 12px; display: flex; justify-content: space-between;">
-                        <span style="color: #6b7280;">${t.telegramBot || "Telegram Bot"}:</span>
-                        <span style="font-weight: bold; color: ${pharmacy.marketChats?.length ? '#059669' : '#dc2626'};">${pharmacy.marketChats?.length ? (t.yes || "ЕСТЬ") : (t.no || "НЕТ")}</span>
+                        <span style="opacity: 0.8;">${t.telegramBot || "Telegram Bot"}:</span>
+                        <span style="font-weight: bold; color: ${pharmacy.marketChats?.length ? '#10b981' : '#ef4444'};">${pharmacy.marketChats?.length ? (t.yes || "ЕСТЬ") : (t.no || "НЕТ")}</span>
                     </div>
                     <div style="font-size: 12px; display: flex; justify-content: space-between;">
-                        <span style="color: #6b7280;">${t.brandedPacket || "Пакет"}:</span>
-                        <span style="font-weight: bold; color: ${pharmacy.brandedPacket ? '#059669' : '#dc2626'};">${pharmacy.brandedPacket ? (t.yes || "ЕСТЬ") : (t.no || "НЕТ")}</span>
+                        <span style="opacity: 0.8;">${t.brandedPacket || "Пакет"}:</span>
+                        <span style="font-weight: bold; color: ${pharmacy.brandedPacket ? '#10b981' : '#ef4444'};">${pharmacy.brandedPacket ? (t.yes || "ЕСТЬ") : (t.no || "НЕТ")}</span>
                     </div>
                     <div style="font-size: 12px; display: flex; justify-content: space-between;">
-                         <span style="color: #6b7280;">${t.training || "Обучение"}:</span>
-                         <span style="font-weight: bold; color: ${pharmacy.training ? '#059669' : '#dc2626'};">${pharmacy.training ? (t.yes || "ЕСТЬ") : (t.no || "НЕТ")}</span>
+                         <span style="opacity: 0.8;">${t.training || "Обучение"}:</span>
+                         <span style="font-weight: bold; color: ${pharmacy.training ? '#10b981' : '#ef4444'};">${pharmacy.training ? (t.yes || "ЕСТЬ") : (t.no || "НЕТ")}</span>
                     </div>
                  </div>
               </div>
@@ -628,7 +628,7 @@ export default function PharmacyMaps() {
                 placeholder={`${t.pharmacyName || "Поиск аптеки"}...`}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)} // State update triggers effect
-                className="w-full bg-gray-50 border-gray-200 focus:bg-white transition-colors"
+                className="w-full bg-gray-50 border-gray-200 focus:bg-white transition-colors dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 dark:focus:bg-gray-600 dark:placeholder-gray-400"
               />
               <Button
                 variant={isFiltersOpen ? "default" : "outline"}

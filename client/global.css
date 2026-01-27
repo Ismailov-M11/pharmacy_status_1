@@ -208,3 +208,34 @@
   pointer-events: none;
   z-index: 1000;
 }
+
+/* Yandex Balloon Dark Mode Overrides */
+.yandex-map-dark [class*="-balloon__content"] {
+  background-color: #1f2937 !important;
+  color: #f3f4f6 !important;
+  border-radius: 8px !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5) !important;
+}
+
+.yandex-map-dark [class*="-balloon__tail"]:after {
+  background-color: #1f2937 !important;
+}
+
+.yandex-map-dark [class*="-balloon__close-button"] {
+  filter: invert(1) brightness(2);
+}
+
+/* Ensure links in balloon are visible */
+.yandex-map-dark [class*="-balloon__content"] a {
+  color: #60a5fa !important;
+}
+
+/* Ensure strong tags are light */
+.yandex-map-dark [class*="-balloon__content"] strong {
+  color: #e5e7eb !important;
+}
+
+/* Ensure spans with explicit color are legible or inverted if needed, but easier to just let them pop */
+.yandex-map-dark [class*="-balloon__content"] span {
+  /* We might need to ensure they aren't too dark, but the inline styles set specific colors like #059669 which is readable on dark */
+}
