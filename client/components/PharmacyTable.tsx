@@ -132,12 +132,18 @@ export function PharmacyTable({
         return <th key={col.id} className="px-2 py-2 md:py-3 text-left font-semibold text-gray-700 whitespace-nowrap" style={{ width: "110px" }}>{t.leadPhone}</th>;
 
       case "telegramBot":
+        const hasTelegramFilter = telegramBotFilter !== null;
         return (
           <th key={col.id} className="px-2 md:px-4 py-2 md:py-3 text-center font-semibold text-gray-700 whitespace-nowrap min-w-max">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm" className="-ml-3 h-8 data-[state=open]:bg-purple-600 data-[state=open]:text-white">
-                  <span>{t.telegramBot}</span><ChevronDown className="ml-2 h-4 w-4" />
+                <Button variant="ghost" size="sm" className="-ml-3 h-8 data-[state=open]:bg-purple-600 data-[state=open]:text-white hover:bg-gray-100">
+                  <div className="flex items-center gap-2">
+                    <span>{t.telegramBot}</span>
+                    {hasTelegramFilter && (
+                      <span className="text-xs bg-blue-100 text-blue-800 px-1.5 py-0.5 rounded">1</span>
+                    )}
+                  </div>
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="start">
@@ -152,12 +158,18 @@ export function PharmacyTable({
         );
 
       case "training":
+        const hasTrainingFilter = trainingFilter !== null;
         return (
           <th key={col.id} className="px-2 md:px-4 py-2 md:py-3 text-center font-semibold text-gray-700 whitespace-nowrap min-w-max">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm" className="-ml-3 h-8 data-[state=open]:bg-purple-600 data-[state=open]:text-white">
-                  <span>{t.training}</span><ChevronDown className="ml-2 h-4 w-4" />
+                <Button variant="ghost" size="sm" className="-ml-3 h-8 data-[state=open]:bg-purple-600 data-[state=open]:text-white hover:bg-gray-100">
+                  <div className="flex items-center gap-2">
+                    <span>{t.training}</span>
+                    {hasTrainingFilter && (
+                      <span className="text-xs bg-blue-100 text-blue-800 px-1.5 py-0.5 rounded">1</span>
+                    )}
+                  </div>
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="start">
@@ -172,12 +184,18 @@ export function PharmacyTable({
         );
 
       case "brandedPacket":
+        const hasBrandedPacketFilter = brandedPacketFilter !== null;
         return (
           <th key={col.id} className="px-2 md:px-4 py-2 md:py-3 text-center font-semibold text-gray-700 whitespace-nowrap min-w-max">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm" className="-ml-3 h-8 data-[state=open]:bg-purple-600 data-[state=open]:text-white">
-                  <span>{t.brandedPacket}</span><ChevronDown className="ml-2 h-4 w-4" />
+                <Button variant="ghost" size="sm" className="-ml-3 h-8 data-[state=open]:bg-purple-600 data-[state=open]:text-white hover:bg-gray-100">
+                  <div className="flex items-center gap-2">
+                    <span>{t.brandedPacket}</span>
+                    {hasBrandedPacketFilter && (
+                      <span className="text-xs bg-blue-100 text-blue-800 px-1.5 py-0.5 rounded">1</span>
+                    )}
+                  </div>
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="start">
@@ -196,13 +214,19 @@ export function PharmacyTable({
 
       case "leadStatus":
         if (!isAdmin) return null;
+        const hasLeadStatusFilter = leadStatusFilter !== null;
         return (
           <th key={col.id} className="px-2 md:px-4 py-2 md:py-3 text-left font-semibold text-gray-700 whitespace-nowrap min-w-max">
             {onLeadStatusFilterChange && leadStatusOptions && leadStatusOptions.length > 0 ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="sm" className="-ml-3 h-8 data-[state=open]:bg-purple-600 data-[state=open]:text-white">
-                    <span>{t.leadStatus}</span><ChevronDown className="ml-2 h-4 w-4" />
+                  <Button variant="ghost" size="sm" className="-ml-3 h-8 data-[state=open]:bg-purple-600 data-[state=open]:text-white hover:bg-gray-100">
+                    <div className="flex items-center gap-2">
+                      <span>{t.leadStatus}</span>
+                      {hasLeadStatusFilter && (
+                        <span className="text-xs bg-blue-100 text-blue-800 px-1.5 py-0.5 rounded">1</span>
+                      )}
+                    </div>
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="start">
@@ -250,17 +274,22 @@ export function PharmacyTable({
         );
 
       case "commentUser":
+        const hasCommentUserFilter = commentUserFilter !== null;
         return (
           <th key={col.id} className="px-2 md:px-4 py-2 md:py-3 text-left font-semibold text-gray-700 whitespace-nowrap min-w-max">
             {onCommentUserFilterChange && commentUserOptions && commentUserOptions.length > 0 ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="sm" className="-ml-3 h-8 data-[state=open]:bg-purple-600 data-[state=open]:text-white">
-                    <div className="flex flex-col items-start">
-                      <span>{t.lastCommentUser || "Автор"}</span>
-                      <span className="text-[10px] font-normal text-gray-500">Lead</span>
+                  <Button variant="ghost" size="sm" className="-ml-3 h-8 data-[state=open]:bg-purple-600 data-[state=open]:text-white hover:bg-gray-100">
+                    <div className="flex items-center gap-2">
+                      <div className="flex flex-col items-start">
+                        <span>{t.lastCommentUser || "Автор"}</span>
+                        <span className="text-[10px] font-normal text-gray-500">Lead</span>
+                      </div>
+                      {hasCommentUserFilter && (
+                        <span className="text-xs bg-blue-100 text-blue-800 px-1.5 py-0.5 rounded">1</span>
+                      )}
                     </div>
-                    <ChevronDown className="ml-2 h-4 w-4" />
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="start">
