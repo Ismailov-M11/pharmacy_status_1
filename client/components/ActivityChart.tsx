@@ -153,13 +153,13 @@ export function ActivityChart({
 
   if (isLoading) {
     return (
-      <Card className="p-6 mb-8">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">
+      <Card className="p-6 mb-8 dark:bg-gray-800">
+        <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
           {t.activitiesChart} — {monthName}
         </h2>
         <div className="flex items-center justify-center h-64">
           <div className="animate-pulse w-full">
-            <div className="h-full bg-gray-200 rounded"></div>
+            <div className="h-full bg-gray-200 dark:bg-gray-700 rounded"></div>
           </div>
         </div>
       </Card>
@@ -168,12 +168,12 @@ export function ActivityChart({
 
   if (chartData.length === 0) {
     return (
-      <Card className="p-6 mb-8">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">
+      <Card className="p-6 mb-8 dark:bg-gray-800">
+        <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
           {t.activitiesChart} — {monthName}
         </h2>
         <div className="flex items-center justify-center h-64">
-          <span className="text-gray-500">{t.noActivities}</span>
+          <span className="text-gray-500 dark:text-gray-400">{t.noActivities}</span>
         </div>
       </Card>
     );
@@ -181,8 +181,8 @@ export function ActivityChart({
 
   return (
     <div className="mb-8">
-      <Card className="p-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-6">
+      <Card className="p-6 dark:bg-gray-800">
+        <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-6">
           {t.activitiesChart} — {monthName}
         </h2>
         <ResponsiveContainer width="100%" height={400}>
