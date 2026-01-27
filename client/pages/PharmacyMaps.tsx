@@ -92,7 +92,7 @@ export default function PharmacyMaps() {
   const mapRef = useRef<any>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Load Yandex Maps API v3
+  // Load Yandex Maps API and initialize
   useEffect(() => {
     if (authLoading) return;
     if (!token) {
@@ -100,64 +100,67 @@ export default function PharmacyMaps() {
       return;
     }
 
-    // Check if script already exists
-    if (document.getElementById('ymaps3-script')) {
-      initializeMap();
-      return;
-    }
-
+    // Load Yandex Maps API script
     const script = document.createElement("script");
-    script.id = 'ymaps3-script';
-    script.src = `https://api-maps.yandex.ru/v3/?apikey=${import.meta.env.VITE_YANDEX_MAP_KEY}&lang=ru_RU`;
+    script.src =
+      `https://api-maps.yandex.ru/2.1/?apikey=${import.meta.env.VITE_YANDEX_MAP_KEY}&lang=ru_RU`;
     script.type = "text/javascript";
     script.async = true;
 
     script.onload = () => {
-      console.log("✅ Yandex Maps V3 script loaded");
-      initializeMap();
+      console.log("✅ Yandex Maps API script loaded successfully");
+      if (window.ymaps) {
+        console.log("📍 ymaps object available, waiting for ready...");
+        window.ymaps.ready(() => {
+          console.log("📍 ymaps ready, initializing map");
+          initializeMap();
+        });
+      } else {
+        console.error("❌ ymaps object not available after script load");
+      }
     };
 
     script.onerror = () => {
-      console.error("❌ Failed to load Yandex Maps V3");
-      toast.error("Не удалось загрузить карты");
+      console.error("❌ Failed to load Yandex Maps API script");
+      toast.error("Не удалось загрузить Yandex Maps");
     };
 
+    console.log("📌 Adding Yandex Maps script to document");
     document.head.appendChild(script);
 
     return () => {
-      // Cleanup if needed
+      // Cleanup script on unmount if needed
     };
   }, [token, authLoading, navigate]);
 
-  const initializeMap = async () => {
-    if (!containerRef.current || !window.ymaps3) return;
+  const initializeMap = () => {
+    if (!containerRef.current) {
+      console.error("❌ Map container not found");
+      return;
+    }
 
     try {
-      await window.ymaps3.ready;
+      console.log("📍 Initializing Yandex Map...");
 
-      const { YMap, YMapDefaultSchemeLayer, YMapDefaultFeaturesLayer, YMapControls, YMapZoomControl } = window.ymaps3;
+      mapRef.current = new window.ymaps.Map(containerRef.current, {
+        center: TASHKENT_CENTER,
+        zoom: 11,
+        controls: ["zoomControl", "fullscreenControl"],
+        behaviors: ["default", "scrollZoom"],
+      });
 
-      if (!mapRef.current) {
-        mapRef.current = new YMap(containerRef.current, {
-          location: {
-            center: TASHKENT_CENTER,
-            zoom: 11
-          },
-          theme: theme === 'dark' ? 'dark' : 'light'
-        });
+      console.log("✅ Map initialized successfully");
 
-        mapRef.current.addChild(new YMapDefaultSchemeLayer({}));
-        mapRef.current.addChild(new YMapDefaultFeaturesLayer({}));
-
-        const controls = new YMapControls({ position: 'right' });
-        controls.addChild(new YMapZoomControl({}));
-        mapRef.current.addChild(controls);
-
-        console.log("✅ Map V3 initialized");
-        fetchPharmacies();
+      // Apply dark theme class if needed on init
+      if (theme === 'dark') {
+        containerRef.current.classList.add('yandex-map-dark');
       }
+
+      // Fetch pharmacies after map is initialized
+      fetchPharmacies();
     } catch (error) {
-      console.error("❌ Failed to initialize V3 map:", error);
+      console.error("❌ Failed to initialize map:", error);
+      toast.error("Не удалось инициализировать карту");
     }
   };
 
