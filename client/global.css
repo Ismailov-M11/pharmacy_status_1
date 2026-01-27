@@ -196,3 +196,15 @@
 .yandex-map-dark [class*="ymaps-2"][class*="-copyrights-promo"] {
   filter: invert(100%) hue-rotate(180deg);
 }
+
+/* Background Tint (Lifts black -> Dark Blue) */
+.yandex-map-dark::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-color: #0f172a;
+  /* Slate 900 - Dark Blue */
+  mix-blend-mode: lighten;
+  pointer-events: none;
+  z-index: 1000;
+}
