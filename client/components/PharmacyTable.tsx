@@ -220,7 +220,7 @@ export function PharmacyTable({
             {onLeadStatusFilterChange && leadStatusOptions && leadStatusOptions.length > 0 ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="sm" className="-ml-3 h-8 data-[state=open]:bg-purple-600 data-[state=open]:text-white hover:bg-gray-100">
+                  <Button variant="ghost" size="sm" className="-ml-3 h-8 data-[state=open]:bg-purple-600 data-[state=open]:text-white">
                     <div className="flex items-center gap-2">
                       <span>{t.leadStatus}</span>
                       {hasLeadStatusFilter && (
@@ -280,7 +280,7 @@ export function PharmacyTable({
             {onCommentUserFilterChange && commentUserOptions && commentUserOptions.length > 0 ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="sm" className="-ml-3 h-8 data-[state=open]:bg-purple-600 data-[state=open]:text-white hover:bg-gray-100">
+                  <Button variant="ghost" size="sm" className="-ml-3 h-8 data-[state=open]:bg-purple-600 data-[state=open]:text-white">
                     <div className="flex items-center gap-2">
                       <div className="flex flex-col items-start">
                         <span>{t.lastCommentUser || "Автор"}</span>

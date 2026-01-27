@@ -99,11 +99,15 @@ export default function AdminPanel() {
       const matchesTraining =
         trainingFilter === null ? true : (p as any).training === trainingFilter;
 
+      const matchesActive =
+        activeFilter === null ? true : p.active === activeFilter;
+
       return (
         matchesSearch &&
         matchesTelegramBot &&
         matchesBrandedPacket &&
-        matchesTraining
+        matchesTraining &&
+        matchesActive
       );
     });
     setFilteredPharmacies(filtered);
@@ -113,6 +117,7 @@ export default function AdminPanel() {
     telegramBotFilter,
     brandedPacketFilter,
     trainingFilter,
+    activeFilter,
   ]);
 
   const fetchPharmacies = async () => {
