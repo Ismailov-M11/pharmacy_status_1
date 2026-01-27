@@ -34,6 +34,9 @@ export default function LeadsPanel() {
     const [stirSortOrder, setStirSortOrder] = useState<'asc' | 'desc' | null>(null);
     const [isStirModalOpen, setIsStirModalOpen] = useState(false);
     const [stirHeaderRef, setStirHeaderRef] = useState<HTMLElement | null>(null);
+    const [telegramBotFilter, setTelegramBotFilter] = useState<boolean | null>(null);
+    const [brandedPacketFilter, setBrandedPacketFilter] = useState<boolean | null>(null);
+    const [trainingFilter, setTrainingFilter] = useState<boolean | null>(null);
 
     // Leads-specific features
     const [selectedRows, setSelectedRows] = useState<Set<number>>(new Set());
@@ -314,7 +317,24 @@ export default function LeadsPanel() {
                 ? true
                 : p.stir && stirFilter.includes(p.stir);
 
-            return matchesSearch && matchesLeadStatus && matchesActive && matchesCommentUser && matchesCommentDate && matchesStir;
+            // 7. Telegram Bot Filter
+            const matchesTelegramBot = telegramBotFilter === null
+                ? true
+                : telegramBotFilter
+                    ? (p as any).marketChats && (p as any).marketChats.length > 0
+                    : !(p as any).marketChats || (p as any).marketChats.length === 0;
+
+            // 8. Branded Packet Filter
+            const matchesBrandedPacket = brandedPacketFilter === null
+                ? true
+                : (p as any).brandedPacket === brandedPacketFilter;
+
+            // 9. Training Filter
+            const matchesTraining = trainingFilter === null
+                ? true
+                : (p as any).training === trainingFilter;
+
+            return matchesSearch && matchesLeadStatus && matchesActive && matchesCommentUser && matchesCommentDate && matchesStir && matchesTelegramBot && matchesBrandedPacket && matchesTraining;
         });
 
         // Apply STIR sorting if enabled
@@ -331,7 +351,7 @@ export default function LeadsPanel() {
         }
 
         setFilteredLeads(filtered);
-    }, [searchQuery, leads, leadStatusFilter, activeFilter, commentUserFilter, commentDateFilter, stirFilter, stirSortOrder]);
+    }, [searchQuery, leads, leadStatusFilter, activeFilter, commentUserFilter, commentDateFilter, stirFilter, stirSortOrder, telegramBotFilter, brandedPacketFilter, trainingFilter]);
 
     if (authLoading) {
         return (
@@ -367,12 +387,12 @@ export default function LeadsPanel() {
                         // Standard Filters
                         activeFilter={activeFilter}
                         onFilterChange={setActiveFilter}
-                        telegramBotFilter={null}
-                        onTelegramBotFilterChange={() => { }}
-                        brandedPacketFilter={null}
-                        onBrandedPacketFilterChange={() => { }}
-                        trainingFilter={null}
-                        onTrainingFilterChange={() => { }}
+                        telegramBotFilter={telegramBotFilter}
+                        onTelegramBotFilterChange={setTelegramBotFilter}
+                        brandedPacketFilter={brandedPacketFilter}
+                        onBrandedPacketFilterChange={setBrandedPacketFilter}
+                        trainingFilter={trainingFilter}
+                        onTrainingFilterChange={setTrainingFilter}
 
                         // Search
                         searchQuery={searchQuery}
