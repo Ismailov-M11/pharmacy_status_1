@@ -318,26 +318,36 @@ export function PharmacyTable({
         return (
           <th
             key={col.id}
-            className={`px-2 md:px-4 py-2 md:py-3 text-left font-semibold text-gray-700 whitespace-nowrap min-w-max ${onStirFilterClick ? 'cursor-pointer hover:bg-purple-600 hover:text-white dark:hover:bg-purple-600 dark:hover:text-white transition-colors' : ''}`}
-            onClick={onStirFilterClick ? (e) => onStirFilterClick(e) : undefined}
+            className="px-2 md:px-4 py-2 md:py-3 text-left font-semibold text-gray-700 whitespace-nowrap min-w-max"
           >
-            <div className="flex items-center gap-2">
-              <span>{t.stir || "СТИР"}</span>
-              {(hasStirFilter || hasStirSort) && (
-                <div className="flex items-center gap-1">
-                  {hasStirFilter && (
-                    <span className="text-xs bg-blue-100 text-blue-800 px-1.5 py-0.5 rounded">
-                      {stirFilter.length}
-                    </span>
-                  )}
-                  {hasStirSort && (
-                    <span className="text-xs text-blue-600">
-                      {stirSortOrder === 'asc' ? '↑' : '↓'}
-                    </span>
+            {onStirFilterClick ? (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="-ml-3 h-8 hover:bg-purple-600 hover:text-white transition-colors"
+                onClick={onStirFilterClick}
+              >
+                <div className="flex items-center gap-2">
+                  <span>{t.stir || "СТИР"}</span>
+                  {(hasStirFilter || hasStirSort) && (
+                    <div className="flex items-center gap-1">
+                      {hasStirFilter && (
+                        <span className="text-xs bg-blue-100 text-blue-800 px-1.5 py-0.5 rounded">
+                          {stirFilter.length}
+                        </span>
+                      )}
+                      {hasStirSort && (
+                        <span className="text-xs text-blue-600">
+                          {stirSortOrder === 'asc' ? '↑' : '↓'}
+                        </span>
+                      )}
+                    </div>
                   )}
                 </div>
-              )}
-            </div>
+              </Button>
+            ) : (
+              t.stir || "СТИР"
+            )}
           </th>
         );
 
