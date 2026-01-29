@@ -131,6 +131,15 @@ export function PharmacyTable({
       case "leadPhone":
         return <th key={col.id} className="px-2 py-2 md:py-3 text-left font-semibold text-gray-700 whitespace-nowrap" style={{ width: "110px" }}>{t.leadPhone}</th>;
 
+      case "merchantStatus":
+        return (
+          <th key={col.id} className="px-2 md:px-4 py-2 md:py-3 text-center font-semibold text-gray-700 whitespace-nowrap min-w-max">
+            <div className="flex flex-col items-start">
+              <span>{t.merchantStatus || "Merchant - статус"}</span>
+            </div>
+          </th>
+        );
+
       case "telegramBot":
         const hasTelegramFilter = telegramBotFilter !== null;
         return (
@@ -389,6 +398,20 @@ export function PharmacyTable({
       case "landmark": return <td key={col.id} className="px-2 py-2 md:py-3 text-gray-600 align-top"><div className="break-words" style={{ lineHeight: "1.4em", minHeight: "4.2em" }}>{pharmacy.landmark || "-"}</div></td>;
       case "pharmacyPhone": return <td key={col.id} className="px-2 py-2 md:py-3 text-gray-900 whitespace-nowrap align-top">{pharmacy.phone || "-"}</td>;
       case "leadPhone": return <td key={col.id} className="px-2 py-2 md:py-3 text-gray-900 whitespace-nowrap align-top">{pharmacy.lead?.phone || "-"}</td>;
+
+      case "merchantStatus": {
+        const isOnline = pharmacy.merchantOnline ?? false;
+        return (
+          <td key={col.id} className="px-2 md:px-4 py-2 md:py-3 text-center">
+            <span className={`px-2 py-1 rounded text-xs font-bold inline-block whitespace-nowrap ${isOnline
+                ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300"
+                : "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300"
+              }`}>
+              {isOnline ? (t.online || "Online") : (t.offline || "Offline")}
+            </span>
+          </td>
+        );
+      }
 
       case "telegramBot": {
         const marketChats = pharmacy.marketChats;

@@ -13,6 +13,7 @@ import {
   getStatusHistory,
   deleteHistoryRecord,
   StatusHistoryRecord,
+  getMarketSessionList,
 } from "@/lib/api";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
@@ -128,15 +129,26 @@ export default function AdminPanel() {
       const response = await getPharmacyList(token, "", 0, activeFilter);
       const pharmacyList = response.payload?.list || [];
 
-      // Fetch statuses from local backend for all pharmacies
+      // Fetch statuses from local backend and session data for all pharmacies
       const pharmaciesWithStatuses = await Promise.all(
         pharmacyList.map(async (pharmacy) => {
           try {
-            const status = await getPharmacyStatus(pharmacy.id);
+            // Fetch both status and session data in parallel
+            const [status, sessionData] = await Promise.all([
+              getPharmacyStatus(pharmacy.id),
+              getMarketSessionList(token, pharmacy.id),
+            ]);
+
+            // Determine if pharmacy is online (any active session)
+            const isOnline = sessionData.payload.list.some(
+              (session) => session.active === true
+            );
+
             return {
               ...pharmacy,
               training: status.training,
               brandedPacket: status.brandedPacket,
+              merchantOnline: isOnline,
             };
           } catch (error) {
             // If status not found, use defaults
@@ -148,6 +160,7 @@ export default function AdminPanel() {
               ...pharmacy,
               training: false,
               brandedPacket: false,
+              merchantOnline: false,
             };
           }
         }),

@@ -64,6 +64,9 @@ export const translations = {
     allPharmacies: "Все аптеки",
     dateTime: "Дата/время изменения",
     phone: "Телефон",
+    merchantStatus: "Merchant - статус",
+    online: "Online",
+    offline: "Offline",
 
     timeLabel: "Время",
     lastCommentDate: "Дата посл. комм.",
@@ -267,6 +270,9 @@ export const translations = {
     allPharmacies: "Barcha dorixonalar",
     dateTime: "O'zgarish sanasi/vaqti",
     phone: "Telefon",
+    merchantStatus: "Merchant - holati",
+    online: "Online",
+    offline: "Offline",
 
     timeLabel: "Vaqt",
     lastCommentDate: "So'nggi izoh sanasi",

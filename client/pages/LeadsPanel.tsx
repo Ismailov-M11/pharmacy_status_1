@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
-import { getLeadsList, getPharmacyList, getPharmacyStatus, Pharmacy, getUserColumnSettings, saveUserColumnSettings, ColumnSettings, updatePharmacyStatusLocal } from "@/lib/api";
+import { getLeadsList, getPharmacyList, getPharmacyStatus, Pharmacy, getUserColumnSettings, saveUserColumnSettings, ColumnSettings, updatePharmacyStatusLocal, getMarketSessionList } from "@/lib/api";
 import { PharmacyTable } from "@/components/PharmacyTable";
 import { Header } from "@/components/Header";
 import { PharmacyDetailModal } from "@/components/PharmacyDetailModal";
@@ -84,10 +84,11 @@ export default function LeadsPanel() {
         { id: "landmark", label: t.landmark || "Landmark", visible: true, order: 4 },
         { id: "pharmacyPhone", label: t.pharmacyPhone || "Phone", visible: true, order: 5 },
         { id: "leadPhone", label: t.leadPhone || "Lead Phone", visible: true, order: 6 },
-        { id: "telegramBot", label: t.telegramBot || "Bot", visible: true, order: 7 },
-        { id: "training", label: t.training || "Training", visible: true, order: 8 },
-        { id: "brandedPacket", label: t.brandedPacket || "Packet", visible: true, order: 9 },
-        { id: "status", label: t.status || "Status", visible: true, order: 10 },
+        { id: "merchantStatus", label: t.merchantStatus || "Merchant - статус", visible: true, order: 7 },
+        { id: "telegramBot", label: t.telegramBot || "Bot", visible: true, order: 8 },
+        { id: "training", label: t.training || "Training", visible: true, order: 9 },
+        { id: "brandedPacket", label: t.brandedPacket || "Packet", visible: true, order: 10 },
+        { id: "status", label: t.status || "Status", visible: true, order: 11 },
         { id: "leadStatus", label: t.leadStatus || "Lead Status", visible: true, order: 11 },
         { id: "comments", label: t.comments || "Comments", visible: true, order: 12 },
         { id: "commentUser", label: t.commentUser || "Comment User", visible: true, order: 13 },
@@ -166,14 +167,25 @@ export default function LeadsPanel() {
                     // Find corresponding pharmacy in market list using the Lead's ID
                     const marketMatch = marketMap.get(item.id);
 
-                    // Fetch Local Status (Packet/Training)
+                    // Fetch Local Status (Packet/Training) and Session Data
                     let status = { brandedPacket: false, training: false };
+                    let merchantOnline = false;
 
                     if (marketMatch) {
                         try {
-                            const fetchedStatus = await getPharmacyStatus(marketMatch.id);
+                            // Fetch both status and session data in parallel
+                            const [fetchedStatus, sessionData] = await Promise.all([
+                                getPharmacyStatus(marketMatch.id),
+                                getMarketSessionList(token, marketMatch.id),
+                            ]);
+
                             status.brandedPacket = fetchedStatus.brandedPacket;
                             status.training = fetchedStatus.training;
+
+                            // Determine if pharmacy is online (any active session)
+                            merchantOnline = sessionData.payload.list.some(
+                                (session) => session.active === true
+                            );
                         } catch (ignore) {
                             // Keep defaults
                         }
@@ -192,6 +204,7 @@ export default function LeadsPanel() {
                         marketChats: marketMatch ? marketMatch.marketChats : [],
                         brandedPacket: status.brandedPacket,
                         training: status.training,
+                        merchantOnline: merchantOnline,
                         creationDate: item.creationDate || new Date().toISOString(),
                         modifiedDate: item.modifiedDate || new Date().toISOString(),
                         comments: item.coments || item.comments || []

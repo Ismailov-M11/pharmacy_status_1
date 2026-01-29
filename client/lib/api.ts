@@ -68,6 +68,30 @@ export interface Comment {
   creator: CommentCreator;
 }
 
+export interface MarketSession {
+  id: number;
+  market: {
+    id: number;
+    name: string;
+    code: string;
+  };
+  deviceId: string;
+  deviceInfo: string;
+  ipAddress: string;
+  connectionCount: number;
+  active: boolean;
+  creationDate: string;
+}
+
+export interface MarketSessionResponse {
+  payload: {
+    list: MarketSession[];
+    total: number;
+  };
+  status: string;
+  code: number;
+}
+
 export interface Pharmacy {
   id: number;
   code: string;
@@ -83,6 +107,7 @@ export interface Pharmacy {
   landmark?: string;
   training?: boolean;
   brandedPacket?: boolean;
+  merchantOnline?: boolean; // New field for merchant online status
   stir?: string;
   juridicalName?: string;
   juridicalAddress?: string;
@@ -176,6 +201,41 @@ export async function getLeadsList(
   }
 
   return response.json();
+}
+
+export async function getMarketSessionList(
+  token: string,
+  marketId: number
+): Promise<MarketSessionResponse> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/market/session-list`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ marketId }),
+    });
+
+    if (!response.ok) {
+      // Return empty list if API fails
+      return {
+        payload: { list: [], total: 0 },
+        status: "Error",
+        code: response.status,
+      };
+    }
+
+    return response.json();
+  } catch (error) {
+    // Return empty list on error
+    console.warn(`Failed to fetch session for market ${marketId}:`, error);
+    return {
+      payload: { list: [], total: 0 },
+      status: "Error",
+      code: 500,
+    };
+  }
 }
 
 export async function updatePharmacyStatus(
