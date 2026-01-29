@@ -841,6 +841,51 @@ export function PharmacyTable({
                           size="sm"
                           className="-ml-3 h-8 data-[state=open]:bg-purple-600 data-[state=open]:text-white"
                         >
+                          <span>{t.merchantStatus || "Merchant - статус"}</span>
+                          <ChevronDown className="ml-2 h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="start">
+                        <DropdownMenuRadioGroup
+                          value={
+                            merchantStatusFilter === true
+                              ? "true"
+                              : merchantStatusFilter === false
+                                ? "false"
+                                : "null"
+                          }
+                          onValueChange={(val) =>
+                            handleFilterChange(val, onMerchantStatusFilterChange)
+                          }
+                        >
+                          <DropdownMenuRadioItem value="null">
+                            {t.allPharmacies}
+                          </DropdownMenuRadioItem>
+                          <DropdownMenuRadioItem
+                            value="true"
+                            className="bg-emerald-100 text-emerald-800 focus:bg-emerald-200 focus:text-emerald-900 m-1 cursor-pointer"
+                          >
+                            {t.online}
+                          </DropdownMenuRadioItem>
+                          <DropdownMenuRadioItem
+                            value="false"
+                            className="bg-red-100 text-red-800 focus:bg-red-200 focus:text-red-900 m-1 cursor-pointer"
+                          >
+                            {t.offline}
+                          </DropdownMenuRadioItem>
+                        </DropdownMenuRadioGroup>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </th>
+
+                  <th className="px-2 md:px-4 py-2 md:py-3 text-center font-semibold text-gray-700 whitespace-nowrap min-w-max">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="-ml-3 h-8 data-[state=open]:bg-purple-600 data-[state=open]:text-white"
+                        >
                           <span>{t.telegramBot}</span>
                           <ChevronDown className="ml-2 h-4 w-4" />
                         </Button>
@@ -1277,6 +1322,15 @@ export function PharmacyTable({
                         </td>
                         <td className="px-2 py-2 md:py-3 text-gray-900 whitespace-nowrap align-top">
                           {pharmacy.lead?.phone || "-"}
+                        </td>
+
+                        <td className="px-2 md:px-4 py-2 md:py-3 text-center">
+                          <span className={`px-2 py-1 rounded text-xs font-bold inline-block whitespace-nowrap ${pharmacy.merchantOnline
+                              ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300"
+                              : "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300"
+                            }`}>
+                            {pharmacy.merchantOnline ? (t.online || "Online") : (t.offline || "Offline")}
+                          </span>
                         </td>
 
                         <td className="px-2 md:px-4 py-2 md:py-3 text-center">
