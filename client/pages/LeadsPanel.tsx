@@ -107,6 +107,91 @@ export default function LeadsPanel() {
     ], [t]);
 
     // Data Fetching
+
+    // Fetch data function - defined here so it can be called by refresh button
+    const fetchData = async () => {
+        if (!token) return;
+
+        setIsLoading(true);
+        try {
+            // 1. Parallel Fetch: Leads and Market List
+            const [leadsResponse, marketResponse] = await Promise.all([
+                getLeadsList(token, "", 0, 10000),
+                getPharmacyList(token, "", 0, null, 10000)
+            ]);
+
+            const rawLeads = leadsResponse.payload.list || [];
+            const marketList = marketResponse.payload.list || [];
+
+            // Create Map of Market Pharmacies by Lead ID for integration
+            const marketMap = new Map<number, Pharmacy>();
+            marketList.forEach(p => {
+                if (p.lead && p.lead.id) {
+                    marketMap.set(p.lead.id, p);
+                }
+            });
+
+            // 2. Map and Merge Data
+            const mappedLeads = await Promise.all(rawLeads.map(async (item: any) => {
+                // Find corresponding pharmacy in market list using the Lead's ID
+                const marketMatch = marketMap.get(item.id);
+
+                // Fetch Local Status (Packet/Training) and Session Data
+                let status = { brandedPacket: false, training: false };
+                let merchantOnline = false;
+
+                if (marketMatch) {
+                    try {
+                        // Fetch both status and session data in parallel
+                        const [fetchedStatus, sessionData] = await Promise.all([
+                            getPharmacyStatus(marketMatch.id),
+                            getMarketSessionList(token, marketMatch.id),
+                        ]);
+
+                        status.brandedPacket = fetchedStatus.brandedPacket;
+                        status.training = fetchedStatus.training;
+
+                        // Determine if pharmacy is online (any active session)
+                        merchantOnline = sessionData.payload.list.some(
+                            (session) => session.active === true
+                        );
+                    } catch (ignore) {
+                        // Keep defaults
+                    }
+                }
+
+                // Construct merged object
+                const pharmacy: Pharmacy = {
+                    ...item,
+                    id: item.id,
+                    code: item.code || "LEAD",
+                    name: item.name || "Unknown Lead",
+                    address: item.address || "",
+                    phone: item.phone || "",
+                    active: marketMatch ? marketMatch.active : false,
+                    lead: item,
+                    marketChats: marketMatch ? marketMatch.marketChats : [],
+                    brandedPacket: status.brandedPacket,
+                    training: status.training,
+                    merchantOnline: merchantOnline,
+                    creationDate: item.creationDate || new Date().toISOString(),
+                    modifiedDate: item.modifiedDate || new Date().toISOString(),
+                    comments: item.coments || item.comments || []
+                };
+
+                return pharmacy;
+            }));
+
+            setLeads(mappedLeads);
+            // filteredLeads will be updated by the filter useEffect
+        } catch (error) {
+            console.error("Failed to fetch leads data:", error);
+            toast.error(t.error);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
     useEffect(() => {
         // Auth Check
         if (authLoading) return;
@@ -142,90 +227,8 @@ export default function LeadsPanel() {
         };
 
         initColumnSettings();
-
-        const fetchData = async () => {
-            setIsLoading(true);
-            try {
-                // 1. Parallel Fetch: Leads and Market List
-                const [leadsResponse, marketResponse] = await Promise.all([
-                    getLeadsList(token, "", 0, 10000),
-                    getPharmacyList(token, "", 0, null, 10000)
-                ]);
-
-                const rawLeads = leadsResponse.payload.list || [];
-                const marketList = marketResponse.payload.list || [];
-
-                // Create Map of Market Pharmacies by Lead ID for integration
-                const marketMap = new Map<number, Pharmacy>();
-                marketList.forEach(p => {
-                    if (p.lead && p.lead.id) {
-                        marketMap.set(p.lead.id, p);
-                    }
-                });
-
-                // 2. Map and Merge Data
-                const mappedLeads = await Promise.all(rawLeads.map(async (item: any) => {
-                    // Find corresponding pharmacy in market list using the Lead's ID
-                    const marketMatch = marketMap.get(item.id);
-
-                    // Fetch Local Status (Packet/Training) and Session Data
-                    let status = { brandedPacket: false, training: false };
-                    let merchantOnline = false;
-
-                    if (marketMatch) {
-                        try {
-                            // Fetch both status and session data in parallel
-                            const [fetchedStatus, sessionData] = await Promise.all([
-                                getPharmacyStatus(marketMatch.id),
-                                getMarketSessionList(token, marketMatch.id),
-                            ]);
-
-                            status.brandedPacket = fetchedStatus.brandedPacket;
-                            status.training = fetchedStatus.training;
-
-                            // Determine if pharmacy is online (any active session)
-                            merchantOnline = sessionData.payload.list.some(
-                                (session) => session.active === true
-                            );
-                        } catch (ignore) {
-                            // Keep defaults
-                        }
-                    }
-
-                    // Construct merged object
-                    const pharmacy: Pharmacy = {
-                        ...item,
-                        id: item.id,
-                        code: item.code || "LEAD",
-                        name: item.name || "Unknown Lead",
-                        address: item.address || "",
-                        phone: item.phone || "",
-                        active: marketMatch ? marketMatch.active : false,
-                        lead: item,
-                        marketChats: marketMatch ? marketMatch.marketChats : [],
-                        brandedPacket: status.brandedPacket,
-                        training: status.training,
-                        merchantOnline: merchantOnline,
-                        creationDate: item.creationDate || new Date().toISOString(),
-                        modifiedDate: item.modifiedDate || new Date().toISOString(),
-                        comments: item.coments || item.comments || []
-                    };
-
-                    return pharmacy;
-                }));
-
-                setLeads(mappedLeads);
-                setFilteredLeads(mappedLeads);
-            } catch (error) {
-                console.error("Failed to fetch leads data:", error);
-                toast.error(t.error);
-            } finally {
-                setIsLoading(false);
-            }
-        };
-
         fetchData();
-    }, [token, authLoading, navigate, t.error]);
+    }, [token, authLoading, navigate, t.error, user?.username, defaultColumns]);
 
     const handleUpdateStatus = async (
         pharmacyId: number,
@@ -420,7 +423,7 @@ export default function LeadsPanel() {
                         onSearchChange={setSearchQuery}
 
                         // Refresh
-                        onRefresh={() => window.location.reload()}
+                        onRefresh={fetchData}
 
                         // New Lead Status Filter
                         leadStatusFilter={leadStatusFilter}
