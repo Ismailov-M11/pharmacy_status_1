@@ -34,6 +34,7 @@ export default function AdminPanel() {
     boolean | null
   >(null);
   const [trainingFilter, setTrainingFilter] = useState<boolean | null>(null);
+  const [merchantStatusFilter, setMerchantStatusFilter] = useState<boolean | null>(null);
   const [selectedPharmacy, setSelectedPharmacy] = useState<Pharmacy | null>(
     null,
   );
@@ -100,6 +101,9 @@ export default function AdminPanel() {
       const matchesTraining =
         trainingFilter === null ? true : (p as any).training === trainingFilter;
 
+      const matchesMerchantStatus =
+        merchantStatusFilter === null ? true : p.merchantOnline === merchantStatusFilter;
+
       const matchesActive =
         activeFilter === null ? true : p.active === activeFilter;
 
@@ -108,6 +112,7 @@ export default function AdminPanel() {
         matchesTelegramBot &&
         matchesBrandedPacket &&
         matchesTraining &&
+        matchesMerchantStatus &&
         matchesActive
       );
     });
@@ -118,6 +123,7 @@ export default function AdminPanel() {
     telegramBotFilter,
     brandedPacketFilter,
     trainingFilter,
+    merchantStatusFilter,
     activeFilter,
   ]);
 
@@ -324,6 +330,8 @@ export default function AdminPanel() {
             onBrandedPacketFilterChange={setBrandedPacketFilter}
             trainingFilter={trainingFilter}
             onTrainingFilterChange={setTrainingFilter}
+            merchantStatusFilter={merchantStatusFilter}
+            onMerchantStatusFilterChange={setMerchantStatusFilter}
             searchQuery={searchQuery}
             onSearchChange={setSearchQuery}
             onPharmacyClick={handlePharmacyClick}
@@ -331,6 +339,7 @@ export default function AdminPanel() {
             leadStatusFilter={null}
             onLeadStatusFilterChange={() => { }}
             leadStatusOptions={[]}
+            stirSortOrder={null}
           />
         </div>
       </main>

@@ -25,6 +25,8 @@ interface PharmacyTableProps {
   onBrandedPacketFilterChange: (value: boolean | null) => void;
   trainingFilter: boolean | null;
   onTrainingFilterChange: (value: boolean | null) => void;
+  merchantStatusFilter?: boolean | null;
+  onMerchantStatusFilterChange?: (value: boolean | null) => void;
   searchQuery?: string;
   onSearchChange?: (value: string) => void;
   onPharmacyClick?: (pharmacy: Pharmacy) => void;
@@ -46,7 +48,7 @@ interface PharmacyTableProps {
   columnSettings?: ColumnSettings[];
   // STIR Filter props
   stirFilter?: string[];
-  stirSortOrder?: 'asc' | 'desc' | null;
+  stirSortOrder: 'asc' | 'desc' | null;
   onStirFilterClick?: (e: React.MouseEvent<HTMLTableCellElement>) => void;
 }
 
@@ -62,6 +64,8 @@ export function PharmacyTable({
   onBrandedPacketFilterChange,
   trainingFilter,
   onTrainingFilterChange,
+  merchantStatusFilter,
+  onMerchantStatusFilterChange,
   searchQuery = "",
   onSearchChange,
   onPharmacyClick,
@@ -132,11 +136,34 @@ export function PharmacyTable({
         return <th key={col.id} className="px-2 py-2 md:py-3 text-left font-semibold text-gray-700 whitespace-nowrap" style={{ width: "110px" }}>{t.leadPhone}</th>;
 
       case "merchantStatus":
+        const hasMerchantStatusFilter = merchantStatusFilter !== null;
         return (
           <th key={col.id} className="px-2 md:px-4 py-2 md:py-3 text-center font-semibold text-gray-700 whitespace-nowrap min-w-max">
-            <div className="flex flex-col items-start">
-              <span>{t.merchantStatus || "Merchant - статус"}</span>
-            </div>
+            {onMerchantStatusFilterChange ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="sm" className="-ml-3 h-8 data-[state=open]:bg-purple-600 data-[state=open]:text-white">
+                    <div className="flex items-center gap-2">
+                      <span>{t.merchantStatus || "Merchant - статус"}</span>
+                      {hasMerchantStatusFilter && (
+                        <span className="text-xs bg-blue-100 text-blue-800 px-1.5 py-0.5 rounded">1</span>
+                      )}
+                    </div>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="start">
+                  <DropdownMenuRadioGroup value={merchantStatusFilter === true ? "true" : merchantStatusFilter === false ? "false" : "null"} onValueChange={(val) => handleFilterChange(val, onMerchantStatusFilterChange)}>
+                    <DropdownMenuRadioItem value="null">{t.allPharmacies}</DropdownMenuRadioItem>
+                    <DropdownMenuRadioItem value="true" className="bg-emerald-100 dark:bg-emerald-900/30 text-emerald-800 dark:text-emerald-300 focus:bg-emerald-200 dark:focus:bg-emerald-800 focus:text-emerald-900 dark:focus:text-emerald-200 m-1 cursor-pointer">{t.online}</DropdownMenuRadioItem>
+                    <DropdownMenuRadioItem value="false" className="bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300 focus:bg-red-200 dark:focus:bg-red-800 focus:text-red-900 dark:focus:text-red-200 m-1 cursor-pointer">{t.offline}</DropdownMenuRadioItem>
+                  </DropdownMenuRadioGroup>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <div className="flex flex-col items-start">
+                <span>{t.merchantStatus || "Merchant - статус"}</span>
+              </div>
+            )}
           </th>
         );
 
@@ -404,8 +431,8 @@ export function PharmacyTable({
         return (
           <td key={col.id} className="px-2 md:px-4 py-2 md:py-3 text-center">
             <span className={`px-2 py-1 rounded text-xs font-bold inline-block whitespace-nowrap ${isOnline
-                ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300"
-                : "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300"
+              ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300"
+              : "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300"
               }`}>
               {isOnline ? (t.online || "Online") : (t.offline || "Offline")}
             </span>
