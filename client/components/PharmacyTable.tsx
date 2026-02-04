@@ -53,6 +53,7 @@ interface PharmacyTableProps {
   onStirFilterClick?: (e: React.MouseEvent<HTMLTableCellElement>) => void;
   filesFilter?: boolean | null;
   onFilesFilterChange?: (value: boolean | null) => void;
+  onFilesClick?: (pharmacy: Pharmacy) => void;
 }
 
 export function PharmacyTable({
@@ -90,8 +91,10 @@ export function PharmacyTable({
   stirFilter = [],
   stirSortOrder = null,
   onStirFilterClick,
+  onStirFilterClick,
   filesFilter,
   onFilesFilterChange,
+  onFilesClick,
 }: PharmacyTableProps) {
   const { t } = useLanguage();
 

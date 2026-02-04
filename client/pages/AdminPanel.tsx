@@ -354,7 +354,6 @@ export default function AdminPanel() {
             leadStatusFilter={null}
             onLeadStatusFilterChange={() => { }}
             leadStatusOptions={[]}
-            leadStatusOptions={[]}
             stirSortOrder={null}
             filesFilter={filesFilter}
             onFilesFilterChange={setFilesFilter}
@@ -366,18 +365,26 @@ export default function AdminPanel() {
           />
         </div>
       </main>
-
-      <PharmacyDetailModal
-        pharmacy={selectedPharmacy}
-        isOpen={isModalOpen}
-        initialTab={initialModalTab}
-        onClose={handleCloseModal}
-        onUpdateStatus={handleUpdateStatus}
-        isAdmin={true}
-        currentUsername={user?.username}
-        changeHistory={changeHistory}
-        onDeleteHistory={handleDeleteHistory}
-      />
+      onFilesClick={(pharmacy) => {
+        setSelectedPharmacy(pharmacy);
+        setInitialModalTab("files");
+        setIsModalOpen(true);
+      }}
+          />
     </div>
+      </main >
+
+    <PharmacyDetailModal
+      pharmacy={selectedPharmacy}
+      isOpen={isModalOpen}
+      initialTab={initialModalTab}
+      onClose={handleCloseModal}
+      onUpdateStatus={handleUpdateStatus}
+      isAdmin={true}
+      currentUsername={user?.username}
+      changeHistory={changeHistory}
+      onDeleteHistory={handleDeleteHistory}
+    />
+    </div >
   );
 }
