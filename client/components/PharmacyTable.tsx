@@ -1456,7 +1456,7 @@ export function PharmacyTable({
                                 e.stopPropagation();
                                 onFilesClick?.(pharmacy);
                               }}
-                              className="px-2 py-1 rounded text-xs font-bold inline-block whitespace-nowrap bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300 cursor-pointer hover:underline"
+                              className="px-2 py-1 rounded text-xs font-bold inline-block whitespace-nowrap bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-300 cursor-pointer hover:underline"
                             >
                               {t.yes}
                             </span>
@@ -1469,7 +1469,7 @@ export function PharmacyTable({
 
                         <td className="px-2 md:px-4 py-2 md:py-3 text-center">
                           <span className={`px-2 py-1 rounded text-xs font-bold inline-block whitespace-nowrap ${pharmacy.merchantOnline
-                            ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300"
+                            ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-300"
                             : "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300"
                             }`}>
                             {pharmacy.merchantOnline ? (t.online || "Online") : (t.offline || "Offline")}
@@ -1479,8 +1479,8 @@ export function PharmacyTable({
                         <td className="px-2 md:px-4 py-2 md:py-3 text-center">
                           <div
                             className={`font-bold text-xs px-2 py-1 rounded inline-block whitespace-nowrap ${hasTelegramBot
-                              ? "bg-green-100 text-green-800"
-                              : "bg-red-100 text-red-800"
+                              ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-300"
+                              : "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300"
                               }`}
                           >
                             {getTelegramBotStatus(marketChats)}
@@ -1489,8 +1489,8 @@ export function PharmacyTable({
                         <td className="px-2 md:px-4 py-2 md:py-3 text-center">
                           <span
                             className={`px-2 py-1 rounded text-xs font-bold inline-block whitespace-nowrap ${(pharmacy as any).training
-                              ? "bg-green-100 text-green-800"
-                              : "bg-red-100 text-red-800"
+                              ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-300"
+                              : "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300"
                               }`}
                           >
                             {getTrainingStatusText((pharmacy as any).training)}
@@ -1499,8 +1499,8 @@ export function PharmacyTable({
                         <td className="px-2 md:px-4 py-2 md:py-3 text-center">
                           <span
                             className={`px-2 py-1 rounded text-xs font-bold inline-block whitespace-nowrap ${(pharmacy as any).brandedPacket
-                              ? "bg-green-100 text-green-800"
-                              : "bg-red-100 text-red-800"
+                              ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-300"
+                              : "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300"
                               }`}
                           >
                             {getStatusText((pharmacy as any).brandedPacket)}
@@ -1509,8 +1509,8 @@ export function PharmacyTable({
                         <td className="px-2 md:px-4 py-2 md:py-3">
                           <span
                             className={`px-2 py-1 rounded text-xs font-bold whitespace-nowrap inline-block ${pharmacy.active
-                              ? "bg-emerald-100 text-emerald-800"
-                              : "bg-red-100 text-red-800"
+                              ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-300"
+                              : "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300"
                               }`}
                           >
                             {pharmacy.active ? t.active : t.inactive}
