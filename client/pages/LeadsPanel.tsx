@@ -419,7 +419,7 @@ export default function LeadsPanel() {
                         trainingFilter={trainingFilter}
                         onTrainingFilterChange={setTrainingFilter}
                         merchantStatusFilter={merchantStatusFilter}
-                        merchantStatusFilter={merchantStatusFilter}
+
                         onMerchantStatusFilterChange={setMerchantStatusFilter}
 
                         // Search
