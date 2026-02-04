@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, ChangeEvent } from "react";
 import { Pharmacy, StatusHistoryRecord, uploadPharmacyFile } from "@/lib/api";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -53,6 +54,7 @@ export function PharmacyDetailModal({
   onUpdate,
 }: PharmacyDetailModalProps) {
   const { t } = useLanguage();
+  const { token } = useAuth();
   const [isUpdating, setIsUpdating] = useState(false);
   const [activeTab, setActiveTab] = useState<
     "details" | "training" | "package" | "history" | "leadHistory" | "files"
@@ -76,7 +78,6 @@ export function PharmacyDetailModal({
   const handleFileChange = async (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file && pharmacy) {
-      const token = localStorage.getItem("token");
       if (!token) {
         toast.error("Authentication token not found");
         return;
