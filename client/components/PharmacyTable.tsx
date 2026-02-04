@@ -91,7 +91,7 @@ export function PharmacyTable({
   stirFilter = [],
   stirSortOrder = null,
   onStirFilterClick,
-  onStirFilterClick,
+
   filesFilter,
   onFilesFilterChange,
   onFilesClick,
