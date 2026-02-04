@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, ChangeEvent } from "react";
 import { Pharmacy, StatusHistoryRecord } from "@/lib/api";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Button } from "@/components/ui/button";
@@ -63,6 +63,20 @@ export function PharmacyDetailModal({
   const [packageError, setPackageError] = useState("");
   const [pendingTraining, setPendingTraining] = useState<boolean | null>(null);
   const [pendingPacket, setPendingPacket] = useState<boolean | null>(null);
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleUploadClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      // Placeholder for upload logic to be implemented with API
+      console.log("File selected:", file);
+    }
+  };
 
   // Reset to details tab when modal opens
   useEffect(() => {
@@ -671,7 +685,17 @@ export function PharmacyDetailModal({
                 <h3 className="text-sm font-medium text-gray-900 dark:text-gray-100">
                   {t.filesList || "Files List"}
                 </h3>
-                <Button size="sm" className="bg-blue-600 hover:bg-blue-700">
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  className="hidden"
+                  onChange={handleFileChange}
+                />
+                <Button
+                  size="sm"
+                  className="bg-blue-600 hover:bg-blue-700"
+                  onClick={handleUploadClick}
+                >
                   <Upload className="mr-2 h-4 w-4" />
                   {t.uploadFile || "Upload File"}
                 </Button>

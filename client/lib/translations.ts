@@ -166,7 +166,7 @@ export const translations = {
 
     // Bulk Selection
     select: "Выбрать",
-    selectAll: "Выбрать все",
+    // selectAll: "Выбрать все", // Duplicate removed
     clearSelection: "Очистить",
     selected: "Выбрано",
 
@@ -205,6 +205,13 @@ export const translations = {
     confirmYes: "ДА",
     confirmNo: "НЕТ",
     shown: "Показано",
+    files: "Файлы",
+    uploadFile: "Загрузить файл",
+    filesList: "Список файлов",
+    fileName: "Имя файла",
+    date: "Дата",
+    actions: "Действия",
+    noFiles: "Файлы еще не загружены",
   },
   uz: {
     // Common
@@ -413,6 +420,14 @@ export const translations = {
     yearUnit: "yil",
     confirmYes: "HA",
     confirmNo: "YO'Q",
+    shown: "Ko'rsatildi",
+    files: "Fayllar",
+    uploadFile: "Fayl yuklash",
+    filesList: "Fayllar ro'yxati",
+    fileName: "Fayl nomi",
+    date: "Sana",
+    actions: "Harakatlar",
+    noFiles: "Fayllar hali yuklanmagan",
   },
 };
 
