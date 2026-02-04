@@ -733,8 +733,8 @@ export function PharmacyDetailModal({
                 </Button>
               </div>
 
-              <div className="border rounded-md border-gray-200 dark:border-gray-700 overflow-hidden">
-                <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+              <div className="border rounded-md border-gray-200 dark:border-gray-700 overflow-x-auto">
+                <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700 min-w-[600px]">
                   <thead className="bg-gray-50 dark:bg-gray-700">
                     <tr>
                       <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
