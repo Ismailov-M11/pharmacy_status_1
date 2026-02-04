@@ -78,14 +78,18 @@ export function PharmacyDetailModal({
   const handleFileChange = async (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file && pharmacy) {
-      if (!token) {
+      // Try to get token from context or localStorage
+      const authToken = token || localStorage.getItem("auth_token");
+
+      if (!authToken) {
+        console.error("No auth token found in context or localStorage");
         toast.error("Authentication token not found");
         return;
       }
 
       setIsUploading(true);
       try {
-        await uploadPharmacyFile(token, pharmacy.id, file);
+        await uploadPharmacyFile(authToken, pharmacy.id, file);
         toast.success(t.saved || "File uploaded successfully");
         if (onUpdate) {
           onUpdate(); // Trigger refresh in parent
