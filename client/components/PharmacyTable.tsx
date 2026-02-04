@@ -908,6 +908,50 @@ export function PharmacyTable({
                   </th>
 
                   <th className="px-2 md:px-4 py-2 md:py-3 text-center font-semibold text-gray-700 whitespace-nowrap min-w-max">
+                    <div className="flex items-center justify-center gap-1">
+                      {t.files || "Files"}
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className={`h-6 w-6 p-0 hover:bg-gray-200 dark:hover:bg-gray-700 ${filesFilter !== null ? "text-blue-600" : "text-gray-400"
+                              }`}
+                          >
+                            <ChevronDown className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="w-40">
+                          <DropdownMenuRadioGroup
+                            value={
+                              filesFilter === null
+                                ? "all"
+                                : filesFilter
+                                  ? "yes"
+                                  : "no"
+                            }
+                            onValueChange={(value) => {
+                              if (value === "all") onFilesFilterChange?.(null);
+                              if (value === "yes") onFilesFilterChange?.(true);
+                              if (value === "no") onFilesFilterChange?.(false);
+                            }}
+                          >
+                            <DropdownMenuRadioItem value="all">
+                              {t.all || "All"}
+                            </DropdownMenuRadioItem>
+                            <DropdownMenuRadioItem value="yes">
+                              {t.yes || "YES"}
+                            </DropdownMenuRadioItem>
+                            <DropdownMenuRadioItem value="no">
+                              {t.no || "NO"}
+                            </DropdownMenuRadioItem>
+                          </DropdownMenuRadioGroup>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </div>
+                  </th>
+
+                  <th className="px-2 md:px-4 py-2 md:py-3 text-center font-semibold text-gray-700 whitespace-nowrap min-w-max">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <Button
