@@ -128,7 +128,7 @@ export function Header() {
             className="w-10 h-10 md:w-12 md:h-12"
           />
           <div>
-            <div className="font-bold text-lg md:text-xl text-purple-700 dark:text-purple-400">
+            <div className="font-bold text-lg md:text-xl text-purple-700 dark:text-purple-400 hidden md:block">
               {t.siteTitle || "Aptekalar holati"}
             </div>
           </div>
