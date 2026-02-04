@@ -22,7 +22,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
-import { X } from "lucide-react";
+import { X, Upload, FileText, Download, Trash2 } from "lucide-react";
 
 interface PharmacyDetailModalProps {
   pharmacy: Pharmacy | null;
@@ -54,7 +54,7 @@ export function PharmacyDetailModal({
   const { t } = useLanguage();
   const [isUpdating, setIsUpdating] = useState(false);
   const [activeTab, setActiveTab] = useState<
-    "details" | "training" | "package" | "history" | "leadHistory"
+    "details" | "training" | "package" | "history" | "leadHistory" | "files"
   >("details");
   const [trainingComment, setTrainingComment] = useState("");
   const [packageComment, setPackageComment] = useState("");
@@ -213,6 +213,16 @@ export function PharmacyDetailModal({
                 }`}
             >
               {t.leadHistory || "Lead History"}
+            </button>
+            {/* Files Tab */}
+            <button
+              onClick={() => setActiveTab("files")}
+              className={`px-2 sm:px-4 py-2 font-medium border-b-2 transition-colors text-xs sm:text-sm whitespace-nowrap ${activeTab === "files"
+                ? "border-blue-500 text-blue-600 dark:text-blue-400"
+                : "border-transparent text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200"
+                }`}
+            >
+              {t.files || "Files"}
             </button>
           </div>
         </div>
@@ -651,6 +661,50 @@ export function PharmacyDetailModal({
                   )}
                 </tbody>
               </table>
+            </div>
+          )}
+
+          {/* Files Tab Content */}
+          {activeTab === "files" && (
+            <div className="space-y-4">
+              <div className="flex justify-between items-center">
+                <h3 className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                  {t.filesList || "Files List"}
+                </h3>
+                <Button size="sm" className="bg-blue-600 hover:bg-blue-700">
+                  <Upload className="mr-2 h-4 w-4" />
+                  {t.uploadFile || "Upload File"}
+                </Button>
+              </div>
+
+              <div className="border rounded-md border-gray-200 dark:border-gray-700 overflow-hidden">
+                <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                  <thead className="bg-gray-50 dark:bg-gray-700">
+                    <tr>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                        {t.fileName || "File Name"}
+                      </th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                        {t.date || "Date"}
+                      </th>
+                      <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                        {t.actions || "Actions"}
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                    {/* Placeholder for when no files exist */}
+                    <tr>
+                      <td colSpan={3} className="px-4 py-8 text-center text-gray-500 dark:text-gray-400">
+                        <div className="flex flex-col items-center justify-center space-y-2">
+                          <FileText className="h-8 w-8 text-gray-300 dark:text-gray-600" />
+                          <p>{t.noFiles || "No files uploaded yet"}</p>
+                        </div>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
             </div>
           )}
         </div>
