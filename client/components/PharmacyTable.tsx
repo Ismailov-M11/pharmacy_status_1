@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ChevronDown, RefreshCw, Settings, Square, CheckSquare } from "lucide-react";
+import { ChevronDown, RefreshCw, Settings, Square, CheckSquare, ListFilter } from "lucide-react";
 
 interface PharmacyTableProps {
   pharmacies: Pharmacy[];
@@ -738,15 +738,15 @@ export function PharmacyTable({
         </div>
       ) : (
         // Original layout for other pages
-        <div className="flex flex-col sm:flex-row gap-4 items-end sm:items-center justify-between">
+        <div className="flex flex-row gap-2 sm:gap-4 items-center justify-between">
           <Input
             type="text"
             placeholder={`${t.pharmacyName} / ${t.address}...`}
             value={searchQuery}
             onChange={(e) => onSearchChange?.(e.target.value)}
-            className="w-full sm:max-w-md"
+            className="flex-1 min-w-0 sm:max-w-md"
           />
-          <div className="flex gap-2">
+          <div className="flex gap-2 flex-shrink-0">
             {onRefresh && (
               <Button
                 variant="outline"
@@ -759,9 +759,10 @@ export function PharmacyTable({
             )}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline" className="gap-2">
-                  {t.filter}
-                  <ChevronDown className="w-4 h-4" />
+                <Button variant="outline" className="gap-2 px-2 sm:px-4">
+                  <ListFilter className="w-4 h-4 sm:hidden" />
+                  <span className="hidden sm:inline">{t.filter}</span>
+                  <ChevronDown className="w-4 h-4 hidden sm:block" />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
