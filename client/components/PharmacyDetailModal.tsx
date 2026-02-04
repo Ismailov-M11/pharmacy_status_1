@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, ChangeEvent } from "react";
-import { Pharmacy, StatusHistoryRecord } from "@/lib/api";
+import { Pharmacy, StatusHistoryRecord, uploadPharmacyFile } from "@/lib/api";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -50,6 +50,7 @@ export function PharmacyDetailModal({
   currentUsername = "User",
   changeHistory = [],
   onDeleteHistory,
+  onUpdate,
 }: PharmacyDetailModalProps) {
   const { t } = useLanguage();
   const [isUpdating, setIsUpdating] = useState(false);
@@ -70,11 +71,34 @@ export function PharmacyDetailModal({
     fileInputRef.current?.click();
   };
 
-  const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
+  const [isUploading, setIsUploading] = useState(false);
+
+  const handleFileChange = async (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    if (file) {
-      // Placeholder for upload logic to be implemented with API
-      console.log("File selected:", file);
+    if (file && pharmacy) {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        toast.error("Authentication token not found");
+        return;
+      }
+
+      setIsUploading(true);
+      try {
+        await uploadPharmacyFile(token, pharmacy.id, file);
+        toast.success(t.saved || "File uploaded successfully");
+        if (onUpdate) {
+          onUpdate(); // Trigger refresh in parent
+        }
+        // Clear input
+        if (fileInputRef.current) {
+          fileInputRef.current.value = "";
+        }
+      } catch (error) {
+        console.error("Upload failed", error);
+        toast.error(t.error || "Failed to upload file");
+      } finally {
+        setIsUploading(false);
+      }
     }
   };
 
@@ -695,9 +719,10 @@ export function PharmacyDetailModal({
                   size="sm"
                   className="bg-blue-600 hover:bg-blue-700"
                   onClick={handleUploadClick}
+                  disabled={isUploading}
                 >
                   <Upload className="mr-2 h-4 w-4" />
-                  {t.uploadFile || "Upload File"}
+                  {isUploading ? (t.loading || "...") : (t.uploadFile || "Upload File")}
                 </Button>
               </div>
 
@@ -717,15 +742,45 @@ export function PharmacyDetailModal({
                     </tr>
                   </thead>
                   <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                    {/* Placeholder for when no files exist */}
-                    <tr>
-                      <td colSpan={3} className="px-4 py-8 text-center text-gray-500 dark:text-gray-400">
-                        <div className="flex flex-col items-center justify-center space-y-2">
-                          <FileText className="h-8 w-8 text-gray-300 dark:text-gray-600" />
-                          <p>{t.noFiles || "No files uploaded yet"}</p>
-                        </div>
-                      </td>
-                    </tr>
+                    {pharmacy.licence ? (
+                      <tr>
+                        <td className="px-4 py-3 text-sm text-gray-900 dark:text-gray-100 whitespace-nowrap">
+                          <div className="flex items-center">
+                            <FileText className="h-4 w-4 mr-2 text-blue-500" />
+                            <a
+                              href={pharmacy.licence.attachmentLink}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="hover:underline hover:text-blue-600"
+                            >
+                              {pharmacy.licence.originalName}
+                            </a>
+                          </div>
+                        </td>
+                        <td className="px-4 py-3 text-sm text-gray-500 dark:text-gray-400 whitespace-nowrap">
+                          {formatDate(pharmacy.licence.creationDate)}
+                        </td>
+                        <td className="px-4 py-3 text-right text-sm font-medium">
+                          <a
+                            href={pharmacy.licence.attachmentLink}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 inline-flex items-center"
+                          >
+                            <Download className="h-4 w-4" />
+                          </a>
+                        </td>
+                      </tr>
+                    ) : (
+                      <tr>
+                        <td colSpan={3} className="px-4 py-8 text-center text-gray-500 dark:text-gray-400">
+                          <div className="flex flex-col items-center justify-center space-y-2">
+                            <FileText className="h-8 w-8 text-gray-300 dark:text-gray-600" />
+                            <p>{t.noFiles || "No files uploaded yet"}</p>
+                          </div>
+                        </td>
+                      </tr>
+                    )}
                   </tbody>
                 </table>
               </div>

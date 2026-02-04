@@ -115,6 +115,7 @@ export interface Pharmacy {
   bankAccount?: string;
   mfo?: string;
   additionalPhone?: string;
+  licence?: Licence;
   [key: string]: any;
 }
 
@@ -127,6 +128,39 @@ export interface PharmacyListResponse {
   payload: PharmacyListPayload;
   status: string;
   code: number;
+}
+
+export interface Licence {
+  id: number;
+  attachmentLink: string;
+  originalName: string;
+  description: string | null;
+  createdBy: string;
+  creationDate: string;
+}
+
+export async function uploadPharmacyFile(
+  token: string,
+  marketId: number,
+  file: File
+): Promise<any> {
+  const formData = new FormData();
+  formData.append("file", file);
+
+  const response = await fetch(`${API_BASE_URL}/attachment/market/${marketId}`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      // Content-Type header must NOT be set manually for FormData, the browser sets it with the boundary
+    },
+    body: formData,
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to upload file");
+  }
+
+  return response.json();
 }
 
 export async function login(credentials: LoginRequest): Promise<LoginResponse> {
