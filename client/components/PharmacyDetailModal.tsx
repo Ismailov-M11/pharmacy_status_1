@@ -39,7 +39,8 @@ interface PharmacyDetailModalProps {
   currentUsername?: string;
   changeHistory?: StatusHistoryRecord[];
   onDeleteHistory?: (ids: number[]) => void;
-  onUpdate?: () => void; // Added matching the usage in LeadsPanel
+  onUpdate?: () => void;
+  initialTab?: "details" | "files";
 }
 
 export function PharmacyDetailModal({
@@ -52,6 +53,7 @@ export function PharmacyDetailModal({
   changeHistory = [],
   onDeleteHistory,
   onUpdate,
+  initialTab = "details",
 }: PharmacyDetailModalProps) {
   const { t } = useLanguage();
   const { token } = useAuth();
@@ -107,12 +109,12 @@ export function PharmacyDetailModal({
     }
   };
 
-  // Reset to details tab when modal opens
+  // Reset to initial tab when modal opens
   useEffect(() => {
     if (isOpen) {
-      setActiveTab("details");
+      setActiveTab(initialTab);
     }
-  }, [isOpen]);
+  }, [isOpen, initialTab]);
 
   // Reset pending state when pharmacy changes or tab changes
   if (pharmacy && pendingTraining === null && activeTab === 'training') {
@@ -690,7 +692,7 @@ export function PharmacyDetailModal({
                           </td>
                           <td className="px-4 py-3 text-sm text-gray-600 align-top">
                             <div className="break-words max-w-sm whitespace-pre-wrap">
-                              {comment.coment || comment.comment || "-"}
+                              {comment.coment || "-"}
                             </div>
                           </td>
                         </tr>
@@ -741,6 +743,9 @@ export function PharmacyDetailModal({
                       <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                         {t.date || "Date"}
                       </th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                        {t.createdBy || "Created By"}
+                      </th>
                       <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                         {t.actions || "Actions"}
                       </th>
@@ -764,6 +769,9 @@ export function PharmacyDetailModal({
                         </td>
                         <td className="px-4 py-3 text-sm text-gray-500 dark:text-gray-400 whitespace-nowrap">
                           {formatDate(pharmacy.licence.creationDate)}
+                        </td>
+                        <td className="px-4 py-3 text-sm text-gray-500 dark:text-gray-400 whitespace-nowrap">
+                          {pharmacy.licence.createdBy || "-"}
                         </td>
                         <td className="px-4 py-3 text-right text-sm font-medium">
                           <a

@@ -212,6 +212,7 @@ export const translations = {
     date: "Дата",
     actions: "Действия",
     noFiles: "Файлы еще не загружены",
+    createdBy: "Кем создан",
   },
   uz: {
     // Common
@@ -381,9 +382,9 @@ export const translations = {
 
     // Bulk Selection
     select: "Tanlash",
-    selectAll: "Hammasini tanlash",
     clearSelection: "Tozalash",
     selected: "Tanlangan",
+
 
     // Column Settings
     columnSettings: "Ustunlar sozlamalari",
@@ -420,7 +421,6 @@ export const translations = {
     yearUnit: "yil",
     confirmYes: "HA",
     confirmNo: "YO'Q",
-    shown: "Ko'rsatildi",
     files: "Fayllar",
     uploadFile: "Fayl yuklash",
     filesList: "Fayllar ro'yxati",
@@ -428,6 +428,7 @@ export const translations = {
     date: "Sana",
     actions: "Harakatlar",
     noFiles: "Fayllar hali yuklanmagan",
+    createdBy: "Kim tomonidan yaratilgan",
   },
 };
 

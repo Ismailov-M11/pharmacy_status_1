@@ -23,6 +23,7 @@ export default function LeadsPanel() {
     // Modal State
     const [selectedPharmacy, setSelectedPharmacy] = useState<Pharmacy | null>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [initialModalTab, setInitialModalTab] = useState<"details" | "files">("details");
 
     // Filters
     const [searchQuery, setSearchQuery] = useState("");
@@ -85,25 +86,26 @@ export default function LeadsPanel() {
         { id: "landmark", label: t.landmark || "Landmark", visible: true, order: 4 },
         { id: "pharmacyPhone", label: t.pharmacyPhone || "Phone", visible: true, order: 5 },
         { id: "leadPhone", label: t.leadPhone || "Lead Phone", visible: true, order: 6 },
-        { id: "merchantStatus", label: t.merchantStatus || "Merchant - статус", visible: true, order: 7 },
-        { id: "telegramBot", label: t.telegramBot || "Bot", visible: true, order: 8 },
-        { id: "training", label: t.training || "Training", visible: true, order: 9 },
-        { id: "brandedPacket", label: t.brandedPacket || "Packet", visible: true, order: 10 },
-        { id: "status", label: t.status || "Status", visible: true, order: 11 },
-        { id: "leadStatus", label: t.leadStatus || "Lead Status", visible: true, order: 11 },
-        { id: "comments", label: t.comments || "Comments", visible: true, order: 12 },
-        { id: "commentUser", label: t.commentUser || "Comment User", visible: true, order: 13 },
-        { id: "commentDate", label: t.commentDate || "Comment Date", visible: true, order: 14 },
+        { id: "files", label: t.files || "Files", visible: true, order: 7 },
+        { id: "merchantStatus", label: t.merchantStatus || "Merchant - статус", visible: true, order: 8 },
+        { id: "telegramBot", label: t.telegramBot || "Bot", visible: true, order: 9 },
+        { id: "training", label: t.training || "Training", visible: true, order: 10 },
+        { id: "brandedPacket", label: t.brandedPacket || "Packet", visible: true, order: 11 },
+        { id: "status", label: t.status || "Status", visible: true, order: 12 },
+        { id: "leadStatus", label: t.leadStatus || "Lead Status", visible: true, order: 12 },
+        { id: "comments", label: t.comments || "Comments", visible: true, order: 13 },
+        { id: "commentUser", label: t.commentUser || "Comment User", visible: true, order: 14 },
+        { id: "commentDate", label: t.commentDate || "Comment Date", visible: true, order: 15 },
 
-        { id: "region", label: t.region || "Region", visible: false, order: 16 },
-        { id: "district", label: t.district || "District", visible: false, order: 17 },
-        { id: "stir", label: t.stir || "СТИР", visible: true, order: 18 },
-        { id: "additionalPhone", label: t.additionalPhone || "Доп. телефон Lead", visible: true, order: 19 },
-        { id: "juridicalName", label: t.juridicalName || "Юридическое название", visible: true, order: 20 },
-        { id: "juridicalAddress", label: t.juridicalAddress || "Юридический адрес", visible: true, order: 21 },
-        { id: "bankName", label: t.bankName || "Название банка", visible: true, order: 22 },
-        { id: "bankAccount", label: t.bankAccount || "Банковский счет", visible: true, order: 23 },
-        { id: "mfo", label: t.mfo || "МФО", visible: true, order: 24 },
+        { id: "region", label: t.region || "Region", visible: false, order: 17 },
+        { id: "district", label: t.district || "District", visible: false, order: 18 },
+        { id: "stir", label: t.stir || "СТИР", visible: true, order: 19 },
+        { id: "additionalPhone", label: t.additionalPhone || "Доп. телефон Lead", visible: true, order: 20 },
+        { id: "juridicalName", label: t.juridicalName || "Юридическое название", visible: true, order: 21 },
+        { id: "juridicalAddress", label: t.juridicalAddress || "Юридический адрес", visible: true, order: 22 },
+        { id: "bankName", label: t.bankName || "Название банка", visible: true, order: 23 },
+        { id: "bankAccount", label: t.bankAccount || "Банковский счет", visible: true, order: 24 },
+        { id: "mfo", label: t.mfo || "МФО", visible: true, order: 25 },
     ], [t]);
 
     // Data Fetching
@@ -403,6 +405,12 @@ export default function LeadsPanel() {
                         // Interaction
                         onPharmacyClick={(pharmacy) => {
                             setSelectedPharmacy(pharmacy);
+                            setInitialModalTab("details");
+                            setIsModalOpen(true);
+                        }}
+                        onFilesClick={(pharmacy) => {
+                            setSelectedPharmacy(pharmacy);
+                            setInitialModalTab("files");
                             setIsModalOpen(true);
                         }}
 
@@ -459,9 +467,13 @@ export default function LeadsPanel() {
             <PharmacyDetailModal
                 pharmacy={selectedPharmacy}
                 isOpen={isModalOpen}
+                initialTab={initialModalTab}
                 onClose={() => setIsModalOpen(false)}
                 onUpdateStatus={handleUpdateStatus}
                 currentUsername={user?.username || "User"}
+                onUpdate={() => {
+                    fetchData();
+                }}
             />
 
             {/* Settings Menu Modal */}
