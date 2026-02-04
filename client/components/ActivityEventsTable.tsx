@@ -108,7 +108,7 @@ export function ActivityEventsTable({
   return (
     <Card className="overflow-hidden">
       <div className="overflow-x-auto">
-        <Table>
+        <Table className="min-w-[1000px]">
           <TableHeader>
             <TableRow className="bg-gray-50">
               <TableHead className="text-center w-12">
