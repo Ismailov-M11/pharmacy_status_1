@@ -754,10 +754,10 @@ export function PharmacyDetailModal({
                   <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                     {pharmacy.licence ? (
                       <tr>
-                        <td className="px-4 py-3 text-sm text-gray-900 dark:text-gray-100 whitespace-nowrap">
-                          <div className="flex items-center">
-                            <FileText className="h-4 w-4 mr-2 text-blue-500" />
-                            <div className="text-sm text-gray-900 dark:text-gray-100">
+                        <td className="px-4 py-3 text-sm text-gray-900 dark:text-gray-100">
+                          <div className="flex items-center min-w-0">
+                            <FileText className="h-4 w-4 mr-2 text-blue-500 flex-shrink-0" />
+                            <div className="text-sm text-gray-900 dark:text-gray-100 break-all whitespace-normal">
                               {pharmacy.licence.originalName}
                             </div>
                           </div>
