@@ -922,7 +922,7 @@ export function PharmacyTable({
                           <ChevronDown className="ml-2 h-4 w-4" />
                         </Button>
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="w-40">
+                      <DropdownMenuContent align="start" className="w-40">
                         <DropdownMenuRadioGroup
                           value={
                             filesFilter === null
@@ -938,7 +938,7 @@ export function PharmacyTable({
                           }}
                         >
                           <DropdownMenuRadioItem value="all">
-                            {t.all || "All"}
+                            {t.allPharmacies || "All Pharmacies"}
                           </DropdownMenuRadioItem>
                           <DropdownMenuRadioItem
                             value="yes"
