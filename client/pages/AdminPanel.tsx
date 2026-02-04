@@ -365,26 +365,19 @@ export default function AdminPanel() {
           />
         </div>
       </main>
-      onFilesClick={(pharmacy) => {
-        setSelectedPharmacy(pharmacy);
-        setInitialModalTab("files");
-        setIsModalOpen(true);
-      }}
-          />
-    </div>
-      </main >
 
-    <PharmacyDetailModal
-      pharmacy={selectedPharmacy}
-      isOpen={isModalOpen}
-      initialTab={initialModalTab}
-      onClose={handleCloseModal}
-      onUpdateStatus={handleUpdateStatus}
-      isAdmin={true}
-      currentUsername={user?.username}
-      changeHistory={changeHistory}
-      onDeleteHistory={handleDeleteHistory}
-    />
+
+      <PharmacyDetailModal
+        pharmacy={selectedPharmacy}
+        isOpen={isModalOpen}
+        initialTab={initialModalTab}
+        onClose={handleCloseModal}
+        onUpdateStatus={handleUpdateStatus}
+        isAdmin={true}
+        currentUsername={user?.username}
+        changeHistory={changeHistory}
+        onDeleteHistory={handleDeleteHistory}
+      />
     </div >
   );
 }
