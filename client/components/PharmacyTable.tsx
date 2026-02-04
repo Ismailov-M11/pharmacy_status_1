@@ -940,10 +940,16 @@ export function PharmacyTable({
                           <DropdownMenuRadioItem value="all">
                             {t.all || "All"}
                           </DropdownMenuRadioItem>
-                          <DropdownMenuRadioItem value="yes">
+                          <DropdownMenuRadioItem
+                            value="yes"
+                            className="bg-emerald-100 text-emerald-800 focus:bg-emerald-200 focus:text-emerald-900 m-1 cursor-pointer"
+                          >
                             {t.yes || "YES"}
                           </DropdownMenuRadioItem>
-                          <DropdownMenuRadioItem value="no">
+                          <DropdownMenuRadioItem
+                            value="no"
+                            className="bg-red-100 text-red-800 focus:bg-red-200 focus:text-red-900 m-1 cursor-pointer"
+                          >
                             {t.no || "NO"}
                           </DropdownMenuRadioItem>
                         </DropdownMenuRadioGroup>
