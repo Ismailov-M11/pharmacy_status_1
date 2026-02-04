@@ -40,7 +40,6 @@ export default function LeadsPanel() {
     const [trainingFilter, setTrainingFilter] = useState<boolean | null>(null);
 
     const [merchantStatusFilter, setMerchantStatusFilter] = useState<boolean | null>(null);
-    const [filesFilter, setFilesFilter] = useState<boolean | null>(null);
 
     // Leads-specific features
     const [selectedRows, setSelectedRows] = useState<Set<number>>(new Set());
@@ -88,7 +87,6 @@ export default function LeadsPanel() {
         { id: "landmark", label: t.landmark || "Landmark", visible: true, order: 4 },
         { id: "pharmacyPhone", label: t.pharmacyPhone || "Phone", visible: true, order: 5 },
         { id: "leadPhone", label: t.leadPhone || "Lead Phone", visible: true, order: 6 },
-        { id: "files", label: t.files || "Files", visible: true, order: 7 },
         { id: "merchantStatus", label: t.merchantStatus || "Merchant - статус", visible: true, order: 8 },
         { id: "telegramBot", label: t.telegramBot || "Bot", visible: true, order: 9 },
         { id: "training", label: t.training || "Training", visible: true, order: 10 },
@@ -360,15 +358,7 @@ export default function LeadsPanel() {
                 ? true
                 : p.merchantOnline === merchantStatusFilter;
 
-            // 11. Files Filter
-            const matchesFiles =
-                filesFilter === null
-                    ? true
-                    : filesFilter
-                        ? p.licence !== null && p.licence !== undefined
-                        : !p.licence;
-
-            return matchesSearch && matchesLeadStatus && matchesActive && matchesCommentUser && matchesCommentDate && matchesStir && matchesTelegramBot && matchesBrandedPacket && matchesTraining && matchesMerchantStatus && matchesFiles;
+            return matchesSearch && matchesLeadStatus && matchesActive && matchesCommentUser && matchesCommentDate && matchesStir && matchesTelegramBot && matchesBrandedPacket && matchesTraining && matchesMerchantStatus;
         });
 
         // Apply STIR sorting if enabled
@@ -385,7 +375,7 @@ export default function LeadsPanel() {
         }
 
         setFilteredLeads(filtered);
-    }, [searchQuery, leads, leadStatusFilter, activeFilter, commentUserFilter, commentDateFilter, stirFilter, stirSortOrder, telegramBotFilter, brandedPacketFilter, trainingFilter, merchantStatusFilter, filesFilter]);
+    }, [searchQuery, leads, leadStatusFilter, activeFilter, commentUserFilter, commentDateFilter, stirFilter, stirSortOrder, telegramBotFilter, brandedPacketFilter, trainingFilter, merchantStatusFilter]);
 
     if (authLoading) {
         return (
@@ -418,11 +408,6 @@ export default function LeadsPanel() {
                             setInitialModalTab("details");
                             setIsModalOpen(true);
                         }}
-                        onFilesClick={(pharmacy) => {
-                            setSelectedPharmacy(pharmacy);
-                            setInitialModalTab("files");
-                            setIsModalOpen(true);
-                        }}
 
                         // Standard Filters
                         activeFilter={activeFilter}
@@ -436,8 +421,6 @@ export default function LeadsPanel() {
                         merchantStatusFilter={merchantStatusFilter}
                         merchantStatusFilter={merchantStatusFilter}
                         onMerchantStatusFilterChange={setMerchantStatusFilter}
-                        filesFilter={filesFilter}
-                        onFilesFilterChange={setFilesFilter}
 
                         // Search
                         searchQuery={searchQuery}
