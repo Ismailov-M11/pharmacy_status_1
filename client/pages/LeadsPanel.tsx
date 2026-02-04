@@ -38,7 +38,7 @@ export default function LeadsPanel() {
     const [telegramBotFilter, setTelegramBotFilter] = useState<boolean | null>(null);
     const [brandedPacketFilter, setBrandedPacketFilter] = useState<boolean | null>(null);
     const [trainingFilter, setTrainingFilter] = useState<boolean | null>(null);
-    const [trainingFilter, setTrainingFilter] = useState<boolean | null>(null);
+
     const [merchantStatusFilter, setMerchantStatusFilter] = useState<boolean | null>(null);
     const [filesFilter, setFilesFilter] = useState<boolean | null>(null);
 
