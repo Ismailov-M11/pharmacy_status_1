@@ -35,10 +35,12 @@ export default function AdminPanel() {
   >(null);
   const [trainingFilter, setTrainingFilter] = useState<boolean | null>(null);
   const [merchantStatusFilter, setMerchantStatusFilter] = useState<boolean | null>(null);
+  const [filesFilter, setFilesFilter] = useState<boolean | null>(null);
   const [selectedPharmacy, setSelectedPharmacy] = useState<Pharmacy | null>(
     null,
   );
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [initialModalTab, setInitialModalTab] = useState<"details" | "files">("details");
   const [changeHistory, setChangeHistory] = useState<StatusHistoryRecord[]>([]);
   const [isLoadingHistory, setIsLoadingHistory] = useState(false);
 
@@ -104,6 +106,13 @@ export default function AdminPanel() {
       const matchesMerchantStatus =
         merchantStatusFilter === null ? true : p.merchantOnline === merchantStatusFilter;
 
+      const matchesFiles =
+        filesFilter === null
+          ? true
+          : filesFilter
+            ? p.licence !== null && p.licence !== undefined
+            : !p.licence;
+
       const matchesActive =
         activeFilter === null ? true : p.active === activeFilter;
 
@@ -113,6 +122,7 @@ export default function AdminPanel() {
         matchesBrandedPacket &&
         matchesTraining &&
         matchesMerchantStatus &&
+        matchesFiles &&
         matchesActive
       );
     });
@@ -123,7 +133,9 @@ export default function AdminPanel() {
     telegramBotFilter,
     brandedPacketFilter,
     trainingFilter,
+    trainingFilter,
     merchantStatusFilter,
+    filesFilter,
     activeFilter,
   ]);
 
@@ -334,12 +346,23 @@ export default function AdminPanel() {
             onMerchantStatusFilterChange={setMerchantStatusFilter}
             searchQuery={searchQuery}
             onSearchChange={setSearchQuery}
-            onPharmacyClick={handlePharmacyClick}
+            onPharmacyClick={(p) => {
+              handlePharmacyClick(p);
+              setInitialModalTab("details");
+            }}
             onRefresh={fetchPharmacies}
             leadStatusFilter={null}
             onLeadStatusFilterChange={() => { }}
             leadStatusOptions={[]}
+            leadStatusOptions={[]}
             stirSortOrder={null}
+            filesFilter={filesFilter}
+            onFilesFilterChange={setFilesFilter}
+            onFilesClick={(pharmacy) => {
+              setSelectedPharmacy(pharmacy);
+              setInitialModalTab("files");
+              setIsModalOpen(true);
+            }}
           />
         </div>
       </main>
@@ -347,6 +370,7 @@ export default function AdminPanel() {
       <PharmacyDetailModal
         pharmacy={selectedPharmacy}
         isOpen={isModalOpen}
+        initialTab={initialModalTab}
         onClose={handleCloseModal}
         onUpdateStatus={handleUpdateStatus}
         isAdmin={true}

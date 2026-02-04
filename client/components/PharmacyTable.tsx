@@ -51,6 +51,8 @@ interface PharmacyTableProps {
   stirFilter?: string[];
   stirSortOrder: 'asc' | 'desc' | null;
   onStirFilterClick?: (e: React.MouseEvent<HTMLTableCellElement>) => void;
+  filesFilter?: boolean | null;
+  onFilesFilterChange?: (value: boolean | null) => void;
 }
 
 export function PharmacyTable({
@@ -88,6 +90,8 @@ export function PharmacyTable({
   stirFilter = [],
   stirSortOrder = null,
   onStirFilterClick,
+  filesFilter,
+  onFilesFilterChange,
 }: PharmacyTableProps) {
   const { t } = useLanguage();
 
@@ -137,7 +141,52 @@ export function PharmacyTable({
         return <th key={col.id} className="px-2 py-2 md:py-3 text-left font-semibold text-gray-700 whitespace-nowrap" style={{ width: "110px" }}>{t.leadPhone}</th>;
 
       case "files":
-        return <th key={col.id} className="px-2 md:px-4 py-2 md:py-3 text-center font-semibold text-gray-700 whitespace-nowrap min-w-max">{t.files}</th>;
+        const hasFilesFilter = filesFilter !== null;
+        return (
+          <th key={col.id} className="px-2 md:px-4 py-2 md:py-3 text-center font-semibold text-gray-700 whitespace-nowrap min-w-max">
+            <div className="flex items-center justify-center gap-1">
+              {t.files}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className={`h-6 w-6 p-0 hover:bg-gray-200 dark:hover:bg-gray-700 ${hasFilesFilter ? "text-blue-600" : "text-gray-400"
+                      }`}
+                  >
+                    <ChevronDown className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-40">
+                  <DropdownMenuRadioGroup
+                    value={
+                      filesFilter === null
+                        ? "all"
+                        : filesFilter
+                          ? "yes"
+                          : "no"
+                    }
+                    onValueChange={(value) => {
+                      if (value === "all") onFilesFilterChange?.(null);
+                      if (value === "yes") onFilesFilterChange?.(true);
+                      if (value === "no") onFilesFilterChange?.(false);
+                    }}
+                  >
+                    <DropdownMenuRadioItem value="all">
+                      {t.all || "All"}
+                    </DropdownMenuRadioItem>
+                    <DropdownMenuRadioItem value="yes">
+                      {t.yes || "YES"}
+                    </DropdownMenuRadioItem>
+                    <DropdownMenuRadioItem value="no">
+                      {t.no || "NO"}
+                    </DropdownMenuRadioItem>
+                  </DropdownMenuRadioGroup>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+          </th>
+        );
 
       case "merchantStatus":
         const hasMerchantStatusFilter = merchantStatusFilter !== null;

@@ -38,7 +38,9 @@ export default function LeadsPanel() {
     const [telegramBotFilter, setTelegramBotFilter] = useState<boolean | null>(null);
     const [brandedPacketFilter, setBrandedPacketFilter] = useState<boolean | null>(null);
     const [trainingFilter, setTrainingFilter] = useState<boolean | null>(null);
+    const [trainingFilter, setTrainingFilter] = useState<boolean | null>(null);
     const [merchantStatusFilter, setMerchantStatusFilter] = useState<boolean | null>(null);
+    const [filesFilter, setFilesFilter] = useState<boolean | null>(null);
 
     // Leads-specific features
     const [selectedRows, setSelectedRows] = useState<Set<number>>(new Set());
@@ -358,7 +360,15 @@ export default function LeadsPanel() {
                 ? true
                 : p.merchantOnline === merchantStatusFilter;
 
-            return matchesSearch && matchesLeadStatus && matchesActive && matchesCommentUser && matchesCommentDate && matchesStir && matchesTelegramBot && matchesBrandedPacket && matchesTraining && matchesMerchantStatus;
+            // 11. Files Filter
+            const matchesFiles =
+                filesFilter === null
+                    ? true
+                    : filesFilter
+                        ? p.licence !== null && p.licence !== undefined
+                        : !p.licence;
+
+            return matchesSearch && matchesLeadStatus && matchesActive && matchesCommentUser && matchesCommentDate && matchesStir && matchesTelegramBot && matchesBrandedPacket && matchesTraining && matchesMerchantStatus && matchesFiles;
         });
 
         // Apply STIR sorting if enabled
@@ -375,7 +385,7 @@ export default function LeadsPanel() {
         }
 
         setFilteredLeads(filtered);
-    }, [searchQuery, leads, leadStatusFilter, activeFilter, commentUserFilter, commentDateFilter, stirFilter, stirSortOrder, telegramBotFilter, brandedPacketFilter, trainingFilter, merchantStatusFilter]);
+    }, [searchQuery, leads, leadStatusFilter, activeFilter, commentUserFilter, commentDateFilter, stirFilter, stirSortOrder, telegramBotFilter, brandedPacketFilter, trainingFilter, merchantStatusFilter, filesFilter]);
 
     if (authLoading) {
         return (
@@ -424,7 +434,10 @@ export default function LeadsPanel() {
                         trainingFilter={trainingFilter}
                         onTrainingFilterChange={setTrainingFilter}
                         merchantStatusFilter={merchantStatusFilter}
+                        merchantStatusFilter={merchantStatusFilter}
                         onMerchantStatusFilterChange={setMerchantStatusFilter}
+                        filesFilter={filesFilter}
+                        onFilesFilterChange={setFilesFilter}
 
                         // Search
                         searchQuery={searchQuery}

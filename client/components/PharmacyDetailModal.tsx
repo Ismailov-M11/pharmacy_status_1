@@ -757,14 +757,9 @@ export function PharmacyDetailModal({
                         <td className="px-4 py-3 text-sm text-gray-900 dark:text-gray-100 whitespace-nowrap">
                           <div className="flex items-center">
                             <FileText className="h-4 w-4 mr-2 text-blue-500" />
-                            <a
-                              href={pharmacy.licence.attachmentLink}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="hover:underline hover:text-blue-600"
-                            >
+                            <div className="text-sm text-gray-900 dark:text-gray-100">
                               {pharmacy.licence.originalName}
-                            </a>
+                            </div>
                           </div>
                         </td>
                         <td className="px-4 py-3 text-sm text-gray-500 dark:text-gray-400 whitespace-nowrap">
