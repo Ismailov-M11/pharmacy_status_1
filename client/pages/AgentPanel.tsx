@@ -37,6 +37,7 @@ export default function AgentPanel() {
     null,
   );
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [initialModalTab, setInitialModalTab] = useState<"details" | "files">("details");
   const [changeHistory, setChangeHistory] = useState<StatusHistoryRecord[]>([]);
   const [isLoadingHistory, setIsLoadingHistory] = useState(false);
 
@@ -177,6 +178,7 @@ export default function AgentPanel() {
     setIsModalOpen(false);
     setSelectedPharmacy(null);
     setChangeHistory([]);
+    setInitialModalTab("details");
   };
 
   const handleUpdateStatus = async (
@@ -272,6 +274,11 @@ export default function AgentPanel() {
             onTrainingFilterChange={setTrainingFilter}
             filesFilter={filesFilter}
             onFilesFilterChange={setFilesFilter}
+            onFilesClick={(pharmacy) => {
+              setSelectedPharmacy(pharmacy);
+              setInitialModalTab("files");
+              setIsModalOpen(true);
+            }}
             searchQuery={searchQuery}
             onSearchChange={setSearchQuery}
             onPharmacyClick={handlePharmacyClick}
@@ -281,6 +288,7 @@ export default function AgentPanel() {
         <PharmacyDetailModal
           pharmacy={selectedPharmacy}
           isOpen={isModalOpen}
+          initialTab={initialModalTab}
           onClose={handleCloseModal}
           onUpdateStatus={handleUpdateStatus}
           isAdmin={false}
