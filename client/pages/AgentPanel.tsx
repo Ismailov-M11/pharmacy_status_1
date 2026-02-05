@@ -31,6 +31,7 @@ export default function AgentPanel() {
     boolean | null
   >(null);
   const [trainingFilter, setTrainingFilter] = useState<boolean | null>(null);
+  const [filesFilter, setFilesFilter] = useState<boolean | null>(null);
   const [filteredPharmacies, setFilteredPharmacies] = useState<Pharmacy[]>([]);
   const [selectedPharmacy, setSelectedPharmacy] = useState<Pharmacy | null>(
     null,
@@ -79,11 +80,19 @@ export default function AgentPanel() {
       const matchesTraining =
         trainingFilter === null ? true : (p as any).training === trainingFilter;
 
+      const matchesFiles =
+        filesFilter === null
+          ? true
+          : filesFilter
+            ? p.licence !== null && p.licence !== undefined
+            : p.licence === null || p.licence === undefined;
+
       return (
         matchesSearch &&
         matchesTelegramBot &&
         matchesBrandedPacket &&
-        matchesTraining
+        matchesTraining &&
+        matchesFiles
       );
     });
     setFilteredPharmacies(filtered);
@@ -93,6 +102,7 @@ export default function AgentPanel() {
     telegramBotFilter,
     brandedPacketFilter,
     trainingFilter,
+    filesFilter,
   ]);
 
   const fetchPharmacies = async () => {
@@ -260,6 +270,8 @@ export default function AgentPanel() {
             onBrandedPacketFilterChange={setBrandedPacketFilter}
             trainingFilter={trainingFilter}
             onTrainingFilterChange={setTrainingFilter}
+            filesFilter={filesFilter}
+            onFilesFilterChange={setFilesFilter}
             searchQuery={searchQuery}
             onSearchChange={setSearchQuery}
             onPharmacyClick={handlePharmacyClick}
