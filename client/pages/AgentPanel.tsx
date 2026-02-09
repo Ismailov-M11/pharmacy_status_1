@@ -11,7 +11,8 @@ import {
   getPharmacyStatus,
   updatePharmacyStatusLocal,
   getStatusHistory,
-  StatusHistoryRecord
+  StatusHistoryRecord,
+  getMarketSessionList,
 } from "@/lib/api";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
@@ -31,6 +32,7 @@ export default function AgentPanel() {
     boolean | null
   >(null);
   const [trainingFilter, setTrainingFilter] = useState<boolean | null>(null);
+  const [merchantStatusFilter, setMerchantStatusFilter] = useState<boolean | null>(null);
   const [filesFilter, setFilesFilter] = useState<boolean | null>(null);
   const [filteredPharmacies, setFilteredPharmacies] = useState<Pharmacy[]>([]);
   const [selectedPharmacy, setSelectedPharmacy] = useState<Pharmacy | null>(
@@ -88,12 +90,20 @@ export default function AgentPanel() {
             ? p.licence !== null && p.licence !== undefined
             : p.licence === null || p.licence === undefined;
 
+      const matchesActive =
+        activeFilter === null ? true : p.active === activeFilter;
+
+      const matchesMerchantStatus =
+        merchantStatusFilter === null ? true : p.merchantOnline === merchantStatusFilter;
+
       return (
         matchesSearch &&
         matchesTelegramBot &&
         matchesBrandedPacket &&
         matchesTraining &&
-        matchesFiles
+        matchesFiles &&
+        matchesActive &&
+        matchesMerchantStatus
       );
     });
     setFilteredPharmacies(filtered);
@@ -104,6 +114,8 @@ export default function AgentPanel() {
     brandedPacketFilter,
     trainingFilter,
     filesFilter,
+    activeFilter,
+    merchantStatusFilter,
   ]);
 
   const fetchPharmacies = async () => {
@@ -114,15 +126,26 @@ export default function AgentPanel() {
       const response = await getPharmacyList(token, "", 0, activeFilter);
       const pharmacyList = response.payload?.list || [];
 
-      // Fetch statuses from local backend for all pharmacies
+      // Fetch statuses from local backend and session data for all pharmacies
       const pharmaciesWithStatuses = await Promise.all(
         pharmacyList.map(async (pharmacy) => {
           try {
-            const status = await getPharmacyStatus(pharmacy.id);
+            // Fetch both status and session data in parallel
+            const [status, sessionData] = await Promise.all([
+              getPharmacyStatus(pharmacy.id),
+              getMarketSessionList(token, pharmacy.id),
+            ]);
+
+            // Determine if pharmacy is online (any active session)
+            const isOnline = sessionData.payload.list.some(
+              (session) => session.active === true
+            );
+
             return {
               ...pharmacy,
               training: status.training,
-              brandedPacket: status.brandedPacket
+              brandedPacket: status.brandedPacket,
+              merchantOnline: isOnline,
             };
           } catch (error) {
             // If status not found, use defaults
@@ -130,7 +153,8 @@ export default function AgentPanel() {
             return {
               ...pharmacy,
               training: false,
-              brandedPacket: false
+              brandedPacket: false,
+              merchantOnline: false,
             };
           }
         })
@@ -272,6 +296,8 @@ export default function AgentPanel() {
             onBrandedPacketFilterChange={setBrandedPacketFilter}
             trainingFilter={trainingFilter}
             onTrainingFilterChange={setTrainingFilter}
+            merchantStatusFilter={merchantStatusFilter}
+            onMerchantStatusFilterChange={setMerchantStatusFilter}
             filesFilter={filesFilter}
             onFilesFilterChange={setFilesFilter}
             onFilesClick={(pharmacy) => {
@@ -283,6 +309,10 @@ export default function AgentPanel() {
             onSearchChange={setSearchQuery}
             onPharmacyClick={handlePharmacyClick}
             onRefresh={fetchPharmacies}
+            leadStatusFilter={null}
+            onLeadStatusFilterChange={() => { }}
+            leadStatusOptions={[]}
+            stirSortOrder={null}
           />
         </div>
         <PharmacyDetailModal
