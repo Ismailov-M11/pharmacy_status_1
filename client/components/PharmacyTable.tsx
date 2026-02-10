@@ -404,7 +404,6 @@ export function PharmacyTable({
         return <th key={col.id} className="px-2 md:px-4 py-2 md:py-3 text-left font-semibold text-gray-700 whitespace-nowrap min-w-max">{t.date || "Дата"}</th>;
 
       case "stir":
-        if (!isAdmin) return null;
         const hasStirFilter = stirFilter && stirFilter.length > 0;
         const hasStirSort = stirSortOrder !== null;
         return (
@@ -444,27 +443,21 @@ export function PharmacyTable({
         );
 
       case "additionalPhone":
-        if (!isAdmin) return null;
         return <th key={col.id} className="px-2 md:px-4 py-2 md:py-3 text-left font-semibold text-gray-700 whitespace-nowrap min-w-max"><div className="flex flex-col items-start"><span>{t.additionalPhone || "Доп. телефон Lead"}</span><span className="text-[10px] font-normal text-gray-500">Lead</span></div></th>;
 
       case "juridicalName":
-        if (!isAdmin) return null;
         return <th key={col.id} className="px-2 md:px-4 py-2 md:py-3 text-left font-semibold text-gray-700 whitespace-nowrap min-w-[180px]">{t.juridicalName || "Юридическое название"}</th>;
 
       case "juridicalAddress":
-        if (!isAdmin) return null;
         return <th key={col.id} className="px-2 md:px-4 py-2 md:py-3 text-left font-semibold text-gray-700" style={{ width: "200px", minWidth: "200px" }}><div className="break-words">{t.juridicalAddress || "Юридический адрес"}</div></th>;
 
       case "bankName":
-        if (!isAdmin) return null;
         return <th key={col.id} className="px-2 md:px-4 py-2 md:py-3 text-left font-semibold text-gray-700 whitespace-nowrap min-w-[150px]">{t.bankName || "Название банка"}</th>;
 
       case "bankAccount":
-        if (!isAdmin) return null;
         return <th key={col.id} className="px-2 md:px-4 py-2 md:py-3 text-left font-semibold text-gray-700 whitespace-nowrap min-w-[150px]">{t.bankAccount || "Банковский счет"}</th>;
 
       case "mfo":
-        if (!isAdmin) return null;
         return <th key={col.id} className="px-2 md:px-4 py-2 md:py-3 text-left font-semibold text-gray-700 whitespace-nowrap min-w-max">{t.mfo || "МФО"}</th>;
 
       default:
@@ -513,13 +506,13 @@ export function PharmacyTable({
       case "comments": return <td key={col.id} className="px-2 md:px-4 py-2 md:py-3 text-gray-900 text-xs align-middle"><div className="max-w-[200px] break-words">{getLastComment(pharmacy.comments || [])?.coment || getLastComment(pharmacy.comments || [])?.comment || "-"}</div></td>;
       case "creationDate": return <td key={col.id} className="px-2 md:px-4 py-2 md:py-3 text-gray-900 text-xs whitespace-nowrap align-middle">{formatDate(pharmacy.creationDate)}</td>;
 
-      case "stir": return isAdmin ? <td key={col.id} className="px-2 md:px-4 py-2 md:py-3 text-gray-900 text-xs whitespace-nowrap align-middle">{pharmacy.stir || "-"}</td> : null;
-      case "additionalPhone": return isAdmin ? <td key={col.id} className="px-2 md:px-4 py-2 md:py-3 text-gray-900 text-xs whitespace-nowrap align-middle">{pharmacy.additionalPhone || "-"}</td> : null;
-      case "juridicalName": return isAdmin ? <td key={col.id} className="px-2 md:px-4 py-2 md:py-3 text-gray-900 text-xs align-middle"><div className="break-words">{pharmacy.juridicalName || "-"}</div></td> : null;
-      case "juridicalAddress": return isAdmin ? <td key={col.id} className="px-2 md:px-4 py-2 md:py-3 text-gray-900 text-xs align-middle"><div className="break-words">{pharmacy.juridicalAddress || "-"}</div></td> : null;
-      case "bankName": return isAdmin ? <td key={col.id} className="px-2 md:px-4 py-2 md:py-3 text-gray-900 text-xs align-middle"><div className="break-words">{pharmacy.bankName || "-"}</div></td> : null;
-      case "bankAccount": return isAdmin ? <td key={col.id} className="px-2 md:px-4 py-2 md:py-3 text-gray-900 text-xs whitespace-nowrap align-middle">{pharmacy.bankAccount || "-"}</td> : null;
-      case "mfo": return isAdmin ? <td key={col.id} className="px-2 md:px-4 py-2 md:py-3 text-gray-900 text-xs whitespace-nowrap align-middle">{pharmacy.mfo || "-"}</td> : null;
+      case "stir": return <td key={col.id} className="px-2 md:px-4 py-2 md:py-3 text-gray-900 text-xs whitespace-nowrap align-middle">{pharmacy.stir || "-"}</td>;
+      case "additionalPhone": return <td key={col.id} className="px-2 md:px-4 py-2 md:py-3 text-gray-900 text-xs whitespace-nowrap align-middle">{pharmacy.additionalPhone || "-"}</td>;
+      case "juridicalName": return <td key={col.id} className="px-2 md:px-4 py-2 md:py-3 text-gray-900 text-xs align-middle"><div className="break-words">{pharmacy.juridicalName || "-"}</div></td>;
+      case "juridicalAddress": return <td key={col.id} className="px-2 md:px-4 py-2 md:py-3 text-gray-900 text-xs align-middle"><div className="break-words">{pharmacy.juridicalAddress || "-"}</div></td>;
+      case "bankName": return <td key={col.id} className="px-2 md:px-4 py-2 md:py-3 text-gray-900 text-xs align-middle"><div className="break-words">{pharmacy.bankName || "-"}</div></td>;
+      case "bankAccount": return <td key={col.id} className="px-2 md:px-4 py-2 md:py-3 text-gray-900 text-xs whitespace-nowrap align-middle">{pharmacy.bankAccount || "-"}</td>;
+      case "mfo": return <td key={col.id} className="px-2 md:px-4 py-2 md:py-3 text-gray-900 text-xs whitespace-nowrap align-middle">{pharmacy.mfo || "-"}</td>;
 
       case "files":
         return (
@@ -1273,35 +1266,70 @@ export function PharmacyTable({
                           </th>
                         </>
                       )}
-                      <th className="px-2 md:px-4 py-2 md:py-3 text-left font-semibold text-gray-700 whitespace-nowrap min-w-max">
-                        {t.stir}
-                      </th>
-                      <th className="px-2 md:px-4 py-2 md:py-3 text-left font-semibold text-gray-700 whitespace-nowrap min-w-max">
-                        <div className="flex flex-col items-start">
-                          <span>{t.additionalPhone}</span>
-                          <span className="text-[10px] font-normal text-gray-500">Lead</span>
-                        </div>
-                      </th>
-                      <th className="px-2 md:px-4 py-2 md:py-3 text-left font-semibold text-gray-700 whitespace-nowrap min-w-[180px]">
-                        {t.juridicalName}
-                      </th>
-                      <th
-                        className="px-2 md:px-4 py-2 md:py-3 text-left font-semibold text-gray-700"
-                        style={{ width: "200px", minWidth: "200px" }}
-                      >
-                        <div className="break-words">{t.juridicalAddress}</div>
-                      </th>
-                      <th className="px-2 md:px-4 py-2 md:py-3 text-left font-semibold text-gray-700 whitespace-nowrap min-w-[150px]">
-                        {t.bankName}
-                      </th>
-                      <th className="px-2 md:px-4 py-2 md:py-3 text-left font-semibold text-gray-700 whitespace-nowrap min-w-[150px]">
-                        {t.bankAccount}
-                      </th>
-                      <th className="px-2 md:px-4 py-2 md:py-3 text-left font-semibold text-gray-700 whitespace-nowrap min-w-max">
-                        {t.mfo}
-                      </th>
                     </>
                   )}
+
+                  {/* STIR Column - Now visible for all roles */}
+                  <th className="px-2 md:px-4 py-2 md:py-3 text-left font-semibold text-gray-700 whitespace-nowrap min-w-max">
+                    {onStirFilterClick ? (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="-ml-3 h-8 hover:bg-purple-600 hover:text-white transition-colors"
+                        onClick={onStirFilterClick}
+                      >
+                        <div className="flex items-center gap-2">
+                          <span>{t.stir || "СТИР"}</span>
+                          {((stirFilter && stirFilter.length > 0) || stirSortOrder !== null) && (
+                            <div className="flex items-center gap-1">
+                              {stirFilter && stirFilter.length > 0 && (
+                                <span className="text-xs bg-blue-100 text-blue-800 px-1.5 py-0.5 rounded">
+                                  {stirFilter.length}
+                                </span>
+                              )}
+                              {stirSortOrder !== null && (
+                                <span className="text-xs text-blue-600">
+                                  {stirSortOrder === 'asc' ? '↑' : '↓'}
+                                </span>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      </Button>
+                    ) : (
+                      t.stir || "СТИР"
+                    )}
+                  </th>
+
+                  {/* Additional Phone - Only for admin */}
+                  {isAdmin && (
+                    <th className="px-2 md:px-4 py-2 md:py-3 text-left font-semibold text-gray-700 whitespace-nowrap min-w-max">
+                      <div className="flex flex-col items-start">
+                        <span>{t.additionalPhone}</span>
+                        <span className="text-[10px] font-normal text-gray-500">Lead</span>
+                      </div>
+                    </th>
+                  )}
+
+                  {/* Juridical Data Columns - Now visible for all roles */}
+                  <th className="px-2 md:px-4 py-2 md:py-3 text-left font-semibold text-gray-700 whitespace-nowrap min-w-[180px]">
+                    {t.juridicalName}
+                  </th>
+                  <th
+                    className="px-2 md:px-4 py-2 md:py-3 text-left font-semibold text-gray-700"
+                    style={{ width: "200px", minWidth: "200px" }}
+                  >
+                    <div className="break-words">{t.juridicalAddress}</div>
+                  </th>
+                  <th className="px-2 md:px-4 py-2 md:py-3 text-left font-semibold text-gray-700 whitespace-nowrap min-w-[150px]">
+                    {t.bankName}
+                  </th>
+                  <th className="px-2 md:px-4 py-2 md:py-3 text-left font-semibold text-gray-700 whitespace-nowrap min-w-[150px]">
+                    {t.bankAccount}
+                  </th>
+                  <th className="px-2 md:px-4 py-2 md:py-3 text-left font-semibold text-gray-700 whitespace-nowrap min-w-max">
+                    {t.mfo}
+                  </th>
                 </>
               )}
             </tr>
@@ -1553,35 +1581,42 @@ export function PharmacyTable({
                                 </td>
                               </>
                             )}
-
-                            <td className="px-2 md:px-4 py-2 md:py-3 text-gray-900 text-xs whitespace-nowrap">
-                              {(pharmacy.lead as any)?.stir || "-"}
-                            </td>
-                            <td className="px-2 md:px-4 py-2 md:py-3 text-gray-900 text-xs whitespace-nowrap">
-                              {(pharmacy.lead as any)?.additionalPhone || "-"}
-                            </td>
-                            <td className="px-2 md:px-4 py-2 md:py-3 text-gray-600 text-xs max-w-xs truncate">
-                              {(pharmacy.lead as any)?.juridicalName || "-"}
-                            </td>
-                            <td className="px-2 md:px-4 py-2 md:py-3 text-gray-600 text-xs align-top">
-                              <div
-                                className="break-words"
-                                style={{ lineHeight: "1.4em", minHeight: "4.2em" }}
-                              >
-                                {(pharmacy.lead as any)?.juridicalAddress || "-"}
-                              </div>
-                            </td>
-                            <td className="px-2 md:px-4 py-2 md:py-3 text-gray-600 text-xs max-w-xs truncate">
-                              {(pharmacy.lead as any)?.bankName || "-"}
-                            </td>
-                            <td className="px-2 md:px-4 py-2 md:py-3 text-gray-900 text-xs font-mono whitespace-nowrap">
-                              {(pharmacy.lead as any)?.bankAccount || "-"}
-                            </td>
-                            <td className="px-2 md:px-4 py-2 md:py-3 text-gray-900 text-xs whitespace-nowrap">
-                              {(pharmacy.lead as any)?.mfo || "-"}
-                            </td>
                           </>
                         )}
+
+                        {/* STIR Column - Now visible for all roles */}
+                        <td className="px-2 md:px-4 py-2 md:py-3 text-gray-900 text-xs whitespace-nowrap">
+                          {(pharmacy.lead as any)?.stir || "-"}
+                        </td>
+
+                        {/* Additional Phone - Only for admin */}
+                        {isAdmin && (
+                          <td className="px-2 md:px-4 py-2 md:py-3 text-gray-900 text-xs whitespace-nowrap">
+                            {(pharmacy.lead as any)?.additionalPhone || "-"}
+                          </td>
+                        )}
+
+                        {/* Juridical Data Columns - Now visible for all roles */}
+                        <td className="px-2 md:px-4 py-2 md:py-3 text-gray-600 text-xs max-w-xs truncate">
+                          {(pharmacy.lead as any)?.juridicalName || "-"}
+                        </td>
+                        <td className="px-2 md:px-4 py-2 md:py-3 text-gray-600 text-xs align-top">
+                          <div
+                            className="break-words"
+                            style={{ lineHeight: "1.4em", minHeight: "4.2em" }}
+                          >
+                            {(pharmacy.lead as any)?.juridicalAddress || "-"}
+                          </div>
+                        </td>
+                        <td className="px-2 md:px-4 py-2 md:py-3 text-gray-600 text-xs max-w-xs truncate">
+                          {(pharmacy.lead as any)?.bankName || "-"}
+                        </td>
+                        <td className="px-2 md:px-4 py-2 md:py-3 text-gray-900 text-xs font-mono whitespace-nowrap">
+                          {(pharmacy.lead as any)?.bankAccount || "-"}
+                        </td>
+                        <td className="px-2 md:px-4 py-2 md:py-3 text-gray-900 text-xs whitespace-nowrap">
+                          {(pharmacy.lead as any)?.mfo || "-"}
+                        </td>
                       </>
                     )}
                   </tr>
