@@ -585,7 +585,7 @@ export default function LeadsPanel() {
             <StirFilterModal
                 isOpen={isStirModalOpen}
                 onClose={() => setIsStirModalOpen(false)}
-                allStirValues={stirOptions}
+                allStirValues={uniqueStirs}
                 selectedStirs={stirFilter}
                 sortOrder={stirSortOrder}
                 onApply={(selected, sort) => {
