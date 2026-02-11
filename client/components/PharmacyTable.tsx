@@ -55,12 +55,12 @@ interface PharmacyTableProps {
   onFilesFilterChange?: (value: boolean | null) => void;
   onFilesClick?: (pharmacy: Pharmacy) => void;
   // Region and District Filter props
-  regionFilter?: string | null;
-  onRegionFilterChange?: (value: string | null) => void;
-  regionOptions?: string[];
-  districtFilter?: string | null;
-  onDistrictFilterChange?: (value: string | null) => void;
-  districtOptions?: string[];
+  regionFilter?: string[];
+  onRegionFilterClick?: (e: React.MouseEvent<HTMLTableCellElement>) => void;
+  regionSortOrder?: 'asc' | 'desc' | null;
+  districtFilter?: string[];
+  onDistrictFilterClick?: (e: React.MouseEvent<HTMLTableCellElement>) => void;
+  districtSortOrder?: 'asc' | 'desc' | null;
 }
 
 export function PharmacyTable({
@@ -103,12 +103,12 @@ export function PharmacyTable({
   onFilesFilterChange,
   onFilesClick,
 
-  regionFilter,
-  onRegionFilterChange,
-  regionOptions = [],
-  districtFilter,
-  onDistrictFilterChange,
-  districtOptions = [],
+  regionFilter = [],
+  onRegionFilterClick,
+  regionSortOrder = null,
+  districtFilter = [],
+  onDistrictFilterClick,
+  districtSortOrder = null,
 }: PharmacyTableProps) {
   const { t } = useLanguage();
 
@@ -475,59 +475,75 @@ export function PharmacyTable({
         return <th key={col.id} className="px-2 md:px-4 py-2 md:py-3 text-left font-semibold text-gray-700 whitespace-nowrap min-w-max">{t.mfo || "МФО"}</th>;
 
       case "region":
-        const hasRegionFilter = regionFilter !== null;
+        const hasRegionFilter = regionFilter && regionFilter.length > 0;
+        const hasRegionSort = regionSortOrder !== null;
         return (
-          <th key={col.id} className="px-2 md:px-4 py-2 md:py-3 text-left font-semibold text-gray-700 whitespace-nowrap min-w-max">
-            {onRegionFilterChange && regionOptions && regionOptions.length > 0 ? (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="sm" className="-ml-3 h-8 data-[state=open]:bg-purple-600 data-[state=open]:text-white">
-                    <div className="flex items-center gap-2">
-                      <span>{t.region}</span>
+          <th
+            key={col.id}
+            className="px-2 md:px-4 py-2 md:py-3 text-left font-semibold text-gray-700 whitespace-nowrap min-w-max"
+          >
+            {onRegionFilterClick ? (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="-ml-3 h-8 hover:bg-purple-600 hover:text-white transition-colors"
+                onClick={onRegionFilterClick}
+              >
+                <div className="flex items-center gap-2">
+                  <span>{t.region}</span>
+                  {(hasRegionFilter || hasRegionSort) && (
+                    <div className="flex items-center gap-1">
                       {hasRegionFilter && (
-                        <span className="text-xs bg-blue-100 text-blue-800 px-1.5 py-0.5 rounded">1</span>
+                        <span className="text-xs bg-blue-100 text-blue-800 px-1.5 py-0.5 rounded">
+                          {regionFilter.length}
+                        </span>
+                      )}
+                      {hasRegionSort && (
+                        <span className="text-xs text-blue-600">
+                          {regionSortOrder === 'asc' ? '↑' : '↓'}
+                        </span>
                       )}
                     </div>
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="start">
-                  <DropdownMenuRadioGroup value={regionFilter || "null"} onValueChange={(val) => handleStringFilterChange(val, onRegionFilterChange)}>
-                    <DropdownMenuRadioItem value="null">{t.all || "Все"}</DropdownMenuRadioItem>
-                    {regionOptions.map((region) => (
-                      <DropdownMenuRadioItem key={region} value={region} className="cursor-pointer">{region}</DropdownMenuRadioItem>
-                    ))}
-                  </DropdownMenuRadioGroup>
-                </DropdownMenuContent>
-              </DropdownMenu>
+                  )}
+                </div>
+              </Button>
             ) : t.region}
           </th>
         );
 
       case "district":
-        const hasDistrictFilter = districtFilter !== null;
+        const hasDistrictFilter = districtFilter && districtFilter.length > 0;
+        const hasDistrictSort = districtSortOrder !== null;
         return (
-          <th key={col.id} className="px-2 md:px-4 py-2 md:py-3 text-left font-semibold text-gray-700 whitespace-nowrap min-w-max">
-            {onDistrictFilterChange && districtOptions && districtOptions.length > 0 ? (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="sm" className="-ml-3 h-8 data-[state=open]:bg-purple-600 data-[state=open]:text-white">
-                    <div className="flex items-center gap-2">
-                      <span>{t.district}</span>
+          <th
+            key={col.id}
+            className="px-2 md:px-4 py-2 md:py-3 text-left font-semibold text-gray-700 whitespace-nowrap min-w-max"
+          >
+            {onDistrictFilterClick ? (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="-ml-3 h-8 hover:bg-purple-600 hover:text-white transition-colors"
+                onClick={onDistrictFilterClick}
+              >
+                <div className="flex items-center gap-2">
+                  <span>{t.district}</span>
+                  {(hasDistrictFilter || hasDistrictSort) && (
+                    <div className="flex items-center gap-1">
                       {hasDistrictFilter && (
-                        <span className="text-xs bg-blue-100 text-blue-800 px-1.5 py-0.5 rounded">1</span>
+                        <span className="text-xs bg-blue-100 text-blue-800 px-1.5 py-0.5 rounded">
+                          {districtFilter.length}
+                        </span>
+                      )}
+                      {hasDistrictSort && (
+                        <span className="text-xs text-blue-600">
+                          {districtSortOrder === 'asc' ? '↑' : '↓'}
+                        </span>
                       )}
                     </div>
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="start">
-                  <DropdownMenuRadioGroup value={districtFilter || "null"} onValueChange={(val) => handleStringFilterChange(val, onDistrictFilterChange)}>
-                    <DropdownMenuRadioItem value="null">{t.all || "Все"}</DropdownMenuRadioItem>
-                    {districtOptions.map((district) => (
-                      <DropdownMenuRadioItem key={district} value={district} className="cursor-pointer">{district}</DropdownMenuRadioItem>
-                    ))}
-                  </DropdownMenuRadioGroup>
-                </DropdownMenuContent>
-              </DropdownMenu>
+                  )}
+                </div>
+              </Button>
             ) : t.district}
           </th>
         );

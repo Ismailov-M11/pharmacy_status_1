@@ -8,6 +8,7 @@ import { PharmacyDetailModal } from "@/components/PharmacyDetailModal";
 import { ColumnSettingsModal } from "@/components/ColumnSettingsModal";
 import { SettingsMenuModal } from "@/components/SettingsMenuModal";
 import { StirFilterModal } from "@/components/StirFilterModal";
+import { GenericFilterModal } from "@/components/GenericFilterModal";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 
@@ -40,8 +41,17 @@ export default function LeadsPanel() {
     const [trainingFilter, setTrainingFilter] = useState<boolean | null>(null);
 
     const [merchantStatusFilter, setMerchantStatusFilter] = useState<boolean | null>(null);
-    const [regionFilter, setRegionFilter] = useState<string | null>(null);
-    const [districtFilter, setDistrictFilter] = useState<string | null>(null);
+
+    // Region and District filters with modal support
+    const [regionFilter, setRegionFilter] = useState<string[]>([]);
+    const [regionSortOrder, setRegionSortOrder] = useState<'asc' | 'desc' | null>(null);
+    const [isRegionModalOpen, setIsRegionModalOpen] = useState(false);
+    const [regionHeaderRef, setRegionHeaderRef] = useState<HTMLElement | null>(null);
+
+    const [districtFilter, setDistrictFilter] = useState<string[]>([]);
+    const [districtSortOrder, setDistrictSortOrder] = useState<'asc' | 'desc' | null>(null);
+    const [isDistrictModalOpen, setIsDistrictModalOpen] = useState(false);
+    const [districtHeaderRef, setDistrictHeaderRef] = useState<HTMLElement | null>(null);
 
     // Leads-specific features
     const [selectedRows, setSelectedRows] = useState<Set<number>>(new Set());
@@ -386,14 +396,14 @@ export default function LeadsPanel() {
 
             // 11. Region Filter
             const regionName = typeof p.region === 'object' && p.region?.name ? p.region.name : (typeof p.region === 'string' ? p.region : null);
-            const matchesRegion = regionFilter === null
+            const matchesRegion = regionFilter.length === 0
                 ? true
-                : regionName === regionFilter;
+                : regionName && regionFilter.includes(regionName);
 
             // 12. District Filter
-            const matchesDistrict = districtFilter === null
+            const matchesDistrict = districtFilter.length === 0
                 ? true
-                : p.district === districtFilter;
+                : p.district && districtFilter.includes(p.district);
 
             return matchesSearch && matchesLeadStatus && matchesActive && matchesCommentUser && matchesCommentDate && matchesStir && matchesTelegramBot && matchesBrandedPacket && matchesTraining && matchesMerchantStatus && matchesRegion && matchesDistrict;
         });
@@ -411,8 +421,28 @@ export default function LeadsPanel() {
             });
         }
 
+        // Apply Region sorting if enabled
+        if (regionSortOrder && regionFilter.length > 0) {
+            filtered.sort((a, b) => {
+                const aRegion = typeof a.region === 'object' && a.region?.name ? a.region.name : (typeof a.region === 'string' ? a.region : '');
+                const bRegion = typeof b.region === 'object' && b.region?.name ? b.region.name : (typeof b.region === 'string' ? b.region : '');
+                const comparison = aRegion.localeCompare(bRegion);
+                return regionSortOrder === 'asc' ? comparison : -comparison;
+            });
+        }
+
+        // Apply District sorting if enabled
+        if (districtSortOrder && districtFilter.length > 0) {
+            filtered.sort((a, b) => {
+                const aDistrict = a.district || '';
+                const bDistrict = b.district || '';
+                const comparison = aDistrict.localeCompare(bDistrict);
+                return districtSortOrder === 'asc' ? comparison : -comparison;
+            });
+        }
+
         setFilteredLeads(filtered);
-    }, [searchQuery, leads, leadStatusFilter, activeFilter, commentUserFilter, commentDateFilter, stirFilter, stirSortOrder, telegramBotFilter, brandedPacketFilter, trainingFilter, merchantStatusFilter, regionFilter, districtFilter]);
+    }, [searchQuery, leads, leadStatusFilter, activeFilter, commentUserFilter, commentDateFilter, stirFilter, stirSortOrder, telegramBotFilter, brandedPacketFilter, trainingFilter, merchantStatusFilter, regionFilter, districtFilter, regionSortOrder, districtSortOrder]);
 
     if (authLoading) {
         return (
@@ -495,11 +525,17 @@ export default function LeadsPanel() {
 
                         // Region and District Filters
                         regionFilter={regionFilter}
-                        onRegionFilterChange={setRegionFilter}
-                        regionOptions={regionOptions}
+                        regionSortOrder={regionSortOrder}
+                        onRegionFilterClick={(e) => {
+                            setRegionHeaderRef(e.currentTarget as HTMLElement);
+                            setIsRegionModalOpen(true);
+                        }}
                         districtFilter={districtFilter}
-                        onDistrictFilterChange={setDistrictFilter}
-                        districtOptions={districtOptions}
+                        districtSortOrder={districtSortOrder}
+                        onDistrictFilterClick={(e) => {
+                            setDistrictHeaderRef(e.currentTarget as HTMLElement);
+                            setIsDistrictModalOpen(true);
+                        }}
                     />
                 </div>
             </main>
@@ -549,15 +585,44 @@ export default function LeadsPanel() {
             <StirFilterModal
                 isOpen={isStirModalOpen}
                 onClose={() => setIsStirModalOpen(false)}
-                allStirValues={uniqueStirs}
+                allStirValues={stirOptions}
                 selectedStirs={stirFilter}
                 sortOrder={stirSortOrder}
-                triggerElement={stirHeaderRef}
                 onApply={(selected, sort) => {
                     setStirFilter(selected);
                     setStirSortOrder(sort);
-                    setIsStirModalOpen(false);
                 }}
+                triggerElement={stirHeaderRef}
+            />
+
+            {/* Region Filter Modal */}
+            <GenericFilterModal
+                isOpen={isRegionModalOpen}
+                onClose={() => setIsRegionModalOpen(false)}
+                title={t.region || "Region"}
+                allValues={regionOptions}
+                selectedValues={regionFilter}
+                sortOrder={regionSortOrder}
+                onApply={(selected, sort) => {
+                    setRegionFilter(selected);
+                    setRegionSortOrder(sort);
+                }}
+                triggerElement={regionHeaderRef}
+            />
+
+            {/* District Filter Modal */}
+            <GenericFilterModal
+                isOpen={isDistrictModalOpen}
+                onClose={() => setIsDistrictModalOpen(false)}
+                title={t.district || "District"}
+                allValues={districtOptions}
+                selectedValues={districtFilter}
+                sortOrder={districtSortOrder}
+                onApply={(selected, sort) => {
+                    setDistrictFilter(selected);
+                    setDistrictSortOrder(sort);
+                }}
+                triggerElement={districtHeaderRef}
             />
         </div>
     );
