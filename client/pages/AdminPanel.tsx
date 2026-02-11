@@ -87,7 +87,10 @@ export default function AdminPanel() {
         (p.bankAccount &&
           p.bankAccount.includes(searchQuery)) ||
         (p.mfo && p.mfo.includes(searchQuery)) ||
-        (p.region && p.region.toLowerCase().includes(searchQuery.toLowerCase())) ||
+        (() => {
+          const regionName = typeof p.region === 'object' && p.region?.name ? p.region.name : (typeof p.region === 'string' ? p.region : '');
+          return regionName.toLowerCase().includes(searchQuery.toLowerCase());
+        })() ||
         (p.district && p.district.toLowerCase().includes(searchQuery.toLowerCase()));
 
       const matchesTelegramBot =

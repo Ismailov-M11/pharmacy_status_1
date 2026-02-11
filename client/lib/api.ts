@@ -115,7 +115,7 @@ export interface Pharmacy {
   bankAccount?: string;
   mfo?: string;
   additionalPhone?: string;
-  region?: string;
+  region?: { name: string } | string; // Can be object or string depending on API
   district?: string;
   licence?: Licence;
   [key: string]: any;

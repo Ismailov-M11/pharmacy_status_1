@@ -75,7 +75,8 @@ export default function LeadsPanel() {
     const regionOptions = useMemo(() => {
         const regions = new Set<string>();
         leads.forEach(l => {
-            if (l.region) regions.add(l.region);
+            const regionName = typeof l.region === 'object' && l.region?.name ? l.region.name : (typeof l.region === 'string' ? l.region : null);
+            if (regionName) regions.add(regionName);
         });
         return Array.from(regions).sort();
     }, [leads]);
@@ -306,7 +307,10 @@ export default function LeadsPanel() {
                 (p.bankName && p.bankName.toLowerCase().includes(q)) ||
                 (p.bankAccount && p.bankAccount.includes(q)) ||
                 (p.mfo && p.mfo.includes(q)) ||
-                (p.region && p.region.toLowerCase().includes(q)) ||
+                (() => {
+                    const regionName = typeof p.region === 'object' && p.region?.name ? p.region.name : (typeof p.region === 'string' ? p.region : '');
+                    return regionName.toLowerCase().includes(q);
+                })() ||
                 (p.district && p.district.toLowerCase().includes(q));
 
             // 2. Lead Status Filter
@@ -381,9 +385,10 @@ export default function LeadsPanel() {
                 : p.merchantOnline === merchantStatusFilter;
 
             // 11. Region Filter
+            const regionName = typeof p.region === 'object' && p.region?.name ? p.region.name : (typeof p.region === 'string' ? p.region : null);
             const matchesRegion = regionFilter === null
                 ? true
-                : p.region === regionFilter;
+                : regionName === regionFilter;
 
             // 12. District Filter
             const matchesDistrict = districtFilter === null

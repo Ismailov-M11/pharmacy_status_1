@@ -586,7 +586,10 @@ export function PharmacyTable({
       case "bankAccount": return <td key={col.id} className="px-2 md:px-4 py-2 md:py-3 text-gray-900 text-xs whitespace-nowrap align-middle">{pharmacy.bankAccount || "-"}</td>;
       case "mfo": return <td key={col.id} className="px-2 md:px-4 py-2 md:py-3 text-gray-900 text-xs whitespace-nowrap align-middle">{pharmacy.mfo || "-"}</td>;
 
-      case "region": return <td key={col.id} className="px-2 md:px-4 py-2 md:py-3 text-gray-900 text-xs whitespace-nowrap align-middle">{pharmacy.region || "-"}</td>;
+      case "region": {
+        const regionName = typeof pharmacy.region === 'object' && pharmacy.region?.name ? pharmacy.region.name : (typeof pharmacy.region === 'string' ? pharmacy.region : '-');
+        return <td key={col.id} className="px-2 md:px-4 py-2 md:py-3 text-gray-900 text-xs whitespace-nowrap align-middle">{regionName}</td>;
+      }
       case "district": return <td key={col.id} className="px-2 md:px-4 py-2 md:py-3 text-gray-900 text-xs whitespace-nowrap align-middle">{pharmacy.district || "-"}</td>;
 
       case "files":
@@ -1562,7 +1565,7 @@ export function PharmacyTable({
                           {pharmacy.lead?.phone || "-"}
                         </td>
                         <td className="px-2 md:px-4 py-2 md:py-3 text-gray-900 text-xs whitespace-nowrap align-middle">
-                          {pharmacy.region || "-"}
+                          {typeof pharmacy.region === 'object' && pharmacy.region?.name ? pharmacy.region.name : (typeof pharmacy.region === 'string' ? pharmacy.region : '-')}
                         </td>
                         <td className="px-2 md:px-4 py-2 md:py-3 text-gray-900 text-xs whitespace-nowrap align-middle">
                           {pharmacy.district || "-"}
