@@ -1581,7 +1581,14 @@ export function PharmacyTable({
                           {pharmacy.lead?.phone || "-"}
                         </td>
                         <td className="px-2 md:px-4 py-2 md:py-3 text-gray-900 text-xs whitespace-nowrap align-middle">
-                          {typeof pharmacy.region === 'object' && pharmacy.region?.name ? pharmacy.region.name : (typeof pharmacy.region === 'string' ? pharmacy.region : '-')}
+                          {(() => {
+                            // Debug logging
+                            if (index === 0) {
+                              console.log('Region data:', pharmacy.region, 'Type:', typeof pharmacy.region);
+                              console.log('District data:', pharmacy.district, 'Type:', typeof pharmacy.district);
+                            }
+                            return typeof pharmacy.region === 'object' && pharmacy.region?.name ? pharmacy.region.name : (typeof pharmacy.region === 'string' ? pharmacy.region : '-');
+                          })()}
                         </td>
                         <td className="px-2 md:px-4 py-2 md:py-3 text-gray-900 text-xs whitespace-nowrap align-middle">
                           {pharmacy.district || "-"}
