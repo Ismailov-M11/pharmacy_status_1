@@ -1,10 +1,11 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { Header } from "@/components/Header";
 import { PharmacyTable } from "@/components/PharmacyTable";
 import { PharmacyDetailModal } from "@/components/PharmacyDetailModal";
+import { StirFilterModal } from "@/components/StirFilterModal";
 import {
   getPharmacyList,
   Pharmacy,
@@ -42,6 +43,12 @@ export default function AgentPanel() {
   const [initialModalTab, setInitialModalTab] = useState<"details" | "files">("details");
   const [changeHistory, setChangeHistory] = useState<StatusHistoryRecord[]>([]);
   const [isLoadingHistory, setIsLoadingHistory] = useState(false);
+
+  // STIR filter state
+  const [stirFilter, setStirFilter] = useState<string[]>([]);
+  const [stirSortOrder, setStirSortOrder] = useState<'asc' | 'desc' | null>(null);
+  const [isStirModalOpen, setIsStirModalOpen] = useState(false);
+  const stirButtonRef = useRef<HTMLTableCellElement>(null);
 
   useEffect(() => {
     if (authLoading) return;
@@ -96,6 +103,12 @@ export default function AgentPanel() {
       const matchesMerchantStatus =
         merchantStatusFilter === null ? true : p.merchantOnline === merchantStatusFilter;
 
+      // STIR filter logic
+      const matchesStir =
+        stirFilter.length === 0
+          ? true
+          : stirFilter.includes((p.lead as any)?.stir || "");
+
       return (
         matchesSearch &&
         matchesTelegramBot &&
@@ -103,10 +116,26 @@ export default function AgentPanel() {
         matchesTraining &&
         matchesFiles &&
         matchesActive &&
-        matchesMerchantStatus
+        matchesMerchantStatus &&
+        matchesStir
       );
     });
-    setFilteredPharmacies(filtered);
+
+    // Apply STIR sorting if set
+    let sortedFiltered = [...filtered];
+    if (stirSortOrder !== null) {
+      sortedFiltered.sort((a, b) => {
+        const stirA = (a.lead as any)?.stir || "";
+        const stirB = (b.lead as any)?.stir || "";
+        if (stirSortOrder === 'asc') {
+          return stirA.localeCompare(stirB);
+        } else {
+          return stirB.localeCompare(stirA);
+        }
+      });
+    }
+
+    setFilteredPharmacies(sortedFiltered);
   }, [
     searchQuery,
     pharmacies,
@@ -116,6 +145,8 @@ export default function AgentPanel() {
     filesFilter,
     activeFilter,
     merchantStatusFilter,
+    stirFilter,
+    stirSortOrder,
   ]);
 
   const fetchPharmacies = async () => {
@@ -271,6 +302,25 @@ export default function AgentPanel() {
     );
   }
 
+  // Get all unique STIR values from pharmacies
+  const allStirValues = Array.from(
+    new Set(
+      pharmacies
+        .map((p) => (p.lead as any)?.stir)
+        .filter((stir) => stir && stir.trim() !== "")
+    )
+  ).sort();
+
+  const handleStirFilterClick = (e: React.MouseEvent<HTMLTableCellElement>) => {
+    e.stopPropagation();
+    setIsStirModalOpen(true);
+  };
+
+  const handleStirFilterApply = (selected: string[], sort: 'asc' | 'desc' | null) => {
+    setStirFilter(selected);
+    setStirSortOrder(sort);
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       <Header />
@@ -312,7 +362,9 @@ export default function AgentPanel() {
             leadStatusFilter={null}
             onLeadStatusFilterChange={() => { }}
             leadStatusOptions={[]}
-            stirSortOrder={null}
+            stirFilter={stirFilter}
+            stirSortOrder={stirSortOrder}
+            onStirFilterClick={handleStirFilterClick}
           />
         </div>
         <PharmacyDetailModal
@@ -324,6 +376,17 @@ export default function AgentPanel() {
           isAdmin={false}
           changeHistory={changeHistory}
           onDeleteHistory={undefined}
+        />
+
+        {/* STIR Filter Modal */}
+        <StirFilterModal
+          isOpen={isStirModalOpen}
+          onClose={() => setIsStirModalOpen(false)}
+          allStirValues={allStirValues}
+          selectedStirs={stirFilter}
+          sortOrder={stirSortOrder}
+          onApply={handleStirFilterApply}
+          triggerElement={stirButtonRef.current}
         />
       </main>
     </div>

@@ -86,7 +86,9 @@ export default function AdminPanel() {
             .includes(searchQuery.toLowerCase())) ||
         (p.bankAccount &&
           p.bankAccount.includes(searchQuery)) ||
-        (p.mfo && p.mfo.includes(searchQuery));
+        (p.mfo && p.mfo.includes(searchQuery)) ||
+        (p.region && p.region.toLowerCase().includes(searchQuery.toLowerCase())) ||
+        (p.district && p.district.toLowerCase().includes(searchQuery.toLowerCase()));
 
       const matchesTelegramBot =
         telegramBotFilter === null

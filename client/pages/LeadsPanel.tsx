@@ -40,6 +40,8 @@ export default function LeadsPanel() {
     const [trainingFilter, setTrainingFilter] = useState<boolean | null>(null);
 
     const [merchantStatusFilter, setMerchantStatusFilter] = useState<boolean | null>(null);
+    const [regionFilter, setRegionFilter] = useState<string | null>(null);
+    const [districtFilter, setDistrictFilter] = useState<string | null>(null);
 
     // Leads-specific features
     const [selectedRows, setSelectedRows] = useState<Set<number>>(new Set());
@@ -67,6 +69,24 @@ export default function LeadsPanel() {
             }
         });
         return Array.from(users).sort();
+    }, [leads]);
+
+    // Unique region values for filtering
+    const regionOptions = useMemo(() => {
+        const regions = new Set<string>();
+        leads.forEach(l => {
+            if (l.region) regions.add(l.region);
+        });
+        return Array.from(regions).sort();
+    }, [leads]);
+
+    // Unique district values for filtering
+    const districtOptions = useMemo(() => {
+        const districts = new Set<string>();
+        leads.forEach(l => {
+            if (l.district) districts.add(l.district);
+        });
+        return Array.from(districts).sort();
     }, [leads]);
 
     // Unique STIR values for filtering - from FILTERED leads
@@ -97,8 +117,8 @@ export default function LeadsPanel() {
         { id: "commentUser", label: t.commentUser || "Comment User", visible: true, order: 14 },
         { id: "commentDate", label: t.commentDate || "Comment Date", visible: true, order: 15 },
 
-        { id: "region", label: t.region || "Region", visible: false, order: 17 },
-        { id: "district", label: t.district || "District", visible: false, order: 18 },
+        { id: "region", label: t.region || "Region", visible: true, order: 7 },
+        { id: "district", label: t.district || "District", visible: true, order: 8 },
         { id: "stir", label: t.stir || "СТИР", visible: true, order: 19 },
         { id: "additionalPhone", label: t.additionalPhone || "Доп. телефон Lead", visible: true, order: 20 },
         { id: "juridicalName", label: t.juridicalName || "Юридическое название", visible: true, order: 21 },
@@ -285,7 +305,9 @@ export default function LeadsPanel() {
                 (p.juridicalAddress && p.juridicalAddress.toLowerCase().includes(q)) ||
                 (p.bankName && p.bankName.toLowerCase().includes(q)) ||
                 (p.bankAccount && p.bankAccount.includes(q)) ||
-                (p.mfo && p.mfo.includes(q));
+                (p.mfo && p.mfo.includes(q)) ||
+                (p.region && p.region.toLowerCase().includes(q)) ||
+                (p.district && p.district.toLowerCase().includes(q));
 
             // 2. Lead Status Filter
             const matchesLeadStatus = leadStatusFilter === null
@@ -358,7 +380,17 @@ export default function LeadsPanel() {
                 ? true
                 : p.merchantOnline === merchantStatusFilter;
 
-            return matchesSearch && matchesLeadStatus && matchesActive && matchesCommentUser && matchesCommentDate && matchesStir && matchesTelegramBot && matchesBrandedPacket && matchesTraining && matchesMerchantStatus;
+            // 11. Region Filter
+            const matchesRegion = regionFilter === null
+                ? true
+                : p.region === regionFilter;
+
+            // 12. District Filter
+            const matchesDistrict = districtFilter === null
+                ? true
+                : p.district === districtFilter;
+
+            return matchesSearch && matchesLeadStatus && matchesActive && matchesCommentUser && matchesCommentDate && matchesStir && matchesTelegramBot && matchesBrandedPacket && matchesTraining && matchesMerchantStatus && matchesRegion && matchesDistrict;
         });
 
         // Apply STIR sorting if enabled
@@ -375,7 +407,7 @@ export default function LeadsPanel() {
         }
 
         setFilteredLeads(filtered);
-    }, [searchQuery, leads, leadStatusFilter, activeFilter, commentUserFilter, commentDateFilter, stirFilter, stirSortOrder, telegramBotFilter, brandedPacketFilter, trainingFilter, merchantStatusFilter]);
+    }, [searchQuery, leads, leadStatusFilter, activeFilter, commentUserFilter, commentDateFilter, stirFilter, stirSortOrder, telegramBotFilter, brandedPacketFilter, trainingFilter, merchantStatusFilter, regionFilter, districtFilter]);
 
     if (authLoading) {
         return (
@@ -455,6 +487,14 @@ export default function LeadsPanel() {
                             setStirHeaderRef(e.currentTarget as HTMLElement);
                             setIsStirModalOpen(true);
                         }}
+
+                        // Region and District Filters
+                        regionFilter={regionFilter}
+                        onRegionFilterChange={setRegionFilter}
+                        regionOptions={regionOptions}
+                        districtFilter={districtFilter}
+                        onDistrictFilterChange={setDistrictFilter}
+                        districtOptions={districtOptions}
                     />
                 </div>
             </main>

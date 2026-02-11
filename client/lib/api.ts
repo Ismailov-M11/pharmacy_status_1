@@ -115,6 +115,8 @@ export interface Pharmacy {
   bankAccount?: string;
   mfo?: string;
   additionalPhone?: string;
+  region?: string;
+  district?: string;
   licence?: Licence;
   [key: string]: any;
 }
