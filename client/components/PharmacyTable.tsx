@@ -978,6 +978,16 @@ export function PharmacyTable({
                   >
                     {t.leadPhone}
                   </th>
+                  <th
+                    className="px-2 md:px-4 py-2 md:py-3 text-left font-semibold text-gray-700 whitespace-nowrap min-w-max"
+                  >
+                    {t.region}
+                  </th>
+                  <th
+                    className="px-2 md:px-4 py-2 md:py-3 text-left font-semibold text-gray-700 whitespace-nowrap min-w-max"
+                  >
+                    {t.district}
+                  </th>
 
                   <th className="px-2 md:px-4 py-2 md:py-3 text-center font-semibold text-gray-700 whitespace-nowrap min-w-max">
                     <DropdownMenu>
@@ -1550,6 +1560,12 @@ export function PharmacyTable({
                         </td>
                         <td className="px-2 py-2 md:py-3 text-gray-900 whitespace-nowrap align-top">
                           {pharmacy.lead?.phone || "-"}
+                        </td>
+                        <td className="px-2 md:px-4 py-2 md:py-3 text-gray-900 text-xs whitespace-nowrap align-middle">
+                          {pharmacy.region || "-"}
+                        </td>
+                        <td className="px-2 md:px-4 py-2 md:py-3 text-gray-900 text-xs whitespace-nowrap align-middle">
+                          {pharmacy.district || "-"}
                         </td>
 
                         <td className="px-2 md:px-4 py-2 md:py-3 text-center">
