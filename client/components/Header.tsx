@@ -1,3 +1,4 @@
+```
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { useTheme } from "@/contexts/ThemeContext";
@@ -16,6 +17,7 @@ import {
   Menu,
   Moon,
   Sun,
+  TrendingUp,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -56,6 +58,11 @@ export function Header() {
         path: "/new-pharmacies",
         icon: Store,
       },
+      {
+        label: t.deliveryAnalytics || "Аналитика доставок",
+        path: "/delivery-analytics",
+        icon: TrendingUp,
+      },
     );
   } else if (role === "ROLE_AGENT" || role === "ROLE_OPERATOR") {
     const agentLabel =
@@ -80,6 +87,11 @@ export function Header() {
         label: t.newPharmacies || "Новые аптеки",
         path: "/new-pharmacies",
         icon: Store,
+      },
+      {
+        label: t.deliveryAnalytics || "Аналитика доставок",
+        path: "/delivery-analytics",
+        icon: TrendingUp,
       },
     );
   }
@@ -108,8 +120,9 @@ export function Header() {
                   <DropdownMenuItem
                     key={item.path}
                     onClick={() => navigate(item.path)}
-                    className={`cursor-pointer ${isActive ? "bg-purple-50 text-purple-700 dark:bg-purple-900 dark:text-purple-300" : ""
-                      }`}
+                    className={`cursor - pointer ${
+  isActive ? "bg-purple-50 text-purple-700 dark:bg-purple-900 dark:text-purple-300" : ""
+} `}
                   >
                     <Icon className="h-4 w-4 mr-2" />
                     <span>{item.label}</span>

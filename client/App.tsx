@@ -16,6 +16,7 @@ import LeadsPanel from "./pages/LeadsPanel";
 import PharmacyMaps from "./pages/PharmacyMaps";
 import PharmaciesActivity from "./pages/PharmaciesActivity";
 import NewPharmacies from "./pages/NewPharmacies";
+import DeliveryAnalytics from "./pages/DeliveryAnalytics";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -126,6 +127,16 @@ const App = () => (
                       allowedRoles={["ROLE_ADMIN", "ROLE_AGENT", "ROLE_OPERATOR"]}
                     >
                       <NewPharmacies />
+                    </RoleBasedRoute>
+                  }
+                />
+                <Route
+                  path="/delivery-analytics"
+                  element={
+                    <RoleBasedRoute
+                      allowedRoles={["ROLE_ADMIN", "ROLE_AGENT", "ROLE_OPERATOR"]}
+                    >
+                      <DeliveryAnalytics />
                     </RoleBasedRoute>
                   }
                 />

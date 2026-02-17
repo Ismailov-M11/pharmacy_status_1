@@ -215,6 +215,24 @@ export const translations = {
     actions: "Действия",
     noFiles: "Файлы еще не загружены",
     createdBy: "Кем создан",
+
+    // Delivery Analytics
+    deliveryAnalytics: "Аналитика доставок",
+    deliveryAnalyticsDescription: "Анализ времени доставки заказов",
+    avgTotalTime: "Среднее время доставки",
+    avgPreparationTime: "Среднее время подготовки",
+    avgDeliveryTime: "Среднее время в пути",
+    onTimePercentage: "Доставлено вовремя",
+    deliveryDistribution: "Распределение по времени доставки",
+    orderCode: "Код заказа",
+    creationTime: "Время создания",
+    deliveryTime: "Время доставки",
+    totalTime: "Общее время",
+    minutes: "мин",
+    selectPeriod: "Выбрать период",
+    onTime: "Вовремя",
+    late: "С опозданием",
+    deliveryDetails: "Детали заказов",
   },
   uz: {
     // Common
@@ -433,6 +451,24 @@ export const translations = {
     actions: "Harakatlar",
     noFiles: "Fayllar hali yuklanmagan",
     createdBy: "Kim tomonidan yaratilgan",
+
+    // Delivery Analytics
+    deliveryAnalytics: "Yetkazib berish analitikasi",
+    deliveryAnalyticsDescription: "Buyurtmalarni yetkazib berish vaqtini tahlil qilish",
+    avgTotalTime: "O'rtacha yetkazib berish vaqti",
+    avgPreparationTime: "O'rtacha tayyorlanish vaqti",
+    avgDeliveryTime: "O'rtacha yo'ldagi vaqt",
+    onTimePercentage: "O'z vaqtida yetkazilgan",
+    deliveryDistribution: "Yetkazib berish vaqti bo'yicha taqsimot",
+    orderCode: "Buyurtma kodi",
+    creationTime: "Yaratilgan vaqt",
+    deliveryTime: "Yetkazib berish vaqti",
+    totalTime: "Umumiy vaqt",
+    minutes: "daq",
+    selectPeriod: "Davrni tanlash",
+    onTime: "O'z vaqtida",
+    late: "Kechikish bilan",
+    deliveryDetails: "Buyurtma tafsilotlari",
   },
 };
 
