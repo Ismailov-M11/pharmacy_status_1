@@ -16,14 +16,9 @@ export function DeliveryDetailsTable({
 }: DeliveryDetailsTableProps) {
     const { t } = useLanguage();
 
-    // Include orders that have either:
-    // 1. histories array with entries (new orders)
-    // 2. deliveredAt and creationDate (old orders before histories feature)
-    const validOrders = orders.filter((order) => {
-        const hasHistories = order.histories && order.histories.length > 0;
-        const hasLegacyData = order.deliveredAt && order.creationDate;
-        return hasHistories || hasLegacyData;
-    });
+    // Show all orders from API (API already filters by COMPLETED status)
+    // Some old orders may not have histories or deliveredAt, but we still show them
+    const validOrders = orders;
 
     if (isLoading) {
         return (
