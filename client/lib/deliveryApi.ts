@@ -241,18 +241,13 @@ function getStatusTimestamp(histories: OrderHistory[], status: string): string |
 export function calculateOrderTotalTime(order: Order): number {
     // Try to use histories first (new orders)
     if (order.histories && order.histories.length > 0) {
-        // Find CREATED (or first status) and COMPLETED timestamps from histories
-        const sortedHistories = [...order.histories].sort(
-            (a, b) => new Date(a.updatedAt).getTime() - new Date(b.updatedAt).getTime()
-        );
-
-        const createdTime = sortedHistories[0]?.updatedAt || order.creationDate;
-
         // Use COMPLETED timestamp from histories (more reliable than deliveredAt)
         const completedTime = getStatusTimestamp(order.histories, "COMPLETED");
 
         if (completedTime) {
-            const totalTime = getMinutesDifference(createdTime, completedTime);
+            // IMPORTANT: Always use order.creationDate as start time, not first history
+            // First history might be CONFIRMED which happens after order creation
+            const totalTime = getMinutesDifference(order.creationDate, completedTime);
 
             // Return 0 if time is negative
             if (totalTime < 0) {
@@ -322,12 +317,6 @@ export function calculateDeliveryMetrics(orders: Order[]): DeliveryMetrics {
             return;
         }
 
-        // Sort histories by time
-        const sortedHistories = [...order.histories].sort(
-            (a, b) => new Date(a.updatedAt).getTime() - new Date(b.updatedAt).getTime()
-        );
-
-        const createdTime = sortedHistories[0]?.updatedAt || order.creationDate;
         const completedTime = getStatusTimestamp(order.histories, "COMPLETED");
         const pickedUpTime = getStatusTimestamp(order.histories, "PICKED_UP");
 
@@ -335,8 +324,9 @@ export function calculateDeliveryMetrics(orders: Order[]): DeliveryMetrics {
             return; // Skip if no COMPLETED status
         }
 
-        // Total time: first status -> COMPLETED
-        const orderTotalTime = getMinutesDifference(createdTime, completedTime);
+        // IMPORTANT: Always use order.creationDate as start time
+        // Total time: order creation -> COMPLETED
+        const orderTotalTime = getMinutesDifference(order.creationDate, completedTime);
 
         if (orderTotalTime < 0) {
             return; // Skip invalid data
@@ -345,9 +335,9 @@ export function calculateDeliveryMetrics(orders: Order[]): DeliveryMetrics {
         validOrdersCount++;
         totalTime += orderTotalTime;
 
-        // Preparation time: first status -> PICKED_UP (if available)
+        // Preparation time: order creation -> PICKED_UP (if available)
         if (pickedUpTime) {
-            const preparationTime = getMinutesDifference(createdTime, pickedUpTime);
+            const preparationTime = getMinutesDifference(order.creationDate, pickedUpTime);
             if (preparationTime >= 0) {
                 totalPreparationTime += preparationTime;
 
