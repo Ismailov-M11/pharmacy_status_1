@@ -1,4 +1,3 @@
-```
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { useTheme } from "@/contexts/ThemeContext";
@@ -120,9 +119,8 @@ export function Header() {
                   <DropdownMenuItem
                     key={item.path}
                     onClick={() => navigate(item.path)}
-                    className={`cursor - pointer ${
-  isActive ? "bg-purple-50 text-purple-700 dark:bg-purple-900 dark:text-purple-300" : ""
-} `}
+                    className={`cursor - pointer ${isActive ? "bg-purple-50 text-purple-700 dark:bg-purple-900 dark:text-purple-300" : ""
+                      } `}
                   >
                     <Icon className="h-4 w-4 mr-2" />
                     <span>{item.label}</span>
