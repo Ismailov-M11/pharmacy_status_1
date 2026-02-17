@@ -60,7 +60,7 @@ export function DeliveryDetailsTable({
                 </p>
                 <div className="overflow-x-auto">
                     <table className="w-full text-sm">
-                        <thead className="sticky top-[82px] z-10 bg-white dark:bg-gray-900">
+                        <thead>
                             <tr className="border-b border-gray-200 dark:border-gray-700">
                                 <th className="text-left py-3 px-3 font-semibold text-gray-700 dark:text-gray-300">
                                     {t.number}
