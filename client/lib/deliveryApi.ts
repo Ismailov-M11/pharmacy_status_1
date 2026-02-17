@@ -228,11 +228,23 @@ function getMinutesDifference(startDate: string, endDate: string): number {
 
 /**
  * Get timestamp from histories for a specific status
+ * If multiple entries exist, returns the EARLIEST one
  */
 function getStatusTimestamp(histories: OrderHistory[], status: string): string | null {
-    // Find the history entry where newStatus matches the target status
-    const historyEntry = histories.find((h) => h.newStatus === status);
-    return historyEntry ? historyEntry.updatedAt : null;
+    // Find all history entries where newStatus matches the target status
+    const matchingEntries = histories.filter((h) => h.newStatus === status);
+
+    if (matchingEntries.length === 0) {
+        return null;
+    }
+
+    // If multiple COMPLETED statuses exist, use the EARLIEST one
+    // (the first time the order was actually completed)
+    const earliestEntry = matchingEntries.reduce((earliest, current) => {
+        return new Date(current.updatedAt) < new Date(earliest.updatedAt) ? current : earliest;
+    });
+
+    return earliestEntry.updatedAt;
 }
 
 /**
