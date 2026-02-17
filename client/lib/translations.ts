@@ -248,6 +248,7 @@ export const translations = {
     confirmed: "Подтвержден",
     created: "Создан",
     clickRowToSeeHistory: "Нажмите на строку, чтобы увидеть историю",
+    orderCreated: "Заказ создан",
   },
   uz: {
     // Common
@@ -499,6 +500,7 @@ export const translations = {
     confirmed: "Tasdiqlandi",
     created: "Yaratildi",
     clickRowToSeeHistory: "Tarixni ko'rish uchun qatorni bosing",
+    orderCreated: "Buyurtma yaratildi",
   },
 };
 

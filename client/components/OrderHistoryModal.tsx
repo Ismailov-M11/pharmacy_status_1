@@ -15,10 +15,62 @@ export function OrderHistoryModal({ order, isOpen, onClose }: OrderHistoryModalP
 
     if (!order) return null;
 
-    // Sort histories by date (newest first)
-    const sortedHistories = [...order.histories].sort(
-        (a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
-    );
+    // Build complete history including all entries
+    const buildCompleteHistory = () => {
+        if (!order.histories || order.histories.length === 0) return [];
+
+        // Sort histories by date (newest first for display)
+        const sortedHistories = [...order.histories].sort(
+            (a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
+        );
+
+        const completeHistory: Array<{
+            status: string;
+            updatedAt: string;
+            performedBy: string;
+            isCreation: boolean;
+        }> = [];
+
+        // Add all history entries (including duplicates)
+        sortedHistories.forEach((history) => {
+            let performedBy = "";
+
+            // Determine who performed the action
+            if (history.courierName) {
+                performedBy = history.courierName;
+            } else if (history.updater) {
+                if (history.updater.firstName && history.updater.lastName) {
+                    performedBy = `${history.updater.firstName} ${history.updater.lastName}`;
+                } else {
+                    performedBy = history.updater.phone;
+                }
+            } else if (history.description && history.marketChat?.name) {
+                // Pharmacy action
+                performedBy = `${order.market.name} / ${history.marketChat.name}`;
+            } else if (history.marketChat?.name) {
+                performedBy = history.marketChat.name;
+            }
+
+            completeHistory.push({
+                status: history.newStatus,
+                updatedAt: history.updatedAt,
+                performedBy,
+                isCreation: false,
+            });
+        });
+
+        // Add "Order Created" as the last item (oldest)
+        completeHistory.push({
+            status: "CREATED",
+            updatedAt: order.creationDate,
+            performedBy: `${order.customer.firstName} ${order.customer.lastName} / ${order.location.name}`,
+            isCreation: true,
+        });
+
+        return completeHistory;
+    };
+
+    const historyItems = buildCompleteHistory();
 
     const getStatusIcon = (status: string) => {
         switch (status) {
@@ -27,9 +79,14 @@ export function OrderHistoryModal({ order, isOpen, onClose }: OrderHistoryModalP
             case "PICKED_UP":
                 return <Package className="h-5 w-5 text-blue-600 dark:text-blue-400" />;
             case "GIVEN_TO_COURIER":
+            case "WAITING_FOR_COURIER":
                 return <Truck className="h-5 w-5 text-purple-600 dark:text-purple-400" />;
             case "READY":
                 return <Clock className="h-5 w-5 text-orange-600 dark:text-orange-400" />;
+            case "NEW":
+            case "CREATED":
+            case "CONFIRMED":
+                return <MapPin className="h-5 w-5 text-gray-600 dark:text-gray-400" />;
             default:
                 return <MapPin className="h-5 w-5 text-gray-600 dark:text-gray-400" />;
         }
@@ -43,7 +100,8 @@ export function OrderHistoryModal({ order, isOpen, onClose }: OrderHistoryModalP
             WAITING_FOR_COURIER: t.waitingForCourier || "Ожидание курьера",
             READY: t.ready || "Готов",
             CONFIRMED: t.confirmed || "Подтвержден",
-            CREATED: t.created || "Создан",
+            CREATED: t.orderCreated || "Заказ создан",
+            NEW: t.created || "Создан",
         };
         return statusMap[status] || status;
     };
@@ -97,33 +155,30 @@ export function OrderHistoryModal({ order, isOpen, onClose }: OrderHistoryModalP
 
                             {/* Timeline items */}
                             <div className="space-y-4">
-                                {sortedHistories.map((history, index) => (
-                                    <div key={history.id} className="relative flex gap-4">
+                                {historyItems.map((item, index) => (
+                                    <div key={`${item.status}-${item.updatedAt}-${index}`} className="relative flex gap-4">
                                         {/* Icon */}
                                         <div className="relative z-10 flex-shrink-0 w-12 h-12 bg-white dark:bg-gray-900 rounded-full border-2 border-gray-200 dark:border-gray-700 flex items-center justify-center">
-                                            {getStatusIcon(history.newStatus)}
+                                            {getStatusIcon(item.status)}
                                         </div>
 
                                         {/* Content */}
                                         <div className="flex-1 bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
                                             <div className="flex items-start justify-between">
-                                                <div>
+                                                <div className="flex-1">
                                                     <p className="font-semibold text-gray-900 dark:text-gray-100">
-                                                        {getStatusLabel(history.newStatus)}
+                                                        {item.isCreation
+                                                            ? t.orderCreated || "Заказ создан"
+                                                            : `${t.statusChangedTo || "Статус изменен на"} ${getStatusLabel(item.status)}`}
                                                     </p>
-                                                    {history.description && (
+                                                    {item.performedBy && (
                                                         <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                                                            {history.description}
-                                                        </p>
-                                                    )}
-                                                    {history.updater && (
-                                                        <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">
-                                                            {history.updater.firstName} {history.updater.lastName}
+                                                            {t.by || "от"} {item.performedBy}
                                                         </p>
                                                     )}
                                                 </div>
                                                 <span className="text-xs text-gray-500 dark:text-gray-500 whitespace-nowrap ml-2">
-                                                    {format(new Date(history.updatedAt), "dd.MM HH:mm")}
+                                                    {format(new Date(item.updatedAt), "dd.MM HH:mm")}
                                                 </span>
                                             </div>
                                         </div>
