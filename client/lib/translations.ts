@@ -249,6 +249,9 @@ export const translations = {
     created: "Создан",
     clickRowToSeeHistory: "Нажмите на строку, чтобы увидеть историю",
     orderCreated: "Заказ создан",
+    preparationTime: "Время подготовки",
+    courierWaitingTime: "Ожидание курьера",
+    deliveryTimeInTransit: "Время в пути",
   },
   uz: {
     // Common
@@ -499,8 +502,11 @@ export const translations = {
     ready: "Tayyor",
     confirmed: "Tasdiqlandi",
     created: "Yaratildi",
-    clickRowToSeeHistory: "Tarixni ko'rish uchun qatorni bosing",
+    clickRowToSeeHistory: "Buyurtma tarixini ko'rish uchun qatorni bosing",
     orderCreated: "Buyurtma yaratildi",
+    preparationTime: "Tayyorlanish vaqti",
+    courierWaitingTime: "Kuryerni kutish",
+    deliveryTimeInTransit: "Yo'ldagi vaqt",
   },
 };
 

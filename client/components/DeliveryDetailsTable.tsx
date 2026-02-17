@@ -1,6 +1,13 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { Order, calculateOrderTotalTime, getDeliveryTime } from "@/lib/deliveryApi";
+import {
+    Order,
+    calculateOrderTotalTime,
+    calculateOrderPreparationTime,
+    calculateOrderCourierWaitingTime,
+    calculateOrderDeliveryTime,
+    getDeliveryTime
+} from "@/lib/deliveryApi";
 import { format } from "date-fns";
 
 interface DeliveryDetailsTableProps {
@@ -71,6 +78,15 @@ export function DeliveryDetailsTable({
                                     {t.deliveryTime}
                                 </th>
                                 <th className="text-left py-3 px-3 font-semibold text-gray-700 dark:text-gray-300">
+                                    {t.preparationTime || "Время подготовки"}
+                                </th>
+                                <th className="text-left py-3 px-3 font-semibold text-gray-700 dark:text-gray-300">
+                                    {t.courierWaitingTime || "Ожидание курьера"}
+                                </th>
+                                <th className="text-left py-3 px-3 font-semibold text-gray-700 dark:text-gray-300">
+                                    {t.deliveryTimeInTransit || "Время в пути"}
+                                </th>
+                                <th className="text-left py-3 px-3 font-semibold text-gray-700 dark:text-gray-300">
                                     {t.totalTime}
                                 </th>
                                 <th className="text-center py-3 px-3 font-semibold text-gray-700 dark:text-gray-300">
@@ -81,6 +97,9 @@ export function DeliveryDetailsTable({
                         <tbody>
                             {validOrders.map((order, index) => {
                                 const totalMinutes = calculateOrderTotalTime(order);
+                                const preparationMinutes = calculateOrderPreparationTime(order);
+                                const courierWaitingMinutes = calculateOrderCourierWaitingTime(order);
+                                const deliveryMinutes = calculateOrderDeliveryTime(order);
                                 const isOnTime = totalMinutes <= 60;
 
                                 return (
@@ -108,6 +127,15 @@ export function DeliveryDetailsTable({
                                                     ? format(deliveryTime, "dd.MM.yyyy HH:mm")
                                                     : t.emptyPlaceholder || "—";
                                             })()}
+                                        </td>
+                                        <td className="py-3 px-3 text-gray-600 dark:text-gray-400">
+                                            {preparationMinutes > 0 ? `${preparationMinutes} ${t.minutes}` : (t.emptyPlaceholder || "—")}
+                                        </td>
+                                        <td className="py-3 px-3 text-gray-600 dark:text-gray-400">
+                                            {courierWaitingMinutes > 0 ? `${courierWaitingMinutes} ${t.minutes}` : (t.emptyPlaceholder || "—")}
+                                        </td>
+                                        <td className="py-3 px-3 text-gray-600 dark:text-gray-400">
+                                            {deliveryMinutes > 0 ? `${deliveryMinutes} ${t.minutes}` : (t.emptyPlaceholder || "—")}
                                         </td>
                                         <td className="py-3 px-3 text-gray-900 dark:text-gray-100 font-medium">
                                             {totalMinutes} {t.minutes}

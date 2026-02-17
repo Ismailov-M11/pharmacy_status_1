@@ -286,6 +286,62 @@ export function calculateOrderTotalTime(order: Order): number {
 }
 
 /**
+ * Calculate preparation time for a single order (creation to READY)
+ */
+export function calculateOrderPreparationTime(order: Order): number {
+    if (!order.histories || order.histories.length === 0) {
+        return 0;
+    }
+
+    const readyTime = getStatusTimestamp(order.histories, "READY");
+
+    if (!readyTime) {
+        return 0;
+    }
+
+    const prepTime = getMinutesDifference(order.creationDate, readyTime);
+    return prepTime < 0 ? 0 : prepTime;
+}
+
+/**
+ * Calculate courier waiting/pickup time for a single order (READY to PICKED_UP)
+ */
+export function calculateOrderCourierWaitingTime(order: Order): number {
+    if (!order.histories || order.histories.length === 0) {
+        return 0;
+    }
+
+    const readyTime = getStatusTimestamp(order.histories, "READY");
+    const pickedUpTime = getStatusTimestamp(order.histories, "PICKED_UP");
+
+    if (!readyTime || !pickedUpTime) {
+        return 0;
+    }
+
+    const waitingTime = getMinutesDifference(readyTime, pickedUpTime);
+    return waitingTime < 0 ? 0 : waitingTime;
+}
+
+/**
+ * Calculate delivery time for a single order (PICKED_UP to COMPLETED)
+ */
+export function calculateOrderDeliveryTime(order: Order): number {
+    if (!order.histories || order.histories.length === 0) {
+        return 0;
+    }
+
+    const pickedUpTime = getStatusTimestamp(order.histories, "PICKED_UP");
+    const completedTime = getStatusTimestamp(order.histories, "COMPLETED");
+
+    if (!pickedUpTime || !completedTime) {
+        return 0;
+    }
+
+    const deliveryTime = getMinutesDifference(pickedUpTime, completedTime);
+    return deliveryTime < 0 ? 0 : deliveryTime;
+}
+
+/**
  * Get delivery time for display in table
  */
 export function getDeliveryTime(order: Order): Date | null {
