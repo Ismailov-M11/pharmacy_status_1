@@ -249,6 +249,8 @@ export function calculateOrderTotalTime(order: Order): number {
     );
 
     const createdTime = sortedHistories[0]?.updatedAt || order.creationDate;
+
+    // Use COMPLETED timestamp from histories (more reliable than deliveredAt)
     const completedTime = getStatusTimestamp(order.histories, "COMPLETED");
 
     if (!completedTime) {
@@ -263,6 +265,25 @@ export function calculateOrderTotalTime(order: Order): number {
     }
 
     return totalTime;
+}
+
+/**
+ * Get delivery time for display in table
+ */
+export function getDeliveryTime(order: Order): Date | null {
+    if (!order.histories || order.histories.length === 0) {
+        return order.deliveredAt ? new Date(order.deliveredAt) : null;
+    }
+
+    // Use COMPLETED timestamp from histories
+    const completedTime = getStatusTimestamp(order.histories, "COMPLETED");
+
+    if (completedTime) {
+        return new Date(completedTime);
+    }
+
+    // Fallback to deliveredAt if no COMPLETED status in histories
+    return order.deliveredAt ? new Date(order.deliveredAt) : null;
 }
 
 /**

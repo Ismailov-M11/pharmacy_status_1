@@ -37,18 +37,18 @@ export function OrderHistoryModal({ order, isOpen, onClose }: OrderHistoryModalP
 
             // Determine who performed the action
             if (history.courierName) {
+                // Courier action
                 performedBy = history.courierName;
+            } else if (history.marketChat?.name) {
+                // Pharmacy employee action - show "Pharmacy Name / Employee Name"
+                performedBy = `${order.market.name} / ${history.marketChat.name}`;
             } else if (history.updater) {
+                // Admin or system user action
                 if (history.updater.firstName && history.updater.lastName) {
                     performedBy = `${history.updater.firstName} ${history.updater.lastName}`;
                 } else {
                     performedBy = history.updater.phone;
                 }
-            } else if (history.description && history.marketChat?.name) {
-                // Pharmacy action
-                performedBy = `${order.market.name} / ${history.marketChat.name}`;
-            } else if (history.marketChat?.name) {
-                performedBy = history.marketChat.name;
             }
 
             completeHistory.push({
