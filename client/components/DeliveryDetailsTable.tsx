@@ -14,6 +14,12 @@ export function DeliveryDetailsTable({
 }: DeliveryDetailsTableProps) {
     const { t } = useLanguage();
 
+    // Filter out orders with invalid data
+    const validOrders = orders.filter((order) => {
+        const totalMinutes = calculateOrderTotalTime(order);
+        return totalMinutes > 0; // Skip orders with 0 minutes (invalid data)
+    });
+
     if (isLoading) {
         return (
             <Card>
@@ -24,7 +30,7 @@ export function DeliveryDetailsTable({
         );
     }
 
-    if (orders.length === 0) {
+    if (validOrders.length === 0) {
         return (
             <Card>
                 <CardContent className="pt-6">
@@ -70,7 +76,7 @@ export function DeliveryDetailsTable({
                             </tr>
                         </thead>
                         <tbody>
-                            {orders.map((order, index) => {
+                            {validOrders.map((order, index) => {
                                 const totalMinutes = calculateOrderTotalTime(order);
                                 const isOnTime = totalMinutes <= 60;
 
@@ -116,7 +122,7 @@ export function DeliveryDetailsTable({
                     </table>
                 </div>
                 <div className="mt-4 text-sm text-gray-600 dark:text-gray-400">
-                    {t.shown}: {orders.length}
+                    {t.shown}: {validOrders.length}
                 </div>
             </CardContent>
         </Card>

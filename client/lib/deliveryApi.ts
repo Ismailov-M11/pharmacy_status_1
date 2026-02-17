@@ -248,27 +248,48 @@ export function calculateDeliveryMetrics(orders: Order[]): DeliveryMetrics {
     let totalPreparationTime = 0;
     let totalDeliveryTime = 0;
     let onTimeCount = 0;
+    let validOrdersCount = 0;
 
     orders.forEach((order) => {
+        // Skip orders with missing timestamps
+        if (!order.creationDate || !order.deliveredAt || !order.originPickupAt) {
+            return;
+        }
+
         // Total time: creationDate -> deliveredAt
         const orderTotalTime = getMinutesDifference(
             order.creationDate,
             order.deliveredAt
         );
-        totalTime += orderTotalTime;
 
         // Preparation time: creationDate -> originPickupAt
         const preparationTime = getMinutesDifference(
             order.creationDate,
             order.originPickupAt
         );
-        totalPreparationTime += preparationTime;
 
         // Delivery time: originPickupAt -> deliveredAt
         const deliveryTime = getMinutesDifference(
             order.originPickupAt,
             order.deliveredAt
         );
+
+        // Skip orders with negative or unrealistic times (data corruption)
+        // Negative times mean timestamps are in wrong order
+        if (orderTotalTime < 0 || preparationTime < 0 || deliveryTime < 0) {
+            console.warn(`Skipping order ${order.code} due to invalid timestamps`);
+            return;
+        }
+
+        // Skip orders with unrealistic times (> 24 hours = 1440 minutes)
+        if (orderTotalTime > 1440) {
+            console.warn(`Skipping order ${order.code} due to unrealistic total time: ${orderTotalTime} minutes`);
+            return;
+        }
+
+        validOrdersCount++;
+        totalTime += orderTotalTime;
+        totalPreparationTime += preparationTime;
         totalDeliveryTime += deliveryTime;
 
         // Count orders delivered within 60 minutes
@@ -277,12 +298,23 @@ export function calculateDeliveryMetrics(orders: Order[]): DeliveryMetrics {
         }
     });
 
+    // If no valid orders, return zeros
+    if (validOrdersCount === 0) {
+        return {
+            avgTotalTime: 0,
+            avgPreparationTime: 0,
+            avgDeliveryTime: 0,
+            onTimePercentage: 0,
+            totalOrders: 0,
+        };
+    }
+
     return {
-        avgTotalTime: Math.round(totalTime / orders.length),
-        avgPreparationTime: Math.round(totalPreparationTime / orders.length),
-        avgDeliveryTime: Math.round(totalDeliveryTime / orders.length),
-        onTimePercentage: Math.round((onTimeCount / orders.length) * 100),
-        totalOrders: orders.length,
+        avgTotalTime: Math.round(totalTime / validOrdersCount),
+        avgPreparationTime: Math.round(totalPreparationTime / validOrdersCount),
+        avgDeliveryTime: Math.round(totalDeliveryTime / validOrdersCount),
+        onTimePercentage: Math.round((onTimeCount / validOrdersCount) * 100),
+        totalOrders: validOrdersCount,
     };
 }
 
@@ -298,10 +330,20 @@ export function getTimeDistribution(orders: Order[]): TimeDistribution {
     };
 
     orders.forEach((order) => {
+        // Skip orders with missing timestamps
+        if (!order.creationDate || !order.deliveredAt) {
+            return;
+        }
+
         const totalTime = getMinutesDifference(
             order.creationDate,
             order.deliveredAt
         );
+
+        // Skip orders with negative or unrealistic times
+        if (totalTime < 0 || totalTime > 1440) {
+            return;
+        }
 
         if (totalTime <= 30) {
             distribution["0-30"]++;
@@ -321,5 +363,17 @@ export function getTimeDistribution(orders: Order[]): TimeDistribution {
  * Calculate total delivery time for a single order
  */
 export function calculateOrderTotalTime(order: Order): number {
-    return getMinutesDifference(order.creationDate, order.deliveredAt);
+    // Return 0 if timestamps are missing
+    if (!order.creationDate || !order.deliveredAt) {
+        return 0;
+    }
+
+    const totalTime = getMinutesDifference(order.creationDate, order.deliveredAt);
+
+    // Return 0 if time is negative or unrealistic
+    if (totalTime < 0 || totalTime > 1440) {
+        return 0;
+    }
+
+    return totalTime;
 }
