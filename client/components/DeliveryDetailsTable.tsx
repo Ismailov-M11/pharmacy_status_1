@@ -6,18 +6,19 @@ import { format } from "date-fns";
 interface DeliveryDetailsTableProps {
     orders: Order[];
     isLoading?: boolean;
+    onOrderClick?: (order: Order) => void;
 }
 
 export function DeliveryDetailsTable({
     orders,
     isLoading,
+    onOrderClick,
 }: DeliveryDetailsTableProps) {
     const { t } = useLanguage();
 
-    // Filter out orders with invalid data
+    // Only filter out orders with no histories (since we use histories for calculations)
     const validOrders = orders.filter((order) => {
-        const totalMinutes = calculateOrderTotalTime(order);
-        return totalMinutes > 0; // Skip orders with 0 minutes (invalid data)
+        return order.histories && order.histories.length > 0;
     });
 
     if (isLoading) {
@@ -48,6 +49,9 @@ export function DeliveryDetailsTable({
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
                     {t.deliveryDetails}
                 </h3>
+                <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+                    {t.clickRowToSeeHistory || "Нажмите на строку, чтобы увидеть историю"}
+                </p>
                 <div className="overflow-x-auto">
                     <table className="w-full text-sm">
                         <thead>
@@ -83,12 +87,13 @@ export function DeliveryDetailsTable({
                                 return (
                                     <tr
                                         key={order.id}
-                                        className="border-b border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                                        onClick={() => onOrderClick?.(order)}
+                                        className="border-b border-gray-100 dark:border-gray-800 hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-colors cursor-pointer"
                                     >
                                         <td className="py-3 px-3 text-gray-600 dark:text-gray-400">
                                             {index + 1}
                                         </td>
-                                        <td className="py-3 px-3 font-medium text-gray-900 dark:text-gray-100">
+                                        <td className="py-3 px-3 font-medium text-purple-700 dark:text-purple-400">
                                             {order.code}
                                         </td>
                                         <td className="py-3 px-3 text-gray-900 dark:text-gray-100">
@@ -128,3 +133,4 @@ export function DeliveryDetailsTable({
         </Card>
     );
 }
+

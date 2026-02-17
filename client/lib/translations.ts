@@ -247,6 +247,7 @@ export const translations = {
     ready: "Готов",
     confirmed: "Подтвержден",
     created: "Создан",
+    clickRowToSeeHistory: "Нажмите на строку, чтобы увидеть историю",
   },
   uz: {
     // Common
@@ -497,6 +498,7 @@ export const translations = {
     ready: "Tayyor",
     confirmed: "Tasdiqlandi",
     created: "Yaratildi",
+    clickRowToSeeHistory: "Tarixni ko'rish uchun qatorni bosing",
   },
 };
 

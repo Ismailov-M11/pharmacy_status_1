@@ -190,7 +190,11 @@ export default function DeliveryAnalytics() {
                     />
 
                     {/* Details Table */}
-                    <DeliveryDetailsTable orders={filteredOrders} isLoading={isLoading} />
+                    <DeliveryDetailsTable
+                        orders={filteredOrders}
+                        isLoading={isLoading}
+                        onOrderClick={handleOrderClick}
+                    />
                 </div>
             </main>
 

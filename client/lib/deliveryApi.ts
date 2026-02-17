@@ -227,7 +227,46 @@ function getMinutesDifference(startDate: string, endDate: string): number {
 }
 
 /**
- * Calculate delivery metrics from orders
+ * Get timestamp from histories for a specific status
+ */
+function getStatusTimestamp(histories: OrderHistory[], status: string): string | null {
+    // Find the history entry where newStatus matches the target status
+    const historyEntry = histories.find((h) => h.newStatus === status);
+    return historyEntry ? historyEntry.updatedAt : null;
+}
+
+/**
+ * Calculate total delivery time for a single order using histories
+ */
+export function calculateOrderTotalTime(order: Order): number {
+    if (!order.histories || order.histories.length === 0) {
+        return 0;
+    }
+
+    // Find CREATED (or first status) and COMPLETED timestamps from histories
+    const sortedHistories = [...order.histories].sort(
+        (a, b) => new Date(a.updatedAt).getTime() - new Date(b.updatedAt).getTime()
+    );
+
+    const createdTime = sortedHistories[0]?.updatedAt || order.creationDate;
+    const completedTime = getStatusTimestamp(order.histories, "COMPLETED");
+
+    if (!completedTime) {
+        return 0;
+    }
+
+    const totalTime = getMinutesDifference(createdTime, completedTime);
+
+    // Return 0 if time is negative (shouldn't happen with histories)
+    if (totalTime < 0) {
+        return 0;
+    }
+
+    return totalTime;
+}
+
+/**
+ * Calculate delivery metrics from orders using histories
  */
 export function calculateDeliveryMetrics(orders: Order[]): DeliveryMetrics {
     if (orders.length === 0) {
@@ -247,46 +286,46 @@ export function calculateDeliveryMetrics(orders: Order[]): DeliveryMetrics {
     let validOrdersCount = 0;
 
     orders.forEach((order) => {
-        // Skip orders with missing timestamps
-        if (!order.creationDate || !order.deliveredAt || !order.originPickupAt) {
+        if (!order.histories || order.histories.length === 0) {
             return;
         }
 
-        // Total time: creationDate -> deliveredAt
-        const orderTotalTime = getMinutesDifference(
-            order.creationDate,
-            order.deliveredAt
+        // Sort histories by time
+        const sortedHistories = [...order.histories].sort(
+            (a, b) => new Date(a.updatedAt).getTime() - new Date(b.updatedAt).getTime()
         );
 
-        // Preparation time: creationDate -> originPickupAt
-        const preparationTime = getMinutesDifference(
-            order.creationDate,
-            order.originPickupAt
-        );
+        const createdTime = sortedHistories[0]?.updatedAt || order.creationDate;
+        const completedTime = getStatusTimestamp(order.histories, "COMPLETED");
+        const pickedUpTime = getStatusTimestamp(order.histories, "PICKED_UP");
 
-        // Delivery time: originPickupAt -> deliveredAt
-        const deliveryTime = getMinutesDifference(
-            order.originPickupAt,
-            order.deliveredAt
-        );
-
-        // Skip orders with negative or unrealistic times (data corruption)
-        // Negative times mean timestamps are in wrong order
-        if (orderTotalTime < 0 || preparationTime < 0 || deliveryTime < 0) {
-            console.warn(`Skipping order ${order.code} due to invalid timestamps`);
-            return;
+        if (!completedTime) {
+            return; // Skip if no COMPLETED status
         }
 
-        // Skip orders with unrealistic times (> 24 hours = 1440 minutes)
-        if (orderTotalTime > 1440) {
-            console.warn(`Skipping order ${order.code} due to unrealistic total time: ${orderTotalTime} minutes`);
-            return;
+        // Total time: first status -> COMPLETED
+        const orderTotalTime = getMinutesDifference(createdTime, completedTime);
+
+        if (orderTotalTime < 0) {
+            return; // Skip invalid data
         }
 
         validOrdersCount++;
         totalTime += orderTotalTime;
-        totalPreparationTime += preparationTime;
-        totalDeliveryTime += deliveryTime;
+
+        // Preparation time: first status -> PICKED_UP (if available)
+        if (pickedUpTime) {
+            const preparationTime = getMinutesDifference(createdTime, pickedUpTime);
+            if (preparationTime >= 0) {
+                totalPreparationTime += preparationTime;
+
+                // Delivery time: PICKED_UP -> COMPLETED
+                const deliveryTime = getMinutesDifference(pickedUpTime, completedTime);
+                if (deliveryTime >= 0) {
+                    totalDeliveryTime += deliveryTime;
+                }
+            }
+        }
 
         // Count orders delivered within 60 minutes
         if (orderTotalTime <= 60) {
@@ -315,7 +354,7 @@ export function calculateDeliveryMetrics(orders: Order[]): DeliveryMetrics {
 }
 
 /**
- * Get time distribution for chart
+ * Get time distribution for chart using histories
  */
 export function getTimeDistribution(orders: Order[]): TimeDistribution {
     const distribution: TimeDistribution = {
@@ -326,18 +365,10 @@ export function getTimeDistribution(orders: Order[]): TimeDistribution {
     };
 
     orders.forEach((order) => {
-        // Skip orders with missing timestamps
-        if (!order.creationDate || !order.deliveredAt) {
-            return;
-        }
+        const totalTime = calculateOrderTotalTime(order);
 
-        const totalTime = getMinutesDifference(
-            order.creationDate,
-            order.deliveredAt
-        );
-
-        // Skip orders with negative or unrealistic times
-        if (totalTime < 0 || totalTime > 1440) {
+        // Skip orders with 0 time (no histories or invalid data)
+        if (totalTime === 0) {
             return;
         }
 
@@ -353,23 +384,4 @@ export function getTimeDistribution(orders: Order[]): TimeDistribution {
     });
 
     return distribution;
-}
-
-/**
- * Calculate total delivery time for a single order
- */
-export function calculateOrderTotalTime(order: Order): number {
-    // Return 0 if timestamps are missing
-    if (!order.creationDate || !order.deliveredAt) {
-        return 0;
-    }
-
-    const totalTime = getMinutesDifference(order.creationDate, order.deliveredAt);
-
-    // Return 0 if time is negative or unrealistic
-    if (totalTime < 0 || totalTime > 1440) {
-        return 0;
-    }
-
-    return totalTime;
 }
