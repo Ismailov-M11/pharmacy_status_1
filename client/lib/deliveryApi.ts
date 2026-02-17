@@ -163,7 +163,7 @@ export async function fetchOrdersPage(
 }
 
 /**
- * Fetch all completed orders from the last 3 months
+ * Fetch all completed orders
  * @param token - Authorization token
  * @param fromDate - Optional start date filter
  * @param toDate - Optional end date filter
@@ -179,25 +179,21 @@ export async function fetchCompletedOrders(
     const size = 10000;
     let hasMore = true;
 
-    // Default to last 3 months if no dates provided
-    const now = new Date();
-    const threeMonthsAgo = new Date(now);
-    threeMonthsAgo.setMonth(now.getMonth() - 3);
-
-    const filterFrom = fromDate || threeMonthsAgo;
-    const filterTo = toDate || now;
-
     while (hasMore) {
         const response = await fetchOrdersPage(token, page, size);
         const orders = response.payload.list;
 
-        // Filter by date range
-        const filteredOrders = orders.filter((order) => {
-            const orderDate = new Date(order.creationDate);
-            return orderDate >= filterFrom && orderDate <= filterTo;
-        });
-
-        allOrders.push(...filteredOrders);
+        // Filter by date range if provided
+        if (fromDate && toDate) {
+            const filteredOrders = orders.filter((order) => {
+                const orderDate = new Date(order.creationDate);
+                return orderDate >= fromDate && orderDate <= toDate;
+            });
+            allOrders.push(...filteredOrders);
+        } else {
+            // No date filter - add all orders
+            allOrders.push(...orders);
+        }
 
         // Check if we need to fetch more pages
         // If we got less than size items, we've reached the end

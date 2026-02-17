@@ -15,11 +15,13 @@ import { TimeDistribution } from "@/lib/deliveryApi";
 interface DeliveryDistributionChartProps {
     distribution: TimeDistribution;
     isLoading?: boolean;
+    onBarClick?: (timeRange: string) => void;
 }
 
 export function DeliveryDistributionChart({
     distribution,
     isLoading,
+    onBarClick,
 }: DeliveryDistributionChartProps) {
     const { t } = useLanguage();
 
@@ -46,6 +48,12 @@ export function DeliveryDistributionChart({
         }
     };
 
+    const handleBarClick = (data: any) => {
+        if (onBarClick && data && data.key) {
+            onBarClick(data.key);
+        }
+    };
+
     if (isLoading) {
         return (
             <Card className="mb-6">
@@ -62,6 +70,9 @@ export function DeliveryDistributionChart({
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
                     {t.deliveryDistribution}
                 </h3>
+                <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+                    {t.clickBarToSeeOrders || "Нажмите на колонку, чтобы увидеть заказы"}
+                </p>
                 <ResponsiveContainer width="100%" height={300}>
                     <BarChart data={data}>
                         <CartesianGrid
@@ -85,7 +96,12 @@ export function DeliveryDistributionChart({
                             }}
                             labelStyle={{ color: "var(--tooltip-text)" }}
                         />
-                        <Bar dataKey="count" radius={[8, 8, 0, 0]}>
+                        <Bar
+                            dataKey="count"
+                            radius={[8, 8, 0, 0]}
+                            onClick={handleBarClick}
+                            cursor="pointer"
+                        >
                             {data.map((entry, index) => (
                                 <Cell key={`cell-${index}`} fill={getBarColor(entry.key)} />
                             ))}
@@ -96,3 +112,4 @@ export function DeliveryDistributionChart({
         </Card>
     );
 }
+

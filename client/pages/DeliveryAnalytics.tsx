@@ -7,12 +7,15 @@ import { DeliveryKpiCards } from "@/components/DeliveryKpiCards";
 import { DeliveryDistributionChart } from "@/components/DeliveryDistributionChart";
 import { DeliveryDetailsTable } from "@/components/DeliveryDetailsTable";
 import { DateRangeFilter } from "@/components/DateRangeFilter";
+import { OrderListModal } from "@/components/OrderListModal";
+import { OrderHistoryModal } from "@/components/OrderHistoryModal";
 import { Button } from "@/components/ui/button";
 import { RefreshCw } from "lucide-react";
 import {
     fetchCompletedOrders,
     calculateDeliveryMetrics,
     getTimeDistribution,
+    calculateOrderTotalTime,
     Order,
 } from "@/lib/deliveryApi";
 import { toast } from "sonner";
@@ -29,6 +32,12 @@ export default function DeliveryAnalytics() {
         from?: Date;
         to?: Date;
     }>({});
+
+    // Modal states
+    const [selectedTimeRange, setSelectedTimeRange] = useState<string | null>(null);
+    const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+    const [isOrderListModalOpen, setIsOrderListModalOpen] = useState(false);
+    const [isOrderHistoryModalOpen, setIsOrderHistoryModalOpen] = useState(false);
 
     useEffect(() => {
         if (authLoading) return;
@@ -82,6 +91,41 @@ export default function DeliveryAnalytics() {
     const handleRefresh = () => {
         loadOrders(dateFilter.from, dateFilter.to);
     };
+
+    // Handle chart bar click
+    const handleBarClick = (timeRange: string) => {
+        setSelectedTimeRange(timeRange);
+        setIsOrderListModalOpen(true);
+    };
+
+    // Handle order click in modal
+    const handleOrderClick = (order: Order) => {
+        setSelectedOrder(order);
+        setIsOrderHistoryModalOpen(true);
+    };
+
+    // Get orders for selected time range
+    const ordersInTimeRange = useMemo(() => {
+        if (!selectedTimeRange) return [];
+
+        return filteredOrders.filter((order) => {
+            const totalTime = calculateOrderTotalTime(order);
+            if (totalTime === 0) return false; // Skip invalid orders
+
+            switch (selectedTimeRange) {
+                case "0-30":
+                    return totalTime <= 30;
+                case "30-60":
+                    return totalTime > 30 && totalTime <= 60;
+                case "60-90":
+                    return totalTime > 60 && totalTime <= 90;
+                case "90+":
+                    return totalTime > 90;
+                default:
+                    return false;
+            }
+        });
+    }, [selectedTimeRange, filteredOrders]);
 
     // Calculate metrics from filtered orders
     const metrics = useMemo(
@@ -142,12 +186,29 @@ export default function DeliveryAnalytics() {
                     <DeliveryDistributionChart
                         distribution={distribution}
                         isLoading={isLoading}
+                        onBarClick={handleBarClick}
                     />
 
                     {/* Details Table */}
                     <DeliveryDetailsTable orders={filteredOrders} isLoading={isLoading} />
                 </div>
             </main>
+
+            {/* Modals */}
+            <OrderListModal
+                orders={ordersInTimeRange}
+                timeRange={selectedTimeRange || ""}
+                isOpen={isOrderListModalOpen}
+                onClose={() => setIsOrderListModalOpen(false)}
+                onOrderClick={handleOrderClick}
+            />
+
+            <OrderHistoryModal
+                order={selectedOrder}
+                isOpen={isOrderHistoryModalOpen}
+                onClose={() => setIsOrderHistoryModalOpen(false)}
+            />
         </div>
     );
 }
+
