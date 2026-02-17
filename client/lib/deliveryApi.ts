@@ -236,35 +236,46 @@ function getStatusTimestamp(histories: OrderHistory[], status: string): string |
 }
 
 /**
- * Calculate total delivery time for a single order using histories
+ * Calculate total delivery time for a single order using histories or legacy fields
  */
 export function calculateOrderTotalTime(order: Order): number {
-    if (!order.histories || order.histories.length === 0) {
-        return 0;
+    // Try to use histories first (new orders)
+    if (order.histories && order.histories.length > 0) {
+        // Find CREATED (or first status) and COMPLETED timestamps from histories
+        const sortedHistories = [...order.histories].sort(
+            (a, b) => new Date(a.updatedAt).getTime() - new Date(b.updatedAt).getTime()
+        );
+
+        const createdTime = sortedHistories[0]?.updatedAt || order.creationDate;
+
+        // Use COMPLETED timestamp from histories (more reliable than deliveredAt)
+        const completedTime = getStatusTimestamp(order.histories, "COMPLETED");
+
+        if (completedTime) {
+            const totalTime = getMinutesDifference(createdTime, completedTime);
+
+            // Return 0 if time is negative
+            if (totalTime < 0) {
+                return 0;
+            }
+
+            return totalTime;
+        }
     }
 
-    // Find CREATED (or first status) and COMPLETED timestamps from histories
-    const sortedHistories = [...order.histories].sort(
-        (a, b) => new Date(a.updatedAt).getTime() - new Date(b.updatedAt).getTime()
-    );
+    // Fallback to legacy fields for old orders without histories
+    if (order.deliveredAt && order.creationDate) {
+        const totalTime = getMinutesDifference(order.creationDate, order.deliveredAt);
 
-    const createdTime = sortedHistories[0]?.updatedAt || order.creationDate;
+        // Return 0 if time is negative or unrealistic
+        if (totalTime < 0 || totalTime > 1440) { // 1440 minutes = 24 hours
+            return 0;
+        }
 
-    // Use COMPLETED timestamp from histories (more reliable than deliveredAt)
-    const completedTime = getStatusTimestamp(order.histories, "COMPLETED");
-
-    if (!completedTime) {
-        return 0;
+        return totalTime;
     }
 
-    const totalTime = getMinutesDifference(createdTime, completedTime);
-
-    // Return 0 if time is negative (shouldn't happen with histories)
-    if (totalTime < 0) {
-        return 0;
-    }
-
-    return totalTime;
+    return 0;
 }
 
 /**

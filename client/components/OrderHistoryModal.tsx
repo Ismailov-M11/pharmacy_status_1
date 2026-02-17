@@ -17,19 +17,40 @@ export function OrderHistoryModal({ order, isOpen, onClose }: OrderHistoryModalP
 
     // Build complete history including all entries
     const buildCompleteHistory = () => {
-        if (!order.histories || order.histories.length === 0) return [];
-
-        // Sort histories by date (newest first for display)
-        const sortedHistories = [...order.histories].sort(
-            (a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
-        );
-
         const completeHistory: Array<{
             status: string;
             updatedAt: string;
             performedBy: string;
             isCreation: boolean;
         }> = [];
+
+        // If no histories, create basic timeline for legacy orders
+        if (!order.histories || order.histories.length === 0) {
+            // Add completion if deliveredAt exists
+            if (order.deliveredAt) {
+                completeHistory.push({
+                    status: "COMPLETED",
+                    updatedAt: order.deliveredAt,
+                    performedBy: "",
+                    isCreation: false,
+                });
+            }
+
+            // Add creation
+            completeHistory.push({
+                status: "CREATED",
+                updatedAt: order.creationDate,
+                performedBy: `${order.customer.firstName || ""} ${order.customer.lastName || ""} / ${order.location.name}`,
+                isCreation: true,
+            });
+
+            return completeHistory;
+        }
+
+        // Sort histories by date (newest first for display)
+        const sortedHistories = [...order.histories].sort(
+            (a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
+        );
 
         // Add all history entries (including duplicates)
         sortedHistories.forEach((history) => {

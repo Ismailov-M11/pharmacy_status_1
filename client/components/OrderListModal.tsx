@@ -1,6 +1,6 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { Order, calculateOrderTotalTime } from "@/lib/deliveryApi";
+import { Order, calculateOrderTotalTime, getDeliveryTime } from "@/lib/deliveryApi";
 import { format } from "date-fns";
 
 interface OrderListModalProps {
@@ -84,7 +84,12 @@ export function OrderListModal({
                                                 {format(new Date(order.creationDate), "dd.MM.yyyy HH:mm")}
                                             </td>
                                             <td className="py-3 px-3 text-gray-600 dark:text-gray-400">
-                                                {format(new Date(order.deliveredAt), "dd.MM.yyyy HH:mm")}
+                                                {(() => {
+                                                    const deliveryTime = getDeliveryTime(order);
+                                                    return deliveryTime
+                                                        ? format(deliveryTime, "dd.MM.yyyy HH:mm")
+                                                        : t.emptyPlaceholder || "—";
+                                                })()}
                                             </td>
                                             <td className="py-3 px-3 text-gray-900 dark:text-gray-100 font-medium">
                                                 {totalMinutes} {t.minutes}

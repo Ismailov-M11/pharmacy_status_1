@@ -16,9 +16,13 @@ export function DeliveryDetailsTable({
 }: DeliveryDetailsTableProps) {
     const { t } = useLanguage();
 
-    // Only filter out orders with no histories (since we use histories for calculations)
+    // Include orders that have either:
+    // 1. histories array with entries (new orders)
+    // 2. deliveredAt and creationDate (old orders before histories feature)
     const validOrders = orders.filter((order) => {
-        return order.histories && order.histories.length > 0;
+        const hasHistories = order.histories && order.histories.length > 0;
+        const hasLegacyData = order.deliveredAt && order.creationDate;
+        return hasHistories || hasLegacyData;
     });
 
     if (isLoading) {
