@@ -33,6 +33,9 @@ export default function DeliveryAnalytics() {
         to?: Date;
     }>({});
 
+    // Excluded orders state
+    const [excludedOrderIds, setExcludedOrderIds] = useState<Set<number>>(new Set());
+
     // Modal states
     const [selectedTimeRange, setSelectedTimeRange] = useState<string | null>(null);
     const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
@@ -92,6 +95,17 @@ export default function DeliveryAnalytics() {
         loadOrders(dateFilter.from, dateFilter.to);
     };
 
+    // Handle exclude change
+    const handleExcludeChange = (excludedIds: Set<number>) => {
+        setExcludedOrderIds(excludedIds);
+    };
+
+    // Effective orders = filtered minus excluded
+    const effectiveOrders = useMemo(
+        () => filteredOrders.filter((o) => !excludedOrderIds.has(o.id)),
+        [filteredOrders, excludedOrderIds]
+    );
+
     // Handle chart bar click
     const handleBarClick = (timeRange: string) => {
         setSelectedTimeRange(timeRange);
@@ -108,7 +122,7 @@ export default function DeliveryAnalytics() {
     const ordersInTimeRange = useMemo(() => {
         if (!selectedTimeRange) return [];
 
-        return filteredOrders.filter((order) => {
+        return effectiveOrders.filter((order) => {
             const totalTime = calculateOrderTotalTime(order);
             if (totalTime === 0) return false; // Skip invalid orders
 
@@ -125,17 +139,17 @@ export default function DeliveryAnalytics() {
                     return false;
             }
         });
-    }, [selectedTimeRange, filteredOrders]);
+    }, [selectedTimeRange, effectiveOrders]);
 
-    // Calculate metrics from filtered orders
+    // Calculate metrics from effective orders (excludes excluded ones)
     const metrics = useMemo(
-        () => calculateDeliveryMetrics(filteredOrders),
-        [filteredOrders]
+        () => calculateDeliveryMetrics(effectiveOrders),
+        [effectiveOrders]
     );
 
     const distribution = useMemo(
-        () => getTimeDistribution(filteredOrders),
-        [filteredOrders]
+        () => getTimeDistribution(effectiveOrders),
+        [effectiveOrders]
     );
 
     if (authLoading) {
@@ -191,9 +205,12 @@ export default function DeliveryAnalytics() {
 
                     {/* Details Table */}
                     <DeliveryDetailsTable
-                        orders={filteredOrders}
+                        orders={effectiveOrders}
+                        allOrders={filteredOrders}
                         isLoading={isLoading}
                         onOrderClick={handleOrderClick}
+                        excludedOrderIds={excludedOrderIds}
+                        onExcludeChange={handleExcludeChange}
                     />
                 </div>
             </main>
@@ -215,4 +232,3 @@ export default function DeliveryAnalytics() {
         </div>
     );
 }
-

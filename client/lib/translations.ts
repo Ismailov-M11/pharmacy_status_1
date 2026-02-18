@@ -253,6 +253,12 @@ export const translations = {
     preparationTime: "Время подготовки",
     courierWaitingTime: "Ожидание курьера",
     deliveryTimeInTransit: "Время в пути",
+    excludeOrders: "Исключить",
+    excludeOrdersTitle: "Исключить заказы",
+    enterOrderId: "Введите ID или код заказа",
+    excluded: "Исключено",
+    filterByPharmacy: "Фильтр по аптеке",
+    noOrdersFound: "Заказы не найдены",
   },
   uz: {
     // Common
@@ -509,6 +515,12 @@ export const translations = {
     preparationTime: "Tayyorlanish vaqti",
     courierWaitingTime: "Kuryerni kutish",
     deliveryTimeInTransit: "Yo'ldagi vaqt",
+    excludeOrders: "Istisno qilish",
+    excludeOrdersTitle: "Buyurtmalarni istisno qilish",
+    enterOrderId: "Buyurtma ID yoki kodini kiriting",
+    excluded: "Istisno qilingan",
+    filterByPharmacy: "Dorixona bo'yicha filtr",
+    noOrdersFound: "Buyurtmalar topilmadi",
   },
 };
 
