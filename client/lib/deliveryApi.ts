@@ -114,6 +114,7 @@ export interface OrderListResponse {
 export interface DeliveryMetrics {
     avgTotalTime: number;
     avgPreparationTime: number;
+    avgCourierWaitingTime: number;
     avgDeliveryTime: number;
     onTimePercentage: number;
     totalOrders: number;
@@ -368,6 +369,7 @@ export function calculateDeliveryMetrics(orders: Order[]): DeliveryMetrics {
         return {
             avgTotalTime: 0,
             avgPreparationTime: 0,
+            avgCourierWaitingTime: 0,
             avgDeliveryTime: 0,
             onTimePercentage: 0,
             totalOrders: 0,
@@ -376,6 +378,7 @@ export function calculateDeliveryMetrics(orders: Order[]): DeliveryMetrics {
 
     let totalTime = 0;
     let totalPreparationTime = 0;
+    let totalCourierWaitingTime = 0;
     let totalDeliveryTime = 0;
     let onTimeCount = 0;
     let validOrdersCount = 0;
@@ -386,6 +389,7 @@ export function calculateDeliveryMetrics(orders: Order[]): DeliveryMetrics {
         }
 
         const completedTime = getStatusTimestamp(order.histories, "COMPLETED");
+        const readyTime = getStatusTimestamp(order.histories, "READY");
         const pickedUpTime = getStatusTimestamp(order.histories, "PICKED_UP");
 
         if (!completedTime) {
@@ -403,17 +407,27 @@ export function calculateDeliveryMetrics(orders: Order[]): DeliveryMetrics {
         validOrdersCount++;
         totalTime += orderTotalTime;
 
-        // Preparation time: order creation -> PICKED_UP (if available)
-        if (pickedUpTime) {
-            const preparationTime = getMinutesDifference(order.creationDate, pickedUpTime);
+        // Preparation time: order creation -> READY
+        if (readyTime) {
+            const preparationTime = getMinutesDifference(order.creationDate, readyTime);
             if (preparationTime >= 0) {
                 totalPreparationTime += preparationTime;
+            }
+        }
 
-                // Delivery time: PICKED_UP -> COMPLETED
-                const deliveryTime = getMinutesDifference(pickedUpTime, completedTime);
-                if (deliveryTime >= 0) {
-                    totalDeliveryTime += deliveryTime;
-                }
+        // Courier waiting time: READY -> PICKED_UP
+        if (readyTime && pickedUpTime) {
+            const courierWaitingTime = getMinutesDifference(readyTime, pickedUpTime);
+            if (courierWaitingTime >= 0) {
+                totalCourierWaitingTime += courierWaitingTime;
+            }
+        }
+
+        // Delivery time: PICKED_UP -> COMPLETED
+        if (pickedUpTime) {
+            const deliveryTime = getMinutesDifference(pickedUpTime, completedTime);
+            if (deliveryTime >= 0) {
+                totalDeliveryTime += deliveryTime;
             }
         }
 
@@ -428,6 +442,7 @@ export function calculateDeliveryMetrics(orders: Order[]): DeliveryMetrics {
         return {
             avgTotalTime: 0,
             avgPreparationTime: 0,
+            avgCourierWaitingTime: 0,
             avgDeliveryTime: 0,
             onTimePercentage: 0,
             totalOrders: 0,
@@ -437,6 +452,7 @@ export function calculateDeliveryMetrics(orders: Order[]): DeliveryMetrics {
     return {
         avgTotalTime: Math.round(totalTime / validOrdersCount),
         avgPreparationTime: Math.round(totalPreparationTime / validOrdersCount),
+        avgCourierWaitingTime: Math.round(totalCourierWaitingTime / validOrdersCount),
         avgDeliveryTime: Math.round(totalDeliveryTime / validOrdersCount),
         onTimePercentage: Math.round((onTimeCount / validOrdersCount) * 100),
         totalOrders: validOrdersCount,

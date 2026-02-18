@@ -1,4 +1,4 @@
-import { Clock, Package, Truck, CheckCircle } from "lucide-react";
+import { Clock, Package, Truck, CheckCircle, UserCheck } from "lucide-react";
 import { KpiCard } from "@/components/KpiCard";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { DeliveryMetrics } from "@/lib/deliveryApi";
@@ -13,8 +13,8 @@ export function DeliveryKpiCards({ metrics, isLoading }: DeliveryKpiCardsProps) 
 
     if (isLoading) {
         return (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-                {[1, 2, 3, 4].map((i) => (
+            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-6">
+                {[1, 2, 3, 4, 5].map((i) => (
                     <div
                         key={i}
                         className="h-32 bg-gray-200 dark:bg-gray-700 animate-pulse rounded-lg"
@@ -25,7 +25,7 @@ export function DeliveryKpiCards({ metrics, isLoading }: DeliveryKpiCardsProps) 
     }
 
     return (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-6">
             <KpiCard
                 label={t.avgTotalTime}
                 value={`${metrics.avgTotalTime} ${t.minutes}`}
@@ -37,6 +37,12 @@ export function DeliveryKpiCards({ metrics, isLoading }: DeliveryKpiCardsProps) 
                 value={`${metrics.avgPreparationTime} ${t.minutes}`}
                 icon={<Package />}
                 variant="warning"
+            />
+            <KpiCard
+                label={t.avgCourierWaitingTime || "Среднее ожидание курьера"}
+                value={`${metrics.avgCourierWaitingTime} ${t.minutes}`}
+                icon={<UserCheck />}
+                variant="default"
             />
             <KpiCard
                 label={t.avgDeliveryTime}
