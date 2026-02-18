@@ -603,10 +603,11 @@ export function PharmacyTable({
       case "mfo": return <td key={col.id} className="px-2 md:px-4 py-2 md:py-3 text-gray-900 text-xs whitespace-nowrap align-middle">{pharmacy.mfo || "-"}</td>;
 
       case "region": {
-        const regionName = typeof pharmacy.region === 'object' && pharmacy.region?.name ? pharmacy.region.name : (typeof pharmacy.region === 'string' ? pharmacy.region : '-');
+        const regionSource = pharmacy.region || pharmacy.lead?.region;
+        const regionName = typeof regionSource === 'object' && regionSource?.name ? regionSource.name : (typeof regionSource === 'string' ? regionSource : '-');
         return <td key={col.id} className="px-2 md:px-4 py-2 md:py-3 text-gray-900 text-xs whitespace-nowrap align-middle">{regionName}</td>;
       }
-      case "district": return <td key={col.id} className="px-2 md:px-4 py-2 md:py-3 text-gray-900 text-xs whitespace-nowrap align-middle">{pharmacy.district || "-"}</td>;
+      case "district": return <td key={col.id} className="px-2 md:px-4 py-2 md:py-3 text-gray-900 text-xs whitespace-nowrap align-middle">{pharmacy.district || pharmacy.lead?.district || "-"}</td>;
 
       case "files":
         return (
@@ -1582,16 +1583,13 @@ export function PharmacyTable({
                         </td>
                         <td className="px-2 md:px-4 py-2 md:py-3 text-gray-900 text-xs whitespace-nowrap align-middle">
                           {(() => {
-                            // Debug logging
-                            if (index === 0) {
-                              console.log('Region data:', pharmacy.region, 'Type:', typeof pharmacy.region);
-                              console.log('District data:', pharmacy.district, 'Type:', typeof pharmacy.district);
-                            }
-                            return typeof pharmacy.region === 'object' && pharmacy.region?.name ? pharmacy.region.name : (typeof pharmacy.region === 'string' ? pharmacy.region : '-');
+                            // Check top-level region first, then fall back to lead.region
+                            const regionSource = pharmacy.region || pharmacy.lead?.region;
+                            return typeof regionSource === 'object' && regionSource?.name ? regionSource.name : (typeof regionSource === 'string' ? regionSource : '-');
                           })()}
                         </td>
                         <td className="px-2 md:px-4 py-2 md:py-3 text-gray-900 text-xs whitespace-nowrap align-middle">
-                          {pharmacy.district || "-"}
+                          {pharmacy.district || pharmacy.lead?.district || "-"}
                         </td>
 
                         <td className="px-2 md:px-4 py-2 md:py-3 text-center">
