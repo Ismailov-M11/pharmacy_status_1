@@ -211,7 +211,7 @@ export default function LeadsPanel() {
                     modifiedDate: item.modifiedDate || new Date().toISOString(),
                     comments: item.coments || item.comments || [],
                     // Store Market M-code if this lead has been converted
-                    ...(marketMatch?.code ? { marketCode: marketMatch.code } : {}),
+                    ...(marketMatch ? { marketCode: marketMatch.code } : {}),
                 } as any;
 
                 return pharmacy;
