@@ -1532,12 +1532,19 @@ export function PharmacyTable({
                           </td>
                         )}
                         <td className="px-2 py-2 md:py-3 text-gray-900 whitespace-nowrap align-top">
-                          <button
-                            onClick={() => onPharmacyClick?.(pharmacy)}
-                            className="text-blue-600 hover:text-blue-800 hover:underline font-medium transition-colors"
-                          >
-                            {pharmacy.code}
-                          </button>
+                          <div className="flex flex-col gap-0.5">
+                            <button
+                              onClick={() => onPharmacyClick?.(pharmacy)}
+                              className="text-blue-600 hover:text-blue-800 hover:underline font-medium transition-colors text-left"
+                            >
+                              {pharmacy.code}
+                            </button>
+                            {(pharmacy as any).marketCode && (
+                              <span className="text-xs font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 rounded px-1 py-0.5 leading-none">
+                                {(pharmacy as any).marketCode}
+                              </span>
+                            )}
+                          </div>
                         </td>
                         <td className="px-2 py-2 md:py-3 text-gray-900 font-medium align-top">
                           <div
