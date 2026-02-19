@@ -1,8 +1,8 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { Order } from "@/lib/deliveryApi";
+import { Order, calculateOrderTotalTime, calculateOrderPreparationTime, calculateOrderCourierWaitingTime, calculateOrderDeliveryTime } from "@/lib/deliveryApi";
 import { format } from "date-fns";
-import { Clock, CheckCircle2, Package, Truck, MapPin } from "lucide-react";
+import { Clock, CheckCircle2, Package, Truck, MapPin, Timer } from "lucide-react";
 
 interface OrderHistoryModalProps {
     order: Order | null;
@@ -14,6 +14,17 @@ export function OrderHistoryModal({ order, isOpen, onClose }: OrderHistoryModalP
     const { t } = useLanguage();
 
     if (!order) return null;
+
+    // Calculate time metrics for this order
+    const prepTime = calculateOrderPreparationTime(order);
+    const courierWaitTime = calculateOrderCourierWaitingTime(order);
+    const deliveryTime = calculateOrderDeliveryTime(order);
+    const totalTime = calculateOrderTotalTime(order);
+
+    const formatMinutes = (minutes: number) => {
+        if (minutes <= 0) return "—";
+        return `${minutes} ${t.minutes || "мин"}`;
+    };
 
     // Build complete history including all entries
     const buildCompleteHistory = () => {
@@ -162,6 +173,30 @@ export function OrderHistoryModal({ order, isOpen, onClose }: OrderHistoryModalP
                                     {order.invoice.total.toLocaleString()} {t.sum || "сум"}
                                 </p>
                             </div>
+                        </div>
+                    </div>
+
+                    {/* Time Metrics */}
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                        <div className="bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 rounded-lg p-3 text-center">
+                            <Clock className="h-4 w-4 text-orange-600 dark:text-orange-400 mx-auto mb-1" />
+                            <p className="text-xs text-orange-700 dark:text-orange-300 font-medium">{t.preparationTime || "Подготовка"}</p>
+                            <p className="text-sm font-bold text-orange-900 dark:text-orange-100 mt-0.5">{formatMinutes(prepTime)}</p>
+                        </div>
+                        <div className="bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 rounded-lg p-3 text-center">
+                            <Truck className="h-4 w-4 text-purple-600 dark:text-purple-400 mx-auto mb-1" />
+                            <p className="text-xs text-purple-700 dark:text-purple-300 font-medium">{t.courierWaitingTime || "Ожидание курьера"}</p>
+                            <p className="text-sm font-bold text-purple-900 dark:text-purple-100 mt-0.5">{formatMinutes(courierWaitTime)}</p>
+                        </div>
+                        <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3 text-center">
+                            <MapPin className="h-4 w-4 text-blue-600 dark:text-blue-400 mx-auto mb-1" />
+                            <p className="text-xs text-blue-700 dark:text-blue-300 font-medium">{t.deliveryTimeInTransit || "В пути"}</p>
+                            <p className="text-sm font-bold text-blue-900 dark:text-blue-100 mt-0.5">{formatMinutes(deliveryTime)}</p>
+                        </div>
+                        <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-3 text-center">
+                            <Timer className="h-4 w-4 text-green-600 dark:text-green-400 mx-auto mb-1" />
+                            <p className="text-xs text-green-700 dark:text-green-300 font-medium">{t.totalDeliveryTime || "Общее время"}</p>
+                            <p className="text-sm font-bold text-green-900 dark:text-green-100 mt-0.5">{formatMinutes(totalTime)}</p>
                         </div>
                     </div>
 
