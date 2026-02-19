@@ -556,7 +556,20 @@ export function PharmacyTable({
   const renderDynamicCell = (col: ColumnSettings, pharmacy: Pharmacy, index: number) => {
     switch (col.id) {
       case "number": return <td key={col.id} className="px-2 py-2 md:py-3 text-gray-900 font-medium whitespace-nowrap align-top">{index + 1}</td>;
-      case "code": return <td key={col.id} className="px-2 py-2 md:py-3 text-gray-900 whitespace-nowrap align-top"><button onClick={() => onPharmacyClick?.(pharmacy)} className="text-blue-600 hover:text-blue-800 hover:underline font-medium transition-colors">{pharmacy.code}</button></td>;
+      case "code": return (
+        <td key={col.id} className="px-2 py-2 md:py-3 text-gray-900 whitespace-nowrap align-top">
+          <div className="flex flex-col gap-0.5">
+            <button onClick={() => onPharmacyClick?.(pharmacy)} className="text-blue-600 hover:text-blue-800 hover:underline font-medium transition-colors text-left">
+              {pharmacy.code}
+            </button>
+            {(pharmacy as any).marketCode && (
+              <span className="text-xs font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 rounded px-1 py-0.5 leading-none">
+                {(pharmacy as any).marketCode}
+              </span>
+            )}
+          </div>
+        </td>
+      );
       case "name": return <td key={col.id} className="px-2 py-2 md:py-3 text-gray-900 font-medium align-top"><div className="break-words overflow-hidden" style={{ display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical", lineHeight: "1.4em", minHeight: "4.2em" }}>{pharmacy.name}</div></td>;
       case "address": return <td key={col.id} className="px-2 py-2 md:py-3 text-gray-600 align-top"><div className="break-words overflow-hidden" style={{ display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical", lineHeight: "1.4em", minHeight: "4.2em" }}>{pharmacy.address}</div></td>;
       case "landmark": return <td key={col.id} className="px-2 py-2 md:py-3 text-gray-600 align-top"><div className="break-words" style={{ lineHeight: "1.4em", minHeight: "4.2em" }}>{pharmacy.landmark || "-"}</div></td>;
