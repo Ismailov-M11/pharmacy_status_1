@@ -753,7 +753,7 @@ function ListTab({
       <table className="text-sm border-collapse" style={{ minWidth: "1900px", width: "100%" }}>
         <thead className="sticky top-0 z-10 bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700">
           <tr>
-            <th className={`${TH} w-10 text-center`}>#</th>
+            <th className={`${TH} w-12 text-center whitespace-nowrap`}>#</th>
             <th className={TH} style={{ minWidth: "180px" }}>Название</th>
             <th className={TH}>Статус</th>
             <th className={TH}>Город</th>
@@ -800,17 +800,20 @@ function ListTab({
             return (
               <tr
                 key={pharmacy.id}
-                onClick={() => setSelectedPharmacy(pharmacy)}
-                className="hover:bg-purple-50/50 dark:hover:bg-gray-800/60 transition-colors cursor-pointer"
+                className="hover:bg-purple-50/50 dark:hover:bg-gray-800/60"
               >
                 {/* # Row number */}
-                <td className="px-3 py-2.5 text-center text-xs text-gray-400 dark:text-gray-500 font-mono">
+                <td className="px-3 py-2.5 text-center text-xs text-gray-400 dark:text-gray-500 font-mono whitespace-nowrap">
                   {index + 1}
                 </td>
 
-                {/* Name */}
-                <td className="px-3 py-2.5 text-gray-900 dark:text-gray-100 font-medium align-top" style={{ minWidth: "180px" }}>
-                  <div className="break-words leading-snug" style={{ maxWidth: "220px" }}>
+                {/* Name — click opens detail modal */}
+                <td
+                  className="px-3 py-2.5 text-gray-900 dark:text-gray-100 font-medium align-top cursor-pointer"
+                  style={{ minWidth: "180px" }}
+                  onClick={() => setSelectedPharmacy(pharmacy)}
+                >
+                  <div className="break-words leading-snug hover:text-purple-600 dark:hover:text-purple-400 hover:underline" style={{ maxWidth: "220px" }}>
                     {name || "—"}
                   </div>
                 </td>
