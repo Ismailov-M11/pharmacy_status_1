@@ -66,8 +66,17 @@ export interface OsonFilters {
 
 // ─── Backend Base URL ────────────────────────────────────────────────────────
 
-const BACKEND_URL =
-  import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
+// VITE_BACKEND_URL may end with "/api/status" or "/api" — we need the root
+// e.g. "https://pharmacystatusbackend-production.up.railway.app/api/status"
+//   → "https://pharmacystatusbackend-production.up.railway.app"
+function getBackendRoot(): string {
+  const raw = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
+  // Strip known suffixes that the existing api.ts adds automatically
+  return raw.replace(/\/api\/status$/, "").replace(/\/api$/, "").replace(/\/$/, "");
+}
+
+const BACKEND_URL = getBackendRoot();
+
 
 // ─── API Functions ───────────────────────────────────────────────────────────
 
