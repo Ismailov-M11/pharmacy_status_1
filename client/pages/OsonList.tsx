@@ -734,38 +734,38 @@ function ListTab({
   }
 
   return (
-    <div className="h-full overflow-y-auto">
-      <table className="w-full text-sm">
-        <thead className="sticky top-0 bg-gray-50 dark:bg-gray-900 z-10 border-b border-gray-200 dark:border-gray-700">
+    <div className="h-full overflow-auto">
+      <table className="text-sm border-collapse" style={{ minWidth: "1100px", width: "100%" }}>
+        <thead className="sticky top-0 z-10 bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700">
           <tr>
-            <th className="text-left px-4 py-3 text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 min-w-[200px]">
+            <th className="px-3 py-2.5 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 whitespace-nowrap" style={{ minWidth: "200px" }}>
               Название
             </th>
-            <th className="text-left px-4 py-3 text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
+            <th className="px-3 py-2.5 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 whitespace-nowrap" style={{ minWidth: "120px" }}>
               Статус
             </th>
-            <th className="text-left px-4 py-3 text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 hidden md:table-cell">
+            <th className="px-3 py-2.5 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 whitespace-nowrap" style={{ minWidth: "120px" }}>
               Город
             </th>
-            <th className="text-left px-4 py-3 text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 hidden lg:table-cell">
+            <th className="px-3 py-2.5 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 whitespace-nowrap" style={{ minWidth: "120px" }}>
               Район
             </th>
-            <th className="text-left px-4 py-3 text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 hidden xl:table-cell">
+            <th className="px-3 py-2.5 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 whitespace-nowrap" style={{ minWidth: "200px" }}>
               Адрес
             </th>
-            <th className="text-left px-4 py-3 text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 hidden lg:table-cell">
+            <th className="px-3 py-2.5 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 whitespace-nowrap" style={{ minWidth: "115px" }}>
               Телефон
             </th>
-            <th className="text-left px-4 py-3 text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 hidden xl:table-cell">
+            <th className="px-3 py-2.5 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 whitespace-nowrap" style={{ minWidth: "110px" }}>
               Время работы
             </th>
-            <th className="text-left px-4 py-3 text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 hidden 2xl:table-cell">
-              Slug
-            </th>
-            <th className="text-left px-4 py-3 text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 hidden lg:table-cell">
+            <th className="px-3 py-2.5 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 whitespace-nowrap" style={{ minWidth: "80px" }}>
               Доставка
             </th>
-            <th className="text-left px-4 py-3 text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 hidden xl:table-cell">
+            <th className="px-3 py-2.5 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 whitespace-nowrap" style={{ minWidth: "160px" }}>
+              Slug
+            </th>
+            <th className="px-3 py-2.5 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 whitespace-nowrap" style={{ minWidth: "130px" }}>
               Обновлено
             </th>
           </tr>
@@ -798,16 +798,16 @@ function ListTab({
                 className="hover:bg-purple-50/50 dark:hover:bg-gray-800/60 transition-colors"
               >
                 {/* Name */}
-                <td className="px-4 py-3 max-w-[220px]">
-                  <div className="font-medium text-gray-900 dark:text-gray-100 leading-snug break-words">
+                <td className="px-3 py-2.5 text-gray-900 dark:text-gray-100 font-medium align-top" style={{ minWidth: "200px" }}>
+                  <div className="break-words leading-snug" style={{ maxWidth: "220px" }}>
                     {name || "—"}
                   </div>
                 </td>
 
                 {/* Status */}
-                <td className="px-4 py-3">
+                <td className="px-3 py-2.5 align-middle whitespace-nowrap">
                   <span
-                    className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium whitespace-nowrap ${getStatusColor(pharmacy.oson_status)}`}
+                    className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${getStatusColor(pharmacy.oson_status)}`}
                   >
                     {getStatusIcon(pharmacy.oson_status)}
                     {getStatusLabel(pharmacy.oson_status, language)}
@@ -815,39 +815,39 @@ function ListTab({
                 </td>
 
                 {/* City */}
-                <td className="px-4 py-3 text-gray-600 dark:text-gray-300 hidden md:table-cell max-w-[140px] break-words">
+                <td className="px-3 py-2.5 text-gray-600 dark:text-gray-300 text-xs align-middle whitespace-nowrap">
                   {city || "—"}
                 </td>
 
                 {/* District */}
-                <td className="px-4 py-3 text-gray-600 dark:text-gray-300 hidden lg:table-cell max-w-[140px] break-words">
+                <td className="px-3 py-2.5 text-gray-600 dark:text-gray-300 text-xs align-middle whitespace-nowrap">
                   {district || "—"}
                 </td>
 
                 {/* Address */}
-                <td className="px-4 py-3 text-gray-500 dark:text-gray-400 hidden xl:table-cell w-[250px]">
-                  <span className="break-words leading-snug" title={address || ""}>
+                <td className="px-3 py-2.5 text-gray-500 dark:text-gray-400 text-xs align-top" style={{ minWidth: "200px" }}>
+                  <div className="break-words leading-snug" style={{ maxWidth: "220px" }}>
                     {address || "—"}
-                  </span>
+                  </div>
                 </td>
 
                 {/* Phone */}
-                <td className="px-4 py-3 hidden lg:table-cell">
+                <td className="px-3 py-2.5 align-middle whitespace-nowrap">
                   {pharmacy.phone ? (
                     <a
                       href={`tel:${pharmacy.phone}`}
-                      className="text-purple-600 dark:text-purple-400 hover:underline flex items-center gap-1 text-xs whitespace-nowrap"
+                      className="text-purple-600 dark:text-purple-400 hover:underline flex items-center gap-1 text-xs"
                     >
-                      <Phone className="h-3 w-3" />
+                      <Phone className="h-3 w-3 shrink-0" />
                       {pharmacy.phone}
                     </a>
                   ) : (
-                    <span className="text-gray-400">—</span>
+                    <span className="text-gray-400 text-xs">—</span>
                   )}
                 </td>
 
                 {/* Work hours */}
-                <td className="px-4 py-3 hidden xl:table-cell text-gray-500 dark:text-gray-400 text-xs whitespace-nowrap">
+                <td className="px-3 py-2.5 text-gray-500 dark:text-gray-400 text-xs align-middle whitespace-nowrap">
                   {pharmacy.open_time && pharmacy.close_time ? (
                     <span className="flex items-center gap-1">
                       <Clock className="h-3 w-3" />
