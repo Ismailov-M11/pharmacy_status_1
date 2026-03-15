@@ -509,7 +509,8 @@ export default function OsonList() {
             />
           </div>
 
-          {/* ─── Search + Filter row ───────────────────────────────────── */}
+          {/* ─── Search + Filter row (list only) ─────────────────────── */}
+          {activeTab === "list" && (
           <div className="flex gap-2 flex-wrap">
             <div className="relative flex-1 min-w-[200px]">
               <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
@@ -521,26 +522,22 @@ export default function OsonList() {
               />
             </div>
 
-            {/* Parent region filter */}
             <select
               value={filterParentRegion}
               onChange={(e) => {
                 setFilterParentRegion(e.target.value);
-                setFilterRegion(""); // Reset district when city changes
+                setFilterRegion("");
               }}
               className="px-3 py-2 text-sm rounded-md border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-gray-200 min-w-[140px]"
             >
               <option value="">Все города</option>
               {filterOptions.parentRegions.map((r) => (
                 <option key={r.parent_region_ru} value={r.parent_region_ru}>
-                  {language === "uz"
-                    ? r.parent_region_uz || r.parent_region_ru
-                    : r.parent_region_ru}
+                  {language === "uz" ? r.parent_region_uz || r.parent_region_ru : r.parent_region_ru}
                 </option>
               ))}
             </select>
 
-            {/* District filter */}
             <select
               value={filterRegion}
               onChange={(e) => setFilterRegion(e.target.value)}
@@ -549,13 +546,12 @@ export default function OsonList() {
               <option value="">Все районы</option>
               {filterOptions.regions.map((r) => (
                 <option key={r.region_ru} value={r.region_ru}>
-                  {language === "uz"
-                    ? r.region_uz || r.region_ru
-                    : r.region_ru}
+                  {language === "uz" ? r.region_uz || r.region_ru : r.region_ru}
                 </option>
               ))}
             </select>
           </div>
+          )}
         </div>
 
         {/* ─── Content area ──────────────────────────────────────────────── */}
@@ -567,7 +563,22 @@ export default function OsonList() {
               language={language}
             />
           ) : (
-            <MapTab containerRef={containerRef} isLoading={isLoading} pharmacies={pharmacies} />
+            <MapTab
+              containerRef={containerRef}
+              isLoading={isLoading}
+              pharmacies={pharmacies}
+              language={language}
+              filterParentRegion={filterParentRegion}
+              filterRegion={filterRegion}
+              filterStatus={filterStatus}
+              searchQuery={searchQuery}
+              filterOptions={filterOptions}
+              onFilterParentRegion={(v) => { setFilterParentRegion(v); setFilterRegion(""); }}
+              onFilterRegion={(v) => setFilterRegion(v)}
+              onFilterStatus={(v) => setFilterStatus(v)}
+              onSearch={(v) => setSearchQuery(v)}
+              stats={stats}
+            />
           )}
         </div>
       </main>
@@ -787,8 +798,8 @@ function ListTab({
                 className="hover:bg-purple-50/50 dark:hover:bg-gray-800/60 transition-colors"
               >
                 {/* Name */}
-                <td className="px-4 py-3">
-                  <div className="font-medium text-gray-900 dark:text-gray-100 line-clamp-1">
+                <td className="px-4 py-3 max-w-[220px]">
+                  <div className="font-medium text-gray-900 dark:text-gray-100 leading-snug break-words">
                     {name || "—"}
                   </div>
                 </td>
@@ -804,18 +815,18 @@ function ListTab({
                 </td>
 
                 {/* City */}
-                <td className="px-4 py-3 text-gray-600 dark:text-gray-300 hidden md:table-cell whitespace-nowrap">
+                <td className="px-4 py-3 text-gray-600 dark:text-gray-300 hidden md:table-cell max-w-[140px] break-words">
                   {city || "—"}
                 </td>
 
                 {/* District */}
-                <td className="px-4 py-3 text-gray-600 dark:text-gray-300 hidden lg:table-cell whitespace-nowrap">
+                <td className="px-4 py-3 text-gray-600 dark:text-gray-300 hidden lg:table-cell max-w-[140px] break-words">
                   {district || "—"}
                 </td>
 
                 {/* Address */}
-                <td className="px-4 py-3 text-gray-500 dark:text-gray-400 hidden xl:table-cell max-w-[220px]">
-                  <span className="line-clamp-1" title={address || ""}>
+                <td className="px-4 py-3 text-gray-500 dark:text-gray-400 hidden xl:table-cell w-[250px]">
+                  <span className="break-words leading-snug" title={address || ""}>
                     {address || "—"}
                   </span>
                 </td>
@@ -904,10 +915,32 @@ function MapTab({
   containerRef,
   isLoading,
   pharmacies,
+  language,
+  filterParentRegion,
+  filterRegion,
+  filterStatus,
+  searchQuery,
+  filterOptions,
+  onFilterParentRegion,
+  onFilterRegion,
+  onFilterStatus,
+  onSearch,
+  stats,
 }: {
   containerRef: React.RefObject<HTMLDivElement | null>;
   isLoading: boolean;
   pharmacies: OsonPharmacy[];
+  language: string;
+  filterParentRegion: string;
+  filterRegion: string;
+  filterStatus: OsonStatus | "all";
+  searchQuery: string;
+  filterOptions: OsonFilterOptions;
+  onFilterParentRegion: (v: string) => void;
+  onFilterRegion: (v: string) => void;
+  onFilterStatus: (v: OsonStatus | "all") => void;
+  onSearch: (v: string) => void;
+  stats: OsonStats;
 }) {
   const mapCount = pharmacies.filter(
     (p) => p.oson_status === "connected" || p.oson_status === "not_connected"
@@ -915,35 +948,93 @@ function MapTab({
 
   return (
     <div className="relative h-full">
+      {/* Yandex Map container */}
       <div ref={containerRef} className="absolute inset-0 w-full h-full" />
 
+      {/* Loading overlay */}
       {isLoading && (
         <div className="absolute inset-0 bg-white/80 dark:bg-gray-900/80 z-20 flex items-center justify-center backdrop-blur-sm">
           <div className="flex flex-col items-center gap-2">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600" />
-            <span className="text-sm text-gray-600 dark:text-gray-400">
-              Загрузка карты...
-            </span>
+            <span className="text-sm text-gray-600 dark:text-gray-400">Загрузка карты...</span>
           </div>
         </div>
       )}
 
-      {/* Map legend */}
+      {/* ─── Left filter panel (overlay on map) ─────────────────────────── */}
       {!isLoading && (
-        <div className="absolute bottom-6 left-4 bg-white dark:bg-gray-800 shadow-lg rounded-lg px-3 py-2 z-10 text-xs flex flex-col gap-1.5 border border-gray-200 dark:border-gray-700">
-          <div className="font-semibold text-gray-700 dark:text-gray-200 text-xs mb-0.5">
-            На карте: {mapCount.toLocaleString()} аптек
+        <div className="absolute top-4 left-4 z-10 flex flex-col gap-2 w-64">
+          {/* Search */}
+          <div className="relative">
+            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-gray-400" />
+            <input
+              type="text"
+              placeholder="Поиск..."
+              value={searchQuery}
+              onChange={(e) => onSearch(e.target.value)}
+              className="w-full pl-8 pr-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-gray-600 bg-white/95 dark:bg-gray-800/95 backdrop-blur text-gray-800 dark:text-gray-200 shadow-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+            />
           </div>
-          <div className="flex items-center gap-2">
-            <span className="w-3 h-3 rounded-full bg-emerald-500 inline-block shrink-0" />
-            <span className="text-gray-600 dark:text-gray-300">Подключён</span>
+
+          {/* City filter */}
+          <select
+            value={filterParentRegion}
+            onChange={(e) => onFilterParentRegion(e.target.value)}
+            className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-gray-600 bg-white/95 dark:bg-gray-800/95 backdrop-blur text-gray-800 dark:text-gray-200 shadow-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+          >
+            <option value="">Все города</option>
+            {filterOptions.parentRegions.map((r) => (
+              <option key={r.parent_region_ru} value={r.parent_region_ru}>
+                {language === "uz" ? r.parent_region_uz || r.parent_region_ru : r.parent_region_ru}
+              </option>
+            ))}
+          </select>
+
+          {/* District filter */}
+          <select
+            value={filterRegion}
+            onChange={(e) => onFilterRegion(e.target.value)}
+            className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-gray-600 bg-white/95 dark:bg-gray-800/95 backdrop-blur text-gray-800 dark:text-gray-200 shadow-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+          >
+            <option value="">Все районы</option>
+            {filterOptions.regions.map((r) => (
+              <option key={r.region_ru} value={r.region_ru}>
+                {language === "uz" ? r.region_uz || r.region_ru : r.region_ru}
+              </option>
+            ))}
+          </select>
+
+          {/* Status filter chips */}
+          <div className="bg-white/95 dark:bg-gray-800/95 backdrop-blur rounded-lg border border-gray-200 dark:border-gray-600 shadow-md p-2 flex flex-col gap-1">
+            {(
+              [
+                { value: "all", label: `Все (${stats.total})`, dot: "bg-gray-400" },
+                { value: "connected", label: `Подключён (${stats.connected})`, dot: "bg-emerald-500" },
+                { value: "not_connected", label: `Не подключён (${stats.not_connected})`, dot: "bg-amber-500" },
+              ] as { value: OsonStatus | "all"; label: string; dot: string }[]
+            ).map(({ value, label, dot }) => (
+              <button
+                key={value}
+                onClick={() => onFilterStatus(value)}
+                className={`flex items-center gap-2 px-2 py-1.5 rounded text-xs text-left transition-colors ${
+                  filterStatus === value
+                    ? "bg-purple-100 dark:bg-purple-900/40 text-purple-700 dark:text-purple-300 font-medium"
+                    : "text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                }`}
+              >
+                <span className={`w-2.5 h-2.5 rounded-full inline-block shrink-0 ${dot}`} />
+                {label}
+              </button>
+            ))}
           </div>
-          <div className="flex items-center gap-2">
-            <span className="w-3 h-3 rounded-full bg-amber-500 inline-block shrink-0" />
-            <span className="text-gray-600 dark:text-gray-300">Не подключён</span>
+
+          {/* Map count */}
+          <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur rounded-lg px-3 py-1.5 text-xs text-gray-500 dark:text-gray-400 shadow border border-gray-200 dark:border-gray-600 text-center">
+            На карте: <span className="font-semibold text-gray-700 dark:text-gray-200">{mapCount.toLocaleString()}</span> аптек
           </div>
         </div>
       )}
     </div>
   );
 }
+
