@@ -18,6 +18,12 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
   RefreshCw,
   List,
   Map,
@@ -32,6 +38,11 @@ import {
   XCircle,
   AlertCircle,
   Filter,
+  Eye,
+  Info,
+  Percent,
+  BadgeCheck,
+  Navigation,
 } from "lucide-react";
 import { toast } from "sonner";
 import {
@@ -708,6 +719,8 @@ function ListTab({
   isLoading: boolean;
   language: string;
 }) {
+  const [selectedPharmacy, setSelectedPharmacy] = useState<OsonPharmacy | null>(null);
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-full">
@@ -733,45 +746,32 @@ function ListTab({
     );
   }
 
+  const TH = "px-3 py-2.5 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 whitespace-nowrap";
+
   return (
     <div className="h-full overflow-auto">
-      <table className="text-sm border-collapse" style={{ minWidth: "1100px", width: "100%" }}>
+      <table className="text-sm border-collapse" style={{ minWidth: "1900px", width: "100%" }}>
         <thead className="sticky top-0 z-10 bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700">
           <tr>
-            <th className="px-3 py-2.5 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 whitespace-nowrap" style={{ minWidth: "200px" }}>
-              Название
-            </th>
-            <th className="px-3 py-2.5 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 whitespace-nowrap" style={{ minWidth: "120px" }}>
-              Статус
-            </th>
-            <th className="px-3 py-2.5 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 whitespace-nowrap" style={{ minWidth: "120px" }}>
-              Город
-            </th>
-            <th className="px-3 py-2.5 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 whitespace-nowrap" style={{ minWidth: "120px" }}>
-              Район
-            </th>
-            <th className="px-3 py-2.5 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 whitespace-nowrap" style={{ minWidth: "200px" }}>
-              Адрес
-            </th>
-            <th className="px-3 py-2.5 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 whitespace-nowrap" style={{ minWidth: "115px" }}>
-              Телефон
-            </th>
-            <th className="px-3 py-2.5 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 whitespace-nowrap" style={{ minWidth: "110px" }}>
-              Время работы
-            </th>
-            <th className="px-3 py-2.5 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 whitespace-nowrap" style={{ minWidth: "80px" }}>
-              Доставка
-            </th>
-            <th className="px-3 py-2.5 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 whitespace-nowrap" style={{ minWidth: "160px" }}>
-              Slug
-            </th>
-            <th className="px-3 py-2.5 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 whitespace-nowrap" style={{ minWidth: "130px" }}>
-              Обновлено
-            </th>
+            <th className={`${TH} w-10 text-center`}>#</th>
+            <th className={TH} style={{ minWidth: "180px" }}>Название</th>
+            <th className={TH}>Статус</th>
+            <th className={TH}>Город</th>
+            <th className={TH}>Район</th>
+            <th className={TH} style={{ minWidth: "180px" }}>Адрес</th>
+            <th className={TH}>Телефон</th>
+            <th className={TH}>Время работы</th>
+            <th className={TH} style={{ minWidth: "160px" }}>Slug</th>
+            <th className={TH}>Доставка</th>
+            <th className={TH}>Скидка</th>
+            <th className={TH}>Кэшбэк</th>
+            <th className={TH}>Верифицирован</th>
+            <th className={TH} style={{ minWidth: "150px" }}>Ориентир</th>
+            <th className={TH} style={{ minWidth: "130px" }}>Обновлено</th>
           </tr>
         </thead>
         <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
-          {pharmacies.map((pharmacy) => {
+          {pharmacies.map((pharmacy, index) => {
             const name =
               language === "uz"
                 ? pharmacy.name_uz || pharmacy.name_ru
@@ -792,13 +792,24 @@ function ListTab({
                 ? pharmacy.address_uz || pharmacy.address_ru
                 : pharmacy.address_ru || pharmacy.address_uz;
 
+            const landmark =
+              language === "uz"
+                ? pharmacy.landmark_uz || pharmacy.landmark_ru
+                : pharmacy.landmark_ru || pharmacy.landmark_uz;
+
             return (
               <tr
                 key={pharmacy.id}
-                className="hover:bg-purple-50/50 dark:hover:bg-gray-800/60 transition-colors"
+                onClick={() => setSelectedPharmacy(pharmacy)}
+                className="hover:bg-purple-50/50 dark:hover:bg-gray-800/60 transition-colors cursor-pointer"
               >
+                {/* # Row number */}
+                <td className="px-3 py-2.5 text-center text-xs text-gray-400 dark:text-gray-500 font-mono">
+                  {index + 1}
+                </td>
+
                 {/* Name */}
-                <td className="px-3 py-2.5 text-gray-900 dark:text-gray-100 font-medium align-top" style={{ minWidth: "200px" }}>
+                <td className="px-3 py-2.5 text-gray-900 dark:text-gray-100 font-medium align-top" style={{ minWidth: "180px" }}>
                   <div className="break-words leading-snug" style={{ maxWidth: "220px" }}>
                     {name || "—"}
                   </div>
@@ -825,7 +836,7 @@ function ListTab({
                 </td>
 
                 {/* Address */}
-                <td className="px-3 py-2.5 text-gray-500 dark:text-gray-400 text-xs align-top" style={{ minWidth: "200px" }}>
+                <td className="px-3 py-2.5 text-gray-500 dark:text-gray-400 text-xs align-top" style={{ minWidth: "180px" }}>
                   <div className="break-words leading-snug" style={{ maxWidth: "220px" }}>
                     {address || "—"}
                   </div>
@@ -836,6 +847,7 @@ function ListTab({
                   {pharmacy.phone ? (
                     <a
                       href={`tel:${pharmacy.phone}`}
+                      onClick={(e) => e.stopPropagation()}
                       className="text-purple-600 dark:text-purple-400 hover:underline flex items-center gap-1 text-xs"
                     >
                       <Phone className="h-3 w-3 shrink-0" />
@@ -858,15 +870,18 @@ function ListTab({
                   )}
                 </td>
 
-                {/* Slug */}
-                <td className="px-4 py-3 hidden 2xl:table-cell">
-                  <code className="text-xs text-gray-400 dark:text-gray-500 bg-gray-100 dark:bg-gray-800 px-1.5 py-0.5 rounded">
+                {/* Slug — with break-all for long slugs */}
+                <td className="px-3 py-2.5 align-top" style={{ minWidth: "160px" }}>
+                  <code
+                    className="text-xs text-gray-400 dark:text-gray-500 bg-gray-100 dark:bg-gray-800 px-1.5 py-0.5 rounded inline-block"
+                    style={{ wordBreak: "break-all" }}
+                  >
                     {pharmacy.slug}
                   </code>
                 </td>
 
                 {/* Delivery */}
-                <td className="px-4 py-3 hidden lg:table-cell">
+                <td className="px-3 py-2.5 align-middle whitespace-nowrap">
                   {pharmacy.has_delivery ? (
                     <span className="flex items-center gap-1 text-emerald-600 dark:text-emerald-400 text-xs">
                       <Truck className="h-3 w-3" />
@@ -877,8 +892,49 @@ function ListTab({
                   )}
                 </td>
 
+                {/* Скидка (Discount) */}
+                <td className="px-3 py-2.5 text-xs align-middle text-center whitespace-nowrap">
+                  {pharmacy.discount_percent > 0 ? (
+                    <span className="inline-flex items-center gap-0.5 text-blue-600 dark:text-blue-400 font-medium">
+                      {pharmacy.discount_percent}%
+                    </span>
+                  ) : (
+                    <span className="text-gray-400">—</span>
+                  )}
+                </td>
+
+                {/* Кэшбэк (Cashback) */}
+                <td className="px-3 py-2.5 text-xs align-middle text-center whitespace-nowrap">
+                  {pharmacy.cashback_percent > 0 ? (
+                    <span className="inline-flex items-center gap-0.5 text-teal-600 dark:text-teal-400 font-medium">
+                      {pharmacy.cashback_percent}%
+                    </span>
+                  ) : (
+                    <span className="text-gray-400">—</span>
+                  )}
+                </td>
+
+                {/* Верифицирован (Verified) */}
+                <td className="px-3 py-2.5 text-xs align-middle text-center whitespace-nowrap">
+                  {pharmacy.is_verified ? (
+                    <span className="inline-flex items-center gap-1 text-emerald-600 dark:text-emerald-400">
+                      <BadgeCheck className="h-3.5 w-3.5" />
+                      Да
+                    </span>
+                  ) : (
+                    <span className="text-gray-400">Нет</span>
+                  )}
+                </td>
+
+                {/* Ориентир (Landmark) */}
+                <td className="px-3 py-2.5 text-gray-500 dark:text-gray-400 text-xs align-top" style={{ minWidth: "150px" }}>
+                  <div className="break-words leading-snug" style={{ maxWidth: "200px" }}>
+                    {landmark || "—"}
+                  </div>
+                </td>
+
                 {/* Last synced */}
-                <td className="px-4 py-3 hidden xl:table-cell text-xs text-gray-400 dark:text-gray-500 whitespace-nowrap">
+                <td className="px-3 py-2.5 text-xs text-gray-400 dark:text-gray-500 whitespace-nowrap">
                   {formatDateTime(pharmacy.last_synced_at)}
                 </td>
               </tr>
@@ -905,6 +961,13 @@ function ListTab({
           </span>
         </div>
       </div>
+
+      {/* Detail Modal */}
+      <PharmacyDetailModal
+        pharmacy={selectedPharmacy}
+        language={language}
+        onClose={() => setSelectedPharmacy(null)}
+      />
     </div>
   );
 }
@@ -1038,3 +1101,136 @@ function MapTab({
   );
 }
 
+// ─── Pharmacy Detail Modal ────────────────────────────────────────────────────
+
+function PharmacyDetailModal({
+  pharmacy,
+  language,
+  onClose,
+}: {
+  pharmacy: OsonPharmacy | null;
+  language: string;
+  onClose: () => void;
+}) {
+  if (!pharmacy) return null;
+
+  const name =
+    language === "uz"
+      ? pharmacy.name_uz || pharmacy.name_ru
+      : pharmacy.name_ru || pharmacy.name_uz;
+
+  const city =
+    language === "uz"
+      ? pharmacy.parent_region_uz || pharmacy.parent_region_ru
+      : pharmacy.parent_region_ru || pharmacy.parent_region_uz;
+
+  const district =
+    language === "uz"
+      ? pharmacy.region_uz || pharmacy.region_ru
+      : pharmacy.region_ru || pharmacy.region_uz;
+
+  const rows: { label: string; value: React.ReactNode }[] = [
+    { label: "ID", value: pharmacy.id },
+    {
+      label: "Статус",
+      value: (
+        <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${getStatusColor(pharmacy.oson_status)}`}>
+          {getStatusIcon(pharmacy.oson_status)}
+          {getStatusLabel(pharmacy.oson_status, language)}
+        </span>
+      ),
+    },
+    { label: "Название (RU)", value: pharmacy.name_ru || "—" },
+    { label: "Название (UZ)", value: pharmacy.name_uz || "—" },
+    {
+      label: "Slug",
+      value: (
+        <code className="text-xs bg-gray-100 dark:bg-gray-800 px-1.5 py-0.5 rounded" style={{ wordBreak: "break-all" }}>
+          {pharmacy.slug}
+        </code>
+      ),
+    },
+    { label: "Город", value: city || "—" },
+    { label: "Район", value: district || "—" },
+    { label: "Адрес (RU)", value: pharmacy.address_ru || "—" },
+    { label: "Адрес (UZ)", value: pharmacy.address_uz || "—" },
+    { label: "Ориентир (RU)", value: pharmacy.landmark_ru || "—" },
+    { label: "Ориентир (UZ)", value: pharmacy.landmark_uz || "—" },
+    {
+      label: "Телефон",
+      value: pharmacy.phone ? (
+        <a href={`tel:${pharmacy.phone}`} className="text-purple-600 dark:text-purple-400 hover:underline">
+          {pharmacy.phone}
+        </a>
+      ) : "—",
+    },
+    {
+      label: "Время работы",
+      value: pharmacy.open_time && pharmacy.close_time
+        ? `${pharmacy.open_time.slice(0, 5)} – ${pharmacy.close_time.slice(0, 5)}`
+        : "—",
+    },
+    {
+      label: "Доставка",
+      value: pharmacy.has_delivery ? (
+        <span className="text-emerald-600 dark:text-emerald-400 flex items-center gap-1"><Truck className="h-3.5 w-3.5" /> Есть</span>
+      ) : (
+        <span className="text-gray-400">Нет</span>
+      ),
+    },
+    {
+      label: "Скидка",
+      value: pharmacy.discount_percent > 0
+        ? <span className="text-blue-600 dark:text-blue-400 font-medium">{pharmacy.discount_percent}%</span>
+        : "—",
+    },
+    {
+      label: "Кэшбэк",
+      value: pharmacy.cashback_percent > 0
+        ? <span className="text-teal-600 dark:text-teal-400 font-medium">{pharmacy.cashback_percent}%</span>
+        : "—",
+    },
+    {
+      label: "Верифицирован",
+      value: pharmacy.is_verified ? (
+        <span className="text-emerald-600 dark:text-emerald-400 flex items-center gap-1"><BadgeCheck className="h-3.5 w-3.5" /> Да</span>
+      ) : (
+        <span className="text-gray-400">Нет</span>
+      ),
+    },
+    {
+      label: "Координаты",
+      value: pharmacy.latitude && pharmacy.longitude
+        ? `${pharmacy.latitude}, ${pharmacy.longitude}`
+        : "—",
+    },
+    { label: "Последняя синхронизация", value: formatDateTime(pharmacy.last_synced_at) },
+    { label: "Дата создания", value: formatDateTime(pharmacy.created_at) },
+  ];
+
+  return (
+    <Dialog open={!!pharmacy} onOpenChange={(open) => !open && onClose()}>
+      <DialogContent className="max-w-lg max-h-[85vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2 text-lg">
+            <Info className="h-5 w-5 text-purple-600" />
+            {name || "Аптека"}
+          </DialogTitle>
+        </DialogHeader>
+
+        <div className="divide-y divide-gray-100 dark:divide-gray-800 -mx-2">
+          {rows.map(({ label, value }, i) => (
+            <div key={i} className="flex gap-3 px-2 py-2.5 text-sm">
+              <span className="w-44 shrink-0 text-gray-500 dark:text-gray-400 text-xs font-medium">
+                {label}
+              </span>
+              <span className="text-gray-900 dark:text-gray-100 text-xs break-words min-w-0">
+                {value}
+              </span>
+            </div>
+          ))}
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
