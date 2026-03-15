@@ -17,6 +17,7 @@ import PharmacyMaps from "./pages/PharmacyMaps";
 import PharmaciesActivity from "./pages/PharmaciesActivity";
 import NewPharmacies from "./pages/NewPharmacies";
 import DeliveryAnalytics from "./pages/DeliveryAnalytics";
+import OsonList from "./pages/OsonList";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -141,6 +142,16 @@ const App = () => (
                   }
                 />
                 <Route path="/" element={<Navigate to="/login" replace />} />
+                <Route
+                  path="/oson-list"
+                  element={
+                    <RoleBasedRoute
+                      allowedRoles={["ROLE_ADMIN", "ROLE_AGENT", "ROLE_OPERATOR"]}
+                    >
+                      <OsonList />
+                    </RoleBasedRoute>
+                  }
+                />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
               </Routes>

@@ -17,6 +17,7 @@ import {
   Moon,
   Sun,
   TrendingUp,
+  ShoppingBag,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -62,6 +63,11 @@ export function Header() {
         path: "/delivery-analytics",
         icon: TrendingUp,
       },
+      {
+        label: "OSON List",
+        path: "/oson-list",
+        icon: ShoppingBag,
+      },
     );
   } else if (role === "ROLE_AGENT" || role === "ROLE_OPERATOR") {
     const agentLabel =
@@ -91,6 +97,11 @@ export function Header() {
         label: t.deliveryAnalytics || "Аналитика доставок",
         path: "/delivery-analytics",
         icon: TrendingUp,
+      },
+      {
+        label: "OSON List",
+        path: "/oson-list",
+        icon: ShoppingBag,
       },
     );
   }
