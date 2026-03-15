@@ -43,6 +43,7 @@ import {
   OsonSyncStatus,
   OsonFilterOptions,
   OsonStatus,
+  OsonProgress,
 } from "@/lib/osonApi";
 
 // ─── Map coordinates ─────────────────────────────────────────────────────────
@@ -146,11 +147,18 @@ export default function OsonList() {
     lastSyncAt: null,
     lastSyncError: null,
     hasToken: false,
+    progress: { current: 0, total: 0, percent: 0, phase: "" },
   });
 
   // Loading states
   const [isLoading, setIsLoading] = useState(true);
   const [isSyncing, setIsSyncing] = useState(false);
+  const [syncProgress, setSyncProgress] = useState<OsonProgress>({
+    current: 0,
+    total: 0,
+    percent: 0,
+    phase: "",
+  });
 
   // Filter states
   const [filterStatus, setFilterStatus] = useState<OsonStatus | "all">("all");
@@ -222,8 +230,10 @@ export default function OsonList() {
             lastSyncAt: status.lastSyncAt,
             lastSyncError: status.lastSyncError,
             hasToken: status.hasToken,
+            progress: status.progress || { current: 0, total: 0, percent: 0, phase: "" },
           });
           setStats(status.stats);
+          if (status.progress) setSyncProgress(status.progress);
 
           if (!status.isSyncing) {
             // Sync finished
@@ -248,6 +258,7 @@ export default function OsonList() {
   const handleSync = async () => {
     if (!token) return;
     setIsConfirmOpen(false);
+    setSyncProgress({ current: 0, total: 0, percent: 0, phase: "collecting" });
 
     try {
       await triggerOsonSync(token);
@@ -412,7 +423,7 @@ export default function OsonList() {
               </div>
             </div>
 
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-4">
               {/* Tabs */}
               <div className="flex rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
                 <button
@@ -454,6 +465,10 @@ export default function OsonList() {
             </div>
           </div>
 
+          {/* ─── Progress Bar (shown during sync) ───────────────────── */}
+          {(isSyncing || syncStatus.isSyncing) && (
+            <SyncProgressBar progress={syncProgress} />
+          )}
           {/* ─── Stats cards ──────────────────────────────────────────── */}
           <div className="flex gap-2 flex-wrap">
             <StatsCard
@@ -633,8 +648,46 @@ function StatsCard({
   );
 }
 
-// ─── List Tab ─────────────────────────────────────────────────────────────────
+// ─── Sync Progress Bar Component ─────────────────────────────────────────────
 
+function getPhaseLabel(phase: string): string {
+  switch (phase) {
+    case "collecting": return "Сбор списка аптек из OSON...";
+    case "syncing":    return "Синхронизация данных...";
+    case "cleanup":   return "Очистка устаревших записей...";
+    case "done":      return "Завершено";
+    case "error":     return "Ошибка синхронизации";
+    default:          return "Подготовка...";
+  }
+}
+
+function SyncProgressBar({ progress }: { progress: OsonProgress }) {
+  const { current, total, percent, phase } = progress;
+
+  return (
+    <div className="w-full bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg px-4 py-2.5 flex flex-col gap-1.5">
+      <div className="flex items-center justify-between text-xs">
+        <span className="flex items-center gap-1.5 text-amber-700 dark:text-amber-400 font-medium">
+          <RefreshCw className="h-3 w-3 animate-spin" />
+          {getPhaseLabel(phase)}
+        </span>
+        <span className="font-bold text-amber-800 dark:text-amber-300">
+          {total > 0 ? (
+            <>{current.toLocaleString()} / {total.toLocaleString()} &nbsp;({percent}%)</>
+          ) : (
+            "Загрузка..."
+          )}
+        </span>
+      </div>
+      <div className="w-full bg-amber-200 dark:bg-amber-800/50 rounded-full h-2 overflow-hidden">
+        <div
+          className="h-2 rounded-full bg-amber-500 dark:bg-amber-400 transition-all duration-500"
+          style={{ width: `${Math.max(percent, total > 0 ? 2 : 0)}%` }}
+        />
+      </div>
+    </div>
+  );
+}
 function ListTab({
   pharmacies,
   isLoading,

@@ -37,11 +37,19 @@ export interface OsonStats {
   lastSyncedAt: string | null;
 }
 
+export interface OsonProgress {
+  current: number;
+  total: number;
+  percent: number;  // 0-100
+  phase: "collecting" | "syncing" | "cleanup" | "done" | "error" | "";
+}
+
 export interface OsonSyncStatus {
   isSyncing: boolean;
   lastSyncAt: string | null;
   lastSyncError: string | null;
   hasToken: boolean;
+  progress: OsonProgress;
 }
 
 export interface OsonFilterOptions {
@@ -127,11 +135,11 @@ export async function triggerOsonSync(token: string): Promise<{ success: boolean
 }
 
 /**
- * Get current sync status + stats
+ * Get current sync status + stats + progress
  */
 export async function getOsonSyncStatus(
   token: string
-): Promise<{ isSyncing: boolean; lastSyncAt: string | null; lastSyncError: string | null; hasToken: boolean; stats: OsonStats }> {
+): Promise<{ isSyncing: boolean; lastSyncAt: string | null; lastSyncError: string | null; hasToken: boolean; stats: OsonStats; progress: OsonProgress }> {
   const response = await fetch(`${BACKEND_URL}/api/oson/sync-status`, {
     headers: { Authorization: `Bearer ${token}` },
   });
