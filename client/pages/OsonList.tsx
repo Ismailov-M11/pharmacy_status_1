@@ -761,7 +761,7 @@ function ListTab({
             <th className={TH} style={{ minWidth: "180px" }}>Адрес</th>
             <th className={TH}>Телефон</th>
             <th className={TH}>Время работы</th>
-            <th className={TH} style={{ minWidth: "160px" }}>Slug</th>
+            <th className={TH} style={{ width: "180px", maxWidth: "180px" }}>Slug</th>
             <th className={TH}>Доставка</th>
             <th className={TH}>Скидка</th>
             <th className={TH}>Кэшбэк</th>
@@ -870,11 +870,11 @@ function ListTab({
                   )}
                 </td>
 
-                {/* Slug — with break-all for long slugs */}
-                <td className="px-3 py-2.5 align-top" style={{ minWidth: "160px" }}>
+                {/* Slug — truncated with tooltip */}
+                <td className="px-3 py-2.5 align-middle" style={{ maxWidth: "180px" }}>
                   <code
-                    className="text-xs text-gray-400 dark:text-gray-500 bg-gray-100 dark:bg-gray-800 px-1.5 py-0.5 rounded inline-block"
-                    style={{ wordBreak: "break-all" }}
+                    className="text-xs text-gray-400 dark:text-gray-500 bg-gray-100 dark:bg-gray-800 px-1.5 py-0.5 rounded block truncate"
+                    title={pharmacy.slug}
                   >
                     {pharmacy.slug}
                   </code>
