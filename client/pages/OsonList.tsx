@@ -332,22 +332,10 @@ export default function OsonList() {
       return;
     }
 
+    // Export raw data directly from DB columns
     const dataToExport = pharmacies.map((p, index) => ({
-      "№": index + 1,
-      "Название": language === "uz" ? p.name_uz || p.name_ru : p.name_ru || p.name_uz,
-      "Статус": getStatusLabel(p.oson_status, language),
-      "Город": language === "uz" ? p.parent_region_uz || p.parent_region_ru : p.parent_region_ru || p.parent_region_uz,
-      "Район": language === "uz" ? p.region_uz || p.region_ru : p.region_ru || p.region_uz,
-      "Адрес": language === "uz" ? p.address_uz || p.address_ru : p.address_ru || p.address_uz,
-      "Ориентир": language === "uz" ? p.landmark_uz || p.landmark_ru : p.landmark_ru || p.landmark_uz,
-      "Телефон": p.phone || "",
-      "Время работы": `${p.open_time || ""} - ${p.close_time || ""}`,
-      "Доставка": p.has_delivery ? "Да" : "Нет",
-      "Скидка %": p.discount_percent || 0,
-      "Кэшбэк %": p.cashback_percent || 0,
-      "Верифицирован": p.is_verified ? "Да" : "Нет",
-      "Slug": p.slug,
-      "Обновлено": formatDateTime(p.last_synced_at)
+      ...p,
+      "№_пп": index + 1 // Add a sequence number at the end or keep raw
     }));
 
     const worksheet = XLSX.utils.json_to_sheet(dataToExport);
@@ -1051,7 +1039,16 @@ function MultiSelectDropdown({
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const [search, setSearch] = useState("");
+  const [localSelected, setLocalSelected] = useState<string[]>([]);
   const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Sync props to local state when opening
+  useEffect(() => {
+    if (isOpen) {
+      setLocalSelected(selectedValues);
+      setSearch("");
+    }
+  }, [isOpen, selectedValues]);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -1068,16 +1065,22 @@ function MultiSelectDropdown({
   );
 
   const toggleOption = (value: string) => {
-    if (selectedValues.includes(value)) {
-      onChange(selectedValues.filter(v => v !== value));
+    if (localSelected.includes(value)) {
+      setLocalSelected(localSelected.filter(v => v !== value));
     } else {
-      onChange([...selectedValues, value]);
+      setLocalSelected([...localSelected, value]);
     }
   };
 
   const clearSelection = (e: React.MouseEvent) => {
     e.stopPropagation();
     onChange([]);
+    setLocalSelected([]);
+  };
+
+  const applySelection = () => {
+    onChange(localSelected);
+    setIsOpen(false);
   };
 
   return (
@@ -1125,12 +1128,18 @@ function MultiSelectDropdown({
               <div className="px-3 py-2 text-sm text-gray-500 text-center">Ничего не найдено</div>
             ) : (
               filteredOptions.map(option => {
-                const isSelected = selectedValues.includes(option.value);
+                const isSelected = localSelected.includes(option.value);
                 return (
                   <label 
                     key={option.value} 
                     className="flex items-center gap-2 px-3 py-2 rounded hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer group"
                   >
+                    <input
+                      type="checkbox"
+                      className="sr-only"
+                      checked={isSelected}
+                      onChange={() => toggleOption(option.value)}
+                    />
                     <div className={`w-4 h-4 rounded border flex items-center justify-center shrink-0 transition-colors ${
                       isSelected 
                         ? 'bg-purple-600 border-purple-600 text-white' 
@@ -1145,6 +1154,12 @@ function MultiSelectDropdown({
                 );
               })
             )}
+          </div>
+
+          <div className="p-2 border-t border-gray-100 dark:border-gray-700 flex justify-end">
+            <Button size="sm" onClick={applySelection} className="w-full bg-purple-600 hover:bg-purple-700">
+              Применить
+            </Button>
           </div>
         </div>
       )}
@@ -1190,94 +1205,101 @@ function MapTab({
   ).length;
 
   return (
-    <div className="relative h-full">
-      {/* Yandex Map container */}
-      <div ref={containerRef} className="absolute inset-0 w-full h-full" />
+    <div className="flex h-full w-full">
+      {/* ─── Left filter panel (sidebar) ─────────────────────────── */}
+      <div className="w-72 shrink-0 border-r border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4 flex flex-col gap-4 overflow-y-auto z-10">
+        <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">
+          Фильтры карты
+        </h3>
 
-      {/* Loading overlay */}
-      {isLoading && (
-        <div className="absolute inset-0 bg-white/80 dark:bg-gray-900/80 z-20 flex items-center justify-center backdrop-blur-sm">
-          <div className="flex flex-col items-center gap-2">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600" />
-            <span className="text-sm text-gray-600 dark:text-gray-400">Загрузка карты...</span>
-          </div>
+        {/* Search */}
+        <div className="relative">
+          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-gray-400" />
+          <input
+            type="text"
+            placeholder="Поиск..."
+            value={searchQuery}
+            onChange={(e) => onSearch(e.target.value)}
+            className="w-full pl-8 pr-3 py-2 text-sm rounded bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-purple-500"
+          />
         </div>
-      )}
 
-      {/* ─── Left filter panel (overlay on map) ─────────────────────────── */}
-      {!isLoading && (
-        <div className="absolute top-4 left-4 z-10 flex flex-col gap-2 w-64">
-          {/* Search */}
-          <div className="relative">
-            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-gray-400" />
-            <input
-              type="text"
-              placeholder="Поиск..."
-              value={searchQuery}
-              onChange={(e) => onSearch(e.target.value)}
-              className="w-full pl-8 pr-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-gray-600 bg-white/95 dark:bg-gray-800/95 backdrop-blur text-gray-800 dark:text-gray-200 shadow-md focus:outline-none focus:ring-2 focus:ring-purple-500"
-            />
-          </div>
-
-          {/* City filter */}
-          <div className="bg-white/95 dark:bg-gray-800/95 backdrop-blur rounded-lg shadow-md border border-gray-200 dark:border-gray-600">
-            <MultiSelectDropdown
-              label="Выберите города"
-              options={filterOptions.parentRegions.map(r => ({
-                value: r.parent_region_ru,
-                label: language === "uz" ? r.parent_region_uz || r.parent_region_ru : r.parent_region_ru
-              }))}
-              selectedValues={filterParentRegion}
-              onChange={(v) => {
-                onFilterParentRegion(v);
-                onFilterRegion([]);
-              }}
-            />
-          </div>
-
-          {/* District filter */}
-          <div className="bg-white/95 dark:bg-gray-800/95 backdrop-blur rounded-lg shadow-md border border-gray-200 dark:border-gray-600">
-            <MultiSelectDropdown
-              label="Выберите районы"
-              options={filterOptions.regions.map(r => ({
-                value: r.region_ru,
-                label: language === "uz" ? r.region_uz || r.region_ru : r.region_ru
-              }))}
-              selectedValues={filterRegion}
-              onChange={onFilterRegion}
-            />
-          </div>
-
-          {/* Status filter chips */}
-          <div className="bg-white/95 dark:bg-gray-800/95 backdrop-blur rounded-lg border border-gray-200 dark:border-gray-600 shadow-md p-2 flex flex-col gap-1">
-            {(
-              [
-                { value: "all", label: `Все (${stats.total})`, dot: "bg-gray-400" },
-                { value: "connected", label: `Подключён (${stats.connected})`, dot: "bg-emerald-500" },
-                { value: "not_connected", label: `Не подключён (${stats.not_connected})`, dot: "bg-amber-500" },
-              ] as { value: OsonStatus | "all"; label: string; dot: string }[]
-            ).map(({ value, label, dot }) => (
-              <button
-                key={value}
-                onClick={() => onFilterStatus(value)}
-                className={`flex items-center gap-2 px-2 py-1.5 rounded text-xs text-left transition-colors ${
-                  (value === "all" ? filterStatus.length === 0 : filterStatus.includes(value))
-                    ? "bg-purple-100 dark:bg-purple-900/40 text-purple-700 dark:text-purple-300 font-medium"
-                    : "text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
-                }`}
-              >
-                <span className={`w-2.5 h-2.5 rounded-full inline-block shrink-0 ${dot}`} />
-                {label}
-              </button>
-            ))}
-          </div>
-
-          {/* Map count */}
-          <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur rounded-lg px-3 py-1.5 text-xs text-gray-500 dark:text-gray-400 shadow border border-gray-200 dark:border-gray-600 text-center">
-            На карте: <span className="font-semibold text-gray-700 dark:text-gray-200">{mapCount.toLocaleString()}</span> аптек
-          </div>
+        {/* City filter */}
+        <div className="w-full">
+          <MultiSelectDropdown
+            label="Выберите города"
+            options={filterOptions.parentRegions.map(r => ({
+              value: r.parent_region_ru,
+              label: language === "uz" ? r.parent_region_uz || r.parent_region_ru : r.parent_region_ru
+            }))}
+            selectedValues={filterParentRegion}
+            onChange={(v) => {
+              onFilterParentRegion(v);
+              onFilterRegion([]);
+            }}
+          />
         </div>
-      )}
+
+        {/* District filter */}
+        <div className="w-full">
+          <MultiSelectDropdown
+            label="Выберите районы"
+            options={filterOptions.regions.map(r => ({
+              value: r.region_ru,
+              label: language === "uz" ? r.region_uz || r.region_ru : r.region_ru
+            }))}
+            selectedValues={filterRegion}
+            onChange={onFilterRegion}
+          />
+        </div>
+
+        {/* Status filter chips */}
+        <div className="rounded border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50 p-2 flex flex-col gap-1 mt-2">
+          {(
+            [
+              { value: "all", label: `Все (${stats.total})`, dot: "bg-gray-400" },
+              { value: "connected", label: `Подключён (${stats.connected})`, dot: "bg-emerald-500" },
+              { value: "not_connected", label: `Не подключён (${stats.not_connected})`, dot: "bg-amber-500" },
+            ] as { value: OsonStatus | "all"; label: string; dot: string }[]
+          ).map(({ value, label, dot }) => (
+            <button
+              key={value}
+              onClick={() => onFilterStatus(value)}
+              className={`flex items-center gap-2 px-2 py-1.5 rounded text-xs text-left transition-colors ${
+                (value === "all" ? filterStatus.length === 0 : filterStatus.includes(value))
+                  ? "bg-purple-100 dark:bg-purple-900/40 text-purple-700 dark:text-purple-300 font-medium"
+                  : "text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+              }`}
+            >
+              <span className={`w-2.5 h-2.5 rounded-full inline-block shrink-0 ${dot}`} />
+              {label}
+            </button>
+          ))}
+        </div>
+
+        {/* Map count */}
+        <div className="mt-auto bg-gray-50 dark:bg-gray-700/50 rounded-lg px-3 py-2.5 text-xs text-gray-500 dark:text-gray-400 border border-gray-200 dark:border-gray-700 text-center">
+          Отображено на карте:<br />
+          <span className="font-semibold text-lg text-gray-800 dark:text-gray-200">
+            {mapCount.toLocaleString()}
+          </span> аптек
+        </div>
+      </div>
+
+      {/* ─── Map container ────────────────────────────────────────────── */}
+      <div className="flex-1 relative h-full w-full z-0 bg-gray-100 dark:bg-gray-900">
+        <div ref={containerRef} className="absolute inset-0 w-full h-full" />
+
+        {/* Loading overlay for Map */}
+        {isLoading && (
+          <div className="absolute inset-0 bg-white/80 dark:bg-gray-900/80 z-20 flex items-center justify-center backdrop-blur-sm">
+            <div className="flex flex-col items-center gap-2">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600" />
+              <span className="text-sm text-gray-600 dark:text-gray-400">Загрузка карты...</span>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
