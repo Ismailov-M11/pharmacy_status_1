@@ -349,6 +349,30 @@ export default function OsonList() {
     toast.success("Файл успешно скачан");
   };
 
+  // ─── Frontend Stats & Filtering ──────────────────────────────────────────
+
+  // Calculate dynamic stats from fetched pharmacies (which represent the current city/search filters)
+  const displayedStats = useMemo(() => {
+    return pharmacies.reduce(
+      (acc, p) => {
+        acc.total++;
+        if (p.oson_status === "connected") acc.connected++;
+        else if (p.oson_status === "not_connected") acc.not_connected++;
+        else if (p.oson_status === "deleted") acc.deleted++;
+        return acc;
+      },
+      { total: 0, connected: 0, not_connected: 0, deleted: 0, lastSyncedAt: stats.lastSyncedAt }
+    );
+  }, [pharmacies, stats.lastSyncedAt]);
+
+  // Apply the status filter on the frontend for rendering
+  const filteredPharmacies = useMemo(() => {
+    if (filterStatus.length === 0 || filterStatus.includes("all")) {
+      return pharmacies;
+    }
+    return pharmacies.filter(p => filterStatus.includes(p.oson_status));
+  }, [pharmacies, filterStatus]);
+
   // ─── Map markers ─────────────────────────────────────────────────────────
 
   const renderMapMarkers = useCallback(() => {
@@ -357,8 +381,8 @@ export default function OsonList() {
     const geoObjects = mapRef.current.geoObjects;
     geoObjects.removeAll();
 
-    const visiblePharmacies = pharmacies.filter(
-      (p) => p.oson_status === "connected" || p.oson_status === "not_connected"
+    const visiblePharmacies = filteredPharmacies.filter(
+      (p) => p.oson_status === "connected" || p.oson_status === "not_connected" || p.oson_status === "deleted"
     );
 
     const collection = new window.ymaps.GeoObjectCollection();
@@ -399,14 +423,14 @@ export default function OsonList() {
     });
 
     geoObjects.add(collection);
-  }, [pharmacies, language]);
+  }, [filteredPharmacies, language]);
 
   // Re-render markers when data or tab changes
   useEffect(() => {
     if (activeTab === "map" && mapInitialized.current && !isLoading) {
       renderMapMarkers();
     }
-  }, [pharmacies, activeTab, isLoading, renderMapMarkers]);
+  }, [filteredPharmacies, activeTab, isLoading, renderMapMarkers]);
 
   // Dark theme for map
   useEffect(() => {
@@ -448,30 +472,6 @@ export default function OsonList() {
     if (status === "all") return filterStatus.length === 0;
     return filterStatus.includes(status);
   };
-
-  // ─── Frontend Stats & Filtering ──────────────────────────────────────────
-
-  // Calculate dynamic stats from fetched pharmacies (which represent the current city/search filters)
-  const displayedStats = useMemo(() => {
-    return pharmacies.reduce(
-      (acc, p) => {
-        acc.total++;
-        if (p.oson_status === "connected") acc.connected++;
-        else if (p.oson_status === "not_connected") acc.not_connected++;
-        else if (p.oson_status === "deleted") acc.deleted++;
-        return acc;
-      },
-      { total: 0, connected: 0, not_connected: 0, deleted: 0, lastSyncedAt: stats.lastSyncedAt }
-    );
-  }, [pharmacies, stats.lastSyncedAt]);
-
-  // Apply the status filter on the frontend for rendering
-  const filteredPharmacies = useMemo(() => {
-    if (filterStatus.length === 0 || filterStatus.includes("all")) {
-      return pharmacies;
-    }
-    return pharmacies.filter(p => filterStatus.includes(p.oson_status));
-  }, [pharmacies, filterStatus]);
 
   return (
     <div className="flex flex-col h-screen bg-gray-50 dark:bg-gray-900 overflow-hidden">
@@ -571,28 +571,28 @@ export default function OsonList() {
           <div className="flex gap-2 flex-wrap">
             <StatsCard
               label="Всего"
-              value={stats.total}
+              value={displayedStats.total}
               color="gray"
               onClick={() => toggleStatusFilter("all")}
               active={isStatusActive("all")}
             />
             <StatsCard
               label="Подключён"
-              value={stats.connected}
+              value={displayedStats.connected}
               color="green"
               onClick={() => toggleStatusFilter("connected")}
               active={isStatusActive("connected")}
             />
             <StatsCard
               label="Не подключён"
-              value={stats.not_connected}
+              value={displayedStats.not_connected}
               color="amber"
               onClick={() => toggleStatusFilter("not_connected")}
               active={isStatusActive("not_connected")}
             />
             <StatsCard
               label="Удалён"
-              value={stats.deleted}
+              value={displayedStats.deleted}
               color="red"
               onClick={() => toggleStatusFilter("deleted")}
               active={isStatusActive("deleted")}
@@ -649,7 +649,7 @@ export default function OsonList() {
         <div className="flex-1 overflow-hidden relative">
           {activeTab === "list" ? (
             <ListTab
-              pharmacies={pharmacies}
+              pharmacies={filteredPharmacies}
               isLoading={isLoading}
               language={language}
             />
@@ -657,18 +657,18 @@ export default function OsonList() {
             <MapTab
               containerRef={containerRef}
               isLoading={isLoading}
-              pharmacies={pharmacies}
+              pharmacies={filteredPharmacies}
               language={language}
               filterParentRegion={filterParentRegion}
               filterRegion={filterRegion}
               filterStatus={filterStatus}
               searchQuery={searchQuery}
               filterOptions={filterOptions}
-              onFilterParentRegion={(v) => { setFilterParentRegion(v); setFilterRegion(""); }}
+              onFilterParentRegion={(v) => { setFilterParentRegion(v); setFilterRegion([]); }}
               onFilterRegion={(v) => setFilterRegion(v)}
               onFilterStatus={(v) => setFilterStatus(v)}
               onSearch={(v) => setSearchQuery(v)}
-              stats={stats}
+              stats={displayedStats}
             />
           )}
         </div>
