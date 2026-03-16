@@ -1058,8 +1058,8 @@ function MultiSelectDropdown({
       </button>
 
       {isOpen && (
-        <div className="absolute z-50 mt-1 w-[260px] max-h-[350px] bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-lg overflow-hidden flex flex-col">
-          <div className="p-2 border-b border-gray-100 dark:border-gray-700 shrink-0">
+        <div className="absolute z-50 mt-1 w-[260px] bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-lg flex flex-col">
+          <div className="p-2 border-b border-gray-100 dark:border-gray-700">
             <div className="relative">
               <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-gray-400" />
               <input
@@ -1073,7 +1073,7 @@ function MultiSelectDropdown({
             </div>
           </div>
           
-          <div className="flex-1 overflow-y-auto p-1 min-h-0">
+          <div className="max-h-60 overflow-y-auto p-1">
             {filteredOptions.length === 0 ? (
               <div className="px-3 py-2 text-sm text-gray-500 text-center">Ничего не найдено</div>
             ) : (
@@ -1106,7 +1106,7 @@ function MultiSelectDropdown({
             )}
           </div>
 
-          <div className="p-2 border-t border-gray-100 dark:border-gray-700 flex justify-end shrink-0 bg-white dark:bg-gray-800">
+          <div className="p-2 border-t border-gray-100 dark:border-gray-700 bg-white dark:bg-gray-800 rounded-b-md">
             <Button size="sm" onClick={applySelection} className="w-full bg-purple-600 hover:bg-purple-700">
               Применить
             </Button>
