@@ -43,7 +43,10 @@ import {
   Percent,
   BadgeCheck,
   Navigation,
+  Download,
+  FilterX
 } from "lucide-react";
+import * as XLSX from "xlsx";
 import { toast } from "sonner";
 import {
   getOsonPharmacies,
@@ -172,9 +175,9 @@ export default function OsonList() {
   });
 
   // Filter states
-  const [filterStatus, setFilterStatus] = useState<OsonStatus | "all">("all");
-  const [filterParentRegion, setFilterParentRegion] = useState<string>("");
-  const [filterRegion, setFilterRegion] = useState<string>("");
+  const [filterStatus, setFilterStatus] = useState<(OsonStatus | "all")[]>([]);
+  const [filterParentRegion, setFilterParentRegion] = useState<string[]>([]);
+  const [filterRegion, setFilterRegion] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [isFilterOpen, setIsFilterOpen] = useState(false);
 
@@ -204,9 +207,9 @@ export default function OsonList() {
     setIsLoading(true);
     try {
       const response = await getOsonPharmacies(token, {
-        status: filterStatus,
-        parentRegion: filterParentRegion || undefined,
-        region: filterRegion || undefined,
+        status: filterStatus.length > 0 ? filterStatus : ["all"],
+        parentRegion: filterParentRegion,
+        region: filterRegion,
         search: searchQuery || undefined,
       });
       setPharmacies(response.data);
@@ -321,6 +324,40 @@ export default function OsonList() {
     }
   };
 
+  // ─── Download Excel ───────────────────────────────────────────────────────
+
+  const handleDownloadExcel = () => {
+    if (pharmacies.length === 0) {
+      toast.error("Нет данных для скачивания");
+      return;
+    }
+
+    const dataToExport = pharmacies.map((p, index) => ({
+      "№": index + 1,
+      "Название": language === "uz" ? p.name_uz || p.name_ru : p.name_ru || p.name_uz,
+      "Статус": getStatusLabel(p.oson_status, language),
+      "Город": language === "uz" ? p.parent_region_uz || p.parent_region_ru : p.parent_region_ru || p.parent_region_uz,
+      "Район": language === "uz" ? p.region_uz || p.region_ru : p.region_ru || p.region_uz,
+      "Адрес": language === "uz" ? p.address_uz || p.address_ru : p.address_ru || p.address_uz,
+      "Ориентир": language === "uz" ? p.landmark_uz || p.landmark_ru : p.landmark_ru || p.landmark_uz,
+      "Телефон": p.phone || "",
+      "Время работы": `${p.open_time || ""} - ${p.close_time || ""}`,
+      "Доставка": p.has_delivery ? "Да" : "Нет",
+      "Скидка %": p.discount_percent || 0,
+      "Кэшбэк %": p.cashback_percent || 0,
+      "Верифицирован": p.is_verified ? "Да" : "Нет",
+      "Slug": p.slug,
+      "Обновлено": formatDateTime(p.last_synced_at)
+    }));
+
+    const worksheet = XLSX.utils.json_to_sheet(dataToExport);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Аптеки");
+
+    XLSX.writeFile(workbook, `OSON_Pharmacies_${new Date().toISOString().split('T')[0]}.xlsx`);
+    toast.success("Файл успешно скачан");
+  };
+
   // ─── Map markers ─────────────────────────────────────────────────────────
 
   const renderMapMarkers = useCallback(() => {
@@ -401,6 +438,26 @@ export default function OsonList() {
     );
   }
 
+  // Toggle status array filter
+  const toggleStatusFilter = (status: OsonStatus | "all") => {
+    if (status === "all") {
+      setFilterStatus([]);
+      return;
+    }
+    setFilterStatus(prev => {
+      if (prev.includes(status)) {
+        return prev.filter(s => s !== status);
+      } else {
+        return [...prev.filter(s => s !== "all"), status];
+      }
+    });
+  };
+
+  const isStatusActive = (status: OsonStatus | "all") => {
+    if (status === "all") return filterStatus.length === 0;
+    return filterStatus.includes(status);
+  };
+
   return (
     <div className="flex flex-col h-screen bg-gray-50 dark:bg-gray-900 overflow-hidden">
       <Header />
@@ -461,6 +518,20 @@ export default function OsonList() {
                 </button>
               </div>
 
+              {/* Download Excel button */}
+              {activeTab === "list" && (
+                <Button
+                  onClick={handleDownloadExcel}
+                  disabled={isLoading || pharmacies.length === 0}
+                  size="sm"
+                  variant="outline"
+                  className="gap-1.5 text-green-700 border-green-200 hover:bg-green-50 hover:text-green-800 dark:text-green-400 dark:border-green-800/50 dark:hover:bg-green-900/30"
+                >
+                  <Download className="h-4 w-4" />
+                  <span className="hidden sm:inline">Скачать</span>
+                </Button>
+              )}
+
               {/* Sync button */}
               <Button
                 onClick={() => setIsConfirmOpen(true)}
@@ -480,43 +551,36 @@ export default function OsonList() {
           {(isSyncing || syncStatus.isSyncing) && (
             <SyncProgressBar progress={syncProgress} />
           )}
+
           {/* ─── Stats cards ──────────────────────────────────────────── */}
           <div className="flex gap-2 flex-wrap">
             <StatsCard
               label="Всего"
               value={stats.total}
               color="gray"
-              onClick={() => setFilterStatus("all")}
-              active={filterStatus === "all"}
+              onClick={() => toggleStatusFilter("all")}
+              active={isStatusActive("all")}
             />
             <StatsCard
               label="Подключён"
               value={stats.connected}
               color="green"
-              onClick={() =>
-                setFilterStatus(filterStatus === "connected" ? "all" : "connected")
-              }
-              active={filterStatus === "connected"}
+              onClick={() => toggleStatusFilter("connected")}
+              active={isStatusActive("connected")}
             />
             <StatsCard
               label="Не подключён"
               value={stats.not_connected}
               color="amber"
-              onClick={() =>
-                setFilterStatus(
-                  filterStatus === "not_connected" ? "all" : "not_connected"
-                )
-              }
-              active={filterStatus === "not_connected"}
+              onClick={() => toggleStatusFilter("not_connected")}
+              active={isStatusActive("not_connected")}
             />
             <StatsCard
               label="Удалён"
               value={stats.deleted}
               color="red"
-              onClick={() =>
-                setFilterStatus(filterStatus === "deleted" ? "all" : "deleted")
-              }
-              active={filterStatus === "deleted"}
+              onClick={() => toggleStatusFilter("deleted")}
+              active={isStatusActive("deleted")}
             />
           </div>
 
@@ -533,34 +597,29 @@ export default function OsonList() {
               />
             </div>
 
-            <select
-              value={filterParentRegion}
-              onChange={(e) => {
-                setFilterParentRegion(e.target.value);
-                setFilterRegion("");
+            <MultiSelectDropdown
+              label="Выберите города"
+              options={filterOptions.parentRegions.map(r => ({
+                value: r.parent_region_ru,
+                label: language === "uz" ? r.parent_region_uz || r.parent_region_ru : r.parent_region_ru
+              }))}
+              selectedValues={filterParentRegion}
+              onChange={(v) => {
+                setFilterParentRegion(v);
+                setFilterRegion([]);
               }}
-              className="px-3 py-2 text-sm rounded-md border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-gray-200 min-w-[140px]"
-            >
-              <option value="">Все города</option>
-              {filterOptions.parentRegions.map((r) => (
-                <option key={r.parent_region_ru} value={r.parent_region_ru}>
-                  {language === "uz" ? r.parent_region_uz || r.parent_region_ru : r.parent_region_ru}
-                </option>
-              ))}
-            </select>
+            />
 
-            <select
-              value={filterRegion}
-              onChange={(e) => setFilterRegion(e.target.value)}
-              className="px-3 py-2 text-sm rounded-md border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-gray-200 min-w-[140px]"
-            >
-              <option value="">Все районы</option>
-              {filterOptions.regions.map((r) => (
-                <option key={r.region_ru} value={r.region_ru}>
-                  {language === "uz" ? r.region_uz || r.region_ru : r.region_ru}
-                </option>
-              ))}
-            </select>
+            <MultiSelectDropdown
+              label="Выберите районы"
+              options={filterOptions.regions.map(r => ({
+                value: r.region_ru,
+                label: language === "uz" ? r.region_uz || r.region_ru : r.region_ru
+              }))}
+              selectedValues={filterRegion}
+              onChange={setFilterRegion}
+            />
+
           </div>
           )}
         </div>
@@ -749,7 +808,8 @@ function ListTab({
   const TH = "px-3 py-2.5 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 whitespace-nowrap";
 
   return (
-    <div className="h-full overflow-auto">
+    <div className="flex flex-col h-full bg-white dark:bg-gray-800 overflow-hidden relative">
+      <div className="flex-1 overflow-auto">
       <table className="text-sm border-collapse" style={{ minWidth: "1900px", width: "100%" }}>
         <thead className="sticky top-0 z-10 bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700">
           <tr>
@@ -945,9 +1005,10 @@ function ListTab({
           })}
         </tbody>
       </table>
+      </div>
 
       {/* Footer */}
-      <div className="sticky bottom-0 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 px-4 py-2 text-xs text-gray-400 flex justify-between items-center">
+      <div className="shrink-0 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 px-4 py-2 text-xs text-gray-400 flex justify-between items-center w-full shadow-[0_-4px_6px_-1px_rgb(0,0,0,0.05)]">
         <span>Показано {pharmacies.length.toLocaleString()} аптек</span>
         <div className="flex items-center gap-4">
           <span className="flex items-center gap-1">
@@ -975,6 +1036,122 @@ function ListTab({
   );
 }
 
+// ─── MultiSelect Dropdown Component ──────────────────────────────────────────
+
+function MultiSelectDropdown({ 
+  label, 
+  options, 
+  selectedValues, 
+  onChange 
+}: { 
+  label: string;
+  options: { label: string; value: string }[];
+  selectedValues: string[];
+  onChange: (values: string[]) => void;
+}) {
+  const [isOpen, setIsOpen] = useState(false);
+  const [search, setSearch] = useState("");
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const filteredOptions = options.filter(opt => 
+    opt.label.toLowerCase().includes(search.toLowerCase())
+  );
+
+  const toggleOption = (value: string) => {
+    if (selectedValues.includes(value)) {
+      onChange(selectedValues.filter(v => v !== value));
+    } else {
+      onChange([...selectedValues, value]);
+    }
+  };
+
+  const clearSelection = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onChange([]);
+  };
+
+  return (
+    <div className="relative min-w-[200px]" ref={dropdownRef}>
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="w-full flex items-center justify-between px-3 py-2 text-sm rounded-md border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 transition-colors hover:bg-gray-50 focus:outline-none"
+      >
+        <span className="truncate pr-2">
+          {selectedValues.length === 0 
+            ? label 
+            : `${label} (${selectedValues.length})`}
+        </span>
+        <div className="flex items-center gap-1">
+          {selectedValues.length > 0 && (
+            <div 
+              onClick={clearSelection}
+              className="p-0.5 rounded-sm hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-500 hover:text-gray-700"
+            >
+              <FilterX className="h-3 w-3" />
+            </div>
+          )}
+          <ChevronDown className="h-4 w-4 text-gray-400" />
+        </div>
+      </button>
+
+      {isOpen && (
+        <div className="absolute z-50 mt-1 w-[260px] bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-lg overflow-hidden flex flex-col">
+          <div className="p-2 border-b border-gray-100 dark:border-gray-700">
+            <div className="relative">
+              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-gray-400" />
+              <input
+                type="text"
+                placeholder="Поиск..."
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+                className="w-full pl-8 pr-2 py-1.5 text-sm rounded bg-gray-50 dark:bg-gray-900 border border-transparent focus:border-purple-300 focus:bg-white focus:outline-none transition-colors"
+                autoFocus
+              />
+            </div>
+          </div>
+          
+          <div className="max-h-60 overflow-y-auto p-1">
+            {filteredOptions.length === 0 ? (
+              <div className="px-3 py-2 text-sm text-gray-500 text-center">Ничего не найдено</div>
+            ) : (
+              filteredOptions.map(option => {
+                const isSelected = selectedValues.includes(option.value);
+                return (
+                  <label 
+                    key={option.value} 
+                    className="flex items-center gap-2 px-3 py-2 rounded hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer group"
+                  >
+                    <div className={`w-4 h-4 rounded border flex items-center justify-center shrink-0 transition-colors ${
+                      isSelected 
+                        ? 'bg-purple-600 border-purple-600 text-white' 
+                        : 'border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800'
+                    }`}>
+                      {isSelected && <CheckCircle className="h-3 w-3" />}
+                    </div>
+                    <span className={`text-sm select-none ${isSelected ? 'font-medium text-gray-900 dark:text-white' : 'text-gray-700 dark:text-gray-300'}`}>
+                      {option.label}
+                    </span>
+                  </label>
+                );
+              })
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ─── Map Tab ──────────────────────────────────────────────────────────────────
 
 function MapTab({
@@ -997,14 +1174,14 @@ function MapTab({
   isLoading: boolean;
   pharmacies: OsonPharmacy[];
   language: string;
-  filterParentRegion: string;
-  filterRegion: string;
-  filterStatus: OsonStatus | "all";
+  filterParentRegion: string[];
+  filterRegion: string[];
+  filterStatus: (OsonStatus | "all")[];
   searchQuery: string;
   filterOptions: OsonFilterOptions;
-  onFilterParentRegion: (v: string) => void;
-  onFilterRegion: (v: string) => void;
-  onFilterStatus: (v: OsonStatus | "all") => void;
+  onFilterParentRegion: (v: string[]) => void;
+  onFilterRegion: (v: string[]) => void;
+  onFilterStatus: (status: OsonStatus | "all") => void;
   onSearch: (v: string) => void;
   stats: OsonStats;
 }) {
@@ -1043,32 +1220,33 @@ function MapTab({
           </div>
 
           {/* City filter */}
-          <select
-            value={filterParentRegion}
-            onChange={(e) => onFilterParentRegion(e.target.value)}
-            className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-gray-600 bg-white/95 dark:bg-gray-800/95 backdrop-blur text-gray-800 dark:text-gray-200 shadow-md focus:outline-none focus:ring-2 focus:ring-purple-500"
-          >
-            <option value="">Все города</option>
-            {filterOptions.parentRegions.map((r) => (
-              <option key={r.parent_region_ru} value={r.parent_region_ru}>
-                {language === "uz" ? r.parent_region_uz || r.parent_region_ru : r.parent_region_ru}
-              </option>
-            ))}
-          </select>
+          <div className="bg-white/95 dark:bg-gray-800/95 backdrop-blur rounded-lg shadow-md border border-gray-200 dark:border-gray-600">
+            <MultiSelectDropdown
+              label="Выберите города"
+              options={filterOptions.parentRegions.map(r => ({
+                value: r.parent_region_ru,
+                label: language === "uz" ? r.parent_region_uz || r.parent_region_ru : r.parent_region_ru
+              }))}
+              selectedValues={filterParentRegion}
+              onChange={(v) => {
+                onFilterParentRegion(v);
+                onFilterRegion([]);
+              }}
+            />
+          </div>
 
           {/* District filter */}
-          <select
-            value={filterRegion}
-            onChange={(e) => onFilterRegion(e.target.value)}
-            className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-gray-600 bg-white/95 dark:bg-gray-800/95 backdrop-blur text-gray-800 dark:text-gray-200 shadow-md focus:outline-none focus:ring-2 focus:ring-purple-500"
-          >
-            <option value="">Все районы</option>
-            {filterOptions.regions.map((r) => (
-              <option key={r.region_ru} value={r.region_ru}>
-                {language === "uz" ? r.region_uz || r.region_ru : r.region_ru}
-              </option>
-            ))}
-          </select>
+          <div className="bg-white/95 dark:bg-gray-800/95 backdrop-blur rounded-lg shadow-md border border-gray-200 dark:border-gray-600">
+            <MultiSelectDropdown
+              label="Выберите районы"
+              options={filterOptions.regions.map(r => ({
+                value: r.region_ru,
+                label: language === "uz" ? r.region_uz || r.region_ru : r.region_ru
+              }))}
+              selectedValues={filterRegion}
+              onChange={onFilterRegion}
+            />
+          </div>
 
           {/* Status filter chips */}
           <div className="bg-white/95 dark:bg-gray-800/95 backdrop-blur rounded-lg border border-gray-200 dark:border-gray-600 shadow-md p-2 flex flex-col gap-1">
@@ -1083,7 +1261,7 @@ function MapTab({
                 key={value}
                 onClick={() => onFilterStatus(value)}
                 className={`flex items-center gap-2 px-2 py-1.5 rounded text-xs text-left transition-colors ${
-                  filterStatus === value
+                  (value === "all" ? filterStatus.length === 0 : filterStatus.includes(value))
                     ? "bg-purple-100 dark:bg-purple-900/40 text-purple-700 dark:text-purple-300 font-medium"
                     : "text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
                 }`}

@@ -66,9 +66,9 @@ export interface OsonDataResponse {
 }
 
 export interface OsonFilters {
-  status?: OsonStatus | "all";
-  parentRegion?: string;
-  region?: string;
+  status?: (OsonStatus | "all")[] | OsonStatus | "all";
+  parentRegion?: string[] | string;
+  region?: string[] | string;
   search?: string;
 }
 
@@ -96,9 +96,15 @@ export async function getOsonPharmacies(
   filters: OsonFilters = {}
 ): Promise<OsonDataResponse> {
   const params = new URLSearchParams();
-  if (filters.status && filters.status !== "all") params.set("status", filters.status);
-  if (filters.parentRegion) params.set("parentRegion", filters.parentRegion);
-  if (filters.region) params.set("region", filters.region);
+  if (filters.status && filters.status !== "all" && (!Array.isArray(filters.status) || filters.status.length > 0)) {
+    params.set("status", Array.isArray(filters.status) ? filters.status.join(",") : filters.status);
+  }
+  if (filters.parentRegion && (!Array.isArray(filters.parentRegion) || filters.parentRegion.length > 0)) {
+    params.set("parentRegion", Array.isArray(filters.parentRegion) ? filters.parentRegion.join(",") : filters.parentRegion);
+  }
+  if (filters.region && (!Array.isArray(filters.region) || filters.region.length > 0)) {
+    params.set("region", Array.isArray(filters.region) ? filters.region.join(",") : filters.region);
+  }
   if (filters.search) params.set("search", filters.search);
 
   const url = `${BACKEND_URL}/api/oson/data${params.toString() ? `?${params}` : ""}`;
