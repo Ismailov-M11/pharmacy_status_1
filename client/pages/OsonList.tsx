@@ -454,7 +454,7 @@ export default function OsonList() {
       <main className="flex-1 flex flex-col overflow-hidden">
 
         {/* ─── Top bar ─────────────────────────────────────────────────── */}
-        <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 sm:px-6 py-3 flex flex-col gap-3 shrink-0">
+        <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 sm:px-6 py-3 flex flex-col gap-3 shrink-0 relative z-20">
           {/* Title + tabs + sync button */}
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="flex items-center gap-4">
@@ -585,30 +585,34 @@ export default function OsonList() {
               />
             </div>
 
-            <MultiSelectDropdown
-              label="Выберите города"
-              options={filterOptions.parentRegions.map(r => ({
-                value: r.parent_region_ru,
-                label: language === "uz" ? r.parent_region_uz || r.parent_region_ru : r.parent_region_ru
-              }))}
-              selectedValues={filterParentRegion}
-              onChange={(v) => {
-                setFilterParentRegion(v);
-                setFilterRegion([]);
-              }}
-              alignRight={true}
-            />
+            <div className="w-56 shrink-0">
+              <MultiSelectDropdown
+                label="Выберите города"
+                options={filterOptions.parentRegions.map(r => ({
+                  value: r.parent_region_ru,
+                  label: language === "uz" ? r.parent_region_uz || r.parent_region_ru : r.parent_region_ru
+                }))}
+                selectedValues={filterParentRegion}
+                onChange={(v) => {
+                  setFilterParentRegion(v);
+                  setFilterRegion([]);
+                }}
+                alignRight={true}
+              />
+            </div>
 
-            <MultiSelectDropdown
-              label="Выберите районы"
-              options={filterOptions.regions.map(r => ({
-                value: r.region_ru,
-                label: language === "uz" ? r.region_uz || r.region_ru : r.region_ru
-              }))}
-              selectedValues={filterRegion}
-              onChange={setFilterRegion}
-              alignRight={true}
-            />
+            <div className="w-56 shrink-0">
+              <MultiSelectDropdown
+                label="Выберите районы"
+                options={filterOptions.regions.map(r => ({
+                  value: r.region_ru,
+                  label: language === "uz" ? r.region_uz || r.region_ru : r.region_ru
+                }))}
+                selectedValues={filterRegion}
+                onChange={setFilterRegion}
+                alignRight={true}
+              />
+            </div>
 
           </div>
           )}
@@ -805,14 +809,14 @@ function ListTab({
           <tr>
             <th className={`${TH} w-12 text-center whitespace-nowrap`}>#</th>
             <th className={TH} style={{ minWidth: "180px" }}>Название</th>
+            <th className={TH} style={{ width: "180px", maxWidth: "180px" }}>Slug</th>
             <th className={TH}>Статус</th>
             <th className={TH}>Город</th>
             <th className={TH}>Район</th>
             <th className={TH} style={{ minWidth: "180px" }}>Адрес</th>
+            <th className={TH} style={{ minWidth: "150px" }}>Ориентир</th>
             <th className={TH}>Телефон</th>
             <th className={TH}>Время работы</th>
-            <th className={TH} style={{ width: "180px", maxWidth: "180px" }}>Slug</th>
-            <th className={TH} style={{ minWidth: "150px" }}>Ориентир</th>
             <th className={TH} style={{ minWidth: "130px" }}>Обновлено</th>
           </tr>
         </thead>
@@ -853,7 +857,7 @@ function ListTab({
                   {index + 1}
                 </td>
 
-                {/* Name — click opens detail modal */}
+                {/* Название */}
                 <td
                   className="px-3 py-2.5 text-gray-900 dark:text-gray-100 font-medium align-top cursor-pointer"
                   style={{ minWidth: "180px" }}
@@ -862,6 +866,16 @@ function ListTab({
                   <div className="break-words leading-snug hover:text-purple-600 dark:hover:text-purple-400 hover:underline" style={{ maxWidth: "220px" }}>
                     {name || "—"}
                   </div>
+                </td>
+
+                {/* Slug — truncated with tooltip */}
+                <td className="px-3 py-2.5 align-middle" style={{ maxWidth: "180px" }}>
+                  <code
+                    className="text-xs text-gray-400 dark:text-gray-500 bg-gray-100 dark:bg-gray-800 px-1.5 py-0.5 rounded block truncate"
+                    title={pharmacy.slug}
+                  >
+                    {pharmacy.slug}
+                  </code>
                 </td>
 
                 {/* Status */}
@@ -891,6 +905,13 @@ function ListTab({
                   </div>
                 </td>
 
+                {/* Ориентир (Landmark) */}
+                <td className="px-3 py-2.5 text-gray-500 dark:text-gray-400 text-xs align-top" style={{ minWidth: "150px" }}>
+                  <div className="break-words leading-snug" style={{ maxWidth: "200px" }}>
+                    {landmark || "—"}
+                  </div>
+                </td>
+
                 {/* Phone */}
                 <td className="px-3 py-2.5 align-middle whitespace-nowrap">
                   {pharmacy.phone ? (
@@ -917,23 +938,6 @@ function ListTab({
                   ) : (
                     "—"
                   )}
-                </td>
-
-                {/* Slug — truncated with tooltip */}
-                <td className="px-3 py-2.5 align-middle" style={{ maxWidth: "180px" }}>
-                  <code
-                    className="text-xs text-gray-400 dark:text-gray-500 bg-gray-100 dark:bg-gray-800 px-1.5 py-0.5 rounded block truncate"
-                    title={pharmacy.slug}
-                  >
-                    {pharmacy.slug}
-                  </code>
-                </td>
-
-                {/* Ориентир (Landmark) */}
-                <td className="px-3 py-2.5 text-gray-500 dark:text-gray-400 text-xs align-top" style={{ minWidth: "150px" }}>
-                  <div className="break-words leading-snug" style={{ maxWidth: "200px" }}>
-                    {landmark || "—"}
-                  </div>
                 </td>
 
                 {/* Last synced */}
@@ -1038,7 +1042,7 @@ function MultiSelectDropdown({
   };
 
   return (
-    <div className="relative min-w-[200px]" ref={dropdownRef}>
+    <div className="relative w-full" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
         className="w-full flex items-center justify-between px-3 py-2 text-sm rounded-md border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 transition-colors hover:bg-gray-50 focus:outline-none"
