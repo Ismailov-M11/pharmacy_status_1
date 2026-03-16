@@ -596,6 +596,7 @@ export default function OsonList() {
                 setFilterParentRegion(v);
                 setFilterRegion([]);
               }}
+              alignRight={true}
             />
 
             <MultiSelectDropdown
@@ -606,6 +607,7 @@ export default function OsonList() {
               }))}
               selectedValues={filterRegion}
               onChange={setFilterRegion}
+              alignRight={true}
             />
 
           </div>
@@ -980,12 +982,14 @@ function MultiSelectDropdown({
   label, 
   options, 
   selectedValues, 
-  onChange 
+  onChange,
+  alignRight
 }: { 
   label: string;
   options: { label: string; value: string }[];
   selectedValues: string[];
   onChange: (values: string[]) => void;
+  alignRight?: boolean;
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const [search, setSearch] = useState("");
@@ -1058,7 +1062,7 @@ function MultiSelectDropdown({
       </button>
 
       {isOpen && (
-        <div className="absolute z-50 mt-1 w-[260px] bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-lg flex flex-col">
+        <div className={`absolute z-50 mt-1 w-[260px] bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-lg flex flex-col ${alignRight ? 'right-0' : 'left-0'}`}>
           <div className="p-2 border-b border-gray-100 dark:border-gray-700">
             <div className="relative">
               <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-gray-400" />

@@ -181,7 +181,7 @@ export function GenericFilterModal({
                 </div>
 
                 {/* Values List */}
-                <div className="flex-1 overflow-y-auto p-2 min-h-0">
+                <div className="max-h-60 overflow-y-auto p-2">
                     {filteredValues.length === 0 ? (
                         <div className="text-center text-gray-500 py-4 text-sm">
                             {t.noResults}
