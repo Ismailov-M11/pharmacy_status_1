@@ -1081,23 +1081,21 @@ function MultiSelectDropdown({
             </div>
           </div>
           
-          <div className="max-h-60 overflow-y-auto p-1">
+          <div className="max-h-60 overflow-y-auto overscroll-contain p-1">
             {filteredOptions.length === 0 ? (
               <div className="px-3 py-2 text-sm text-gray-500 text-center">Ничего не найдено</div>
             ) : (
               filteredOptions.map(option => {
                 const isSelected = localSelected.includes(option.value);
                 return (
-                  <label 
+                  <div 
                     key={option.value} 
+                    onClick={(e) => {
+                      e.preventDefault();
+                      toggleOption(option.value);
+                    }}
                     className="flex items-center gap-2 px-3 py-2 rounded hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer group"
                   >
-                    <input
-                      type="checkbox"
-                      className="sr-only"
-                      checked={isSelected}
-                      onChange={() => toggleOption(option.value)}
-                    />
                     <div className={`w-4 h-4 rounded border flex items-center justify-center shrink-0 transition-colors ${
                       isSelected 
                         ? 'bg-purple-600 border-purple-600 text-white' 
@@ -1108,7 +1106,7 @@ function MultiSelectDropdown({
                     <span className={`text-sm select-none ${isSelected ? 'font-medium text-gray-900 dark:text-white' : 'text-gray-700 dark:text-gray-300'}`}>
                       {option.label}
                     </span>
-                  </label>
+                  </div>
                 );
               })
             )}
