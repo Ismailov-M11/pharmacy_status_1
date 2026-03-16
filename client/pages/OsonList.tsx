@@ -810,10 +810,6 @@ function ListTab({
             <th className={TH}>Телефон</th>
             <th className={TH}>Время работы</th>
             <th className={TH} style={{ width: "180px", maxWidth: "180px" }}>Slug</th>
-            <th className={TH}>Доставка</th>
-            <th className={TH}>Скидка</th>
-            <th className={TH}>Кэшбэк</th>
-            <th className={TH}>Верифицирован</th>
             <th className={TH} style={{ minWidth: "150px" }}>Ориентир</th>
             <th className={TH} style={{ minWidth: "130px" }}>Обновлено</th>
           </tr>
@@ -929,52 +925,6 @@ function ListTab({
                   >
                     {pharmacy.slug}
                   </code>
-                </td>
-
-                {/* Delivery */}
-                <td className="px-3 py-2.5 align-middle whitespace-nowrap">
-                  {pharmacy.has_delivery ? (
-                    <span className="flex items-center gap-1 text-emerald-600 dark:text-emerald-400 text-xs">
-                      <Truck className="h-3 w-3" />
-                      Есть
-                    </span>
-                  ) : (
-                    <span className="text-gray-400 text-xs">Нет</span>
-                  )}
-                </td>
-
-                {/* Скидка (Discount) */}
-                <td className="px-3 py-2.5 text-xs align-middle text-center whitespace-nowrap">
-                  {pharmacy.discount_percent > 0 ? (
-                    <span className="inline-flex items-center gap-0.5 text-blue-600 dark:text-blue-400 font-medium">
-                      {pharmacy.discount_percent}%
-                    </span>
-                  ) : (
-                    <span className="text-gray-400">—</span>
-                  )}
-                </td>
-
-                {/* Кэшбэк (Cashback) */}
-                <td className="px-3 py-2.5 text-xs align-middle text-center whitespace-nowrap">
-                  {pharmacy.cashback_percent > 0 ? (
-                    <span className="inline-flex items-center gap-0.5 text-teal-600 dark:text-teal-400 font-medium">
-                      {pharmacy.cashback_percent}%
-                    </span>
-                  ) : (
-                    <span className="text-gray-400">—</span>
-                  )}
-                </td>
-
-                {/* Верифицирован (Verified) */}
-                <td className="px-3 py-2.5 text-xs align-middle text-center whitespace-nowrap">
-                  {pharmacy.is_verified ? (
-                    <span className="inline-flex items-center gap-1 text-emerald-600 dark:text-emerald-400">
-                      <BadgeCheck className="h-3.5 w-3.5" />
-                      Да
-                    </span>
-                  ) : (
-                    <span className="text-gray-400">Нет</span>
-                  )}
                 </td>
 
                 {/* Ориентир (Landmark) */}
@@ -1108,8 +1058,8 @@ function MultiSelectDropdown({
       </button>
 
       {isOpen && (
-        <div className="absolute z-50 mt-1 w-[260px] bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-lg overflow-hidden flex flex-col">
-          <div className="p-2 border-b border-gray-100 dark:border-gray-700">
+        <div className="absolute z-50 mt-1 w-[260px] max-h-[350px] bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-lg overflow-hidden flex flex-col">
+          <div className="p-2 border-b border-gray-100 dark:border-gray-700 shrink-0">
             <div className="relative">
               <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-gray-400" />
               <input
@@ -1123,7 +1073,7 @@ function MultiSelectDropdown({
             </div>
           </div>
           
-          <div className="max-h-60 overflow-y-auto p-1">
+          <div className="flex-1 overflow-y-auto p-1 min-h-0">
             {filteredOptions.length === 0 ? (
               <div className="px-3 py-2 text-sm text-gray-500 text-center">Ничего не найдено</div>
             ) : (
@@ -1156,7 +1106,7 @@ function MultiSelectDropdown({
             )}
           </div>
 
-          <div className="p-2 border-t border-gray-100 dark:border-gray-700 flex justify-end">
+          <div className="p-2 border-t border-gray-100 dark:border-gray-700 flex justify-end shrink-0 bg-white dark:bg-gray-800">
             <Button size="sm" onClick={applySelection} className="w-full bg-purple-600 hover:bg-purple-700">
               Применить
             </Button>
