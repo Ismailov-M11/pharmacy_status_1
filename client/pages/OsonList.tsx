@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import React, { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
@@ -206,8 +206,11 @@ export default function OsonList() {
     if (!token) return;
     setIsLoading(true);
     try {
+      // NOTE: We fetch ALL statuses from the backend so we can calculate accurate counts 
+      // for the status toggle buttons on the frontend. The status filtering is then 
+      // done purely on the frontend based on the `pharmacies` array.
       const response = await getOsonPharmacies(token, {
-        status: filterStatus.length > 0 ? filterStatus : ["all"],
+        status: ["all"],
         parentRegion: filterParentRegion,
         region: filterRegion,
         search: searchQuery || undefined,
@@ -222,7 +225,7 @@ export default function OsonList() {
     } finally {
       setIsLoading(false);
     }
-  }, [token, filterStatus, filterParentRegion, filterRegion, searchQuery]);
+  }, [token, filterParentRegion, filterRegion, searchQuery]); // removed filterStatus
 
   // Initial load
   useEffect(() => {
@@ -445,6 +448,30 @@ export default function OsonList() {
     if (status === "all") return filterStatus.length === 0;
     return filterStatus.includes(status);
   };
+
+  // ─── Frontend Stats & Filtering ──────────────────────────────────────────
+
+  // Calculate dynamic stats from fetched pharmacies (which represent the current city/search filters)
+  const displayedStats = useMemo(() => {
+    return pharmacies.reduce(
+      (acc, p) => {
+        acc.total++;
+        if (p.oson_status === "connected") acc.connected++;
+        else if (p.oson_status === "not_connected") acc.not_connected++;
+        else if (p.oson_status === "deleted") acc.deleted++;
+        return acc;
+      },
+      { total: 0, connected: 0, not_connected: 0, deleted: 0, lastSyncedAt: stats.lastSyncedAt }
+    );
+  }, [pharmacies, stats.lastSyncedAt]);
+
+  // Apply the status filter on the frontend for rendering
+  const filteredPharmacies = useMemo(() => {
+    if (filterStatus.length === 0 || filterStatus.includes("all")) {
+      return pharmacies;
+    }
+    return pharmacies.filter(p => filterStatus.includes(p.oson_status));
+  }, [pharmacies, filterStatus]);
 
   return (
     <div className="flex flex-col h-screen bg-gray-50 dark:bg-gray-900 overflow-hidden">
@@ -1216,6 +1243,7 @@ function MapTab({
               { value: "all", label: `Все (${stats.total})`, dot: "bg-gray-400" },
               { value: "connected", label: `Подключён (${stats.connected})`, dot: "bg-emerald-500" },
               { value: "not_connected", label: `Не подключён (${stats.not_connected})`, dot: "bg-amber-500" },
+              { value: "deleted", label: `Удалён (${stats.deleted})`, dot: "bg-red-500" },
             ] as { value: OsonStatus | "all"; label: string; dot: string }[]
           ).map(({ value, label, dot }) => (
             <button
