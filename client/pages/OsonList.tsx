@@ -330,13 +330,13 @@ export default function OsonList() {
   // ─── Download Excel ───────────────────────────────────────────────────────
 
   const handleDownloadExcel = () => {
-    if (pharmacies.length === 0) {
+    if (filteredPharmacies.length === 0) {
       toast.error("Нет данных для скачивания");
       return;
     }
 
     // Export raw data directly from DB columns
-    const dataToExport = pharmacies.map((p, index) => ({
+    const dataToExport = filteredPharmacies.map((p, index) => ({
       ...p,
       "№_пп": index + 1 // Add a sequence number at the end or keep raw
     }));
