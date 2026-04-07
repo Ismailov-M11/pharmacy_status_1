@@ -72,6 +72,15 @@ export interface Campaign {
   source?: string;
   active?: boolean;
   createdAt?: string;
+  creationDate?: string;
+  modifiedDate?: string;
+  createdBy?: string;
+  modifiedBy?: string;
+  totalCount?: number;
+  successCount?: number;
+  failCount?: number;
+  tgCount?: number | null;
+  mobileCount?: number | null;
   [key: string]: any;
 }
 

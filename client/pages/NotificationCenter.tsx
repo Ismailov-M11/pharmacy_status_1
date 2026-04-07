@@ -623,23 +623,35 @@ function CampaignsTab({
           <table className="w-full text-sm">
             <thead>
               <tr className="bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
-                <th className="px-4 py-3 text-left font-semibold text-gray-600 dark:text-gray-400 w-14">
+                <th className="px-4 py-3 text-left font-semibold text-gray-600 dark:text-gray-400 w-12">
                   №
                 </th>
                 <th className="px-4 py-3 text-left font-semibold text-gray-600 dark:text-gray-400">
-                  Заголовок
-                </th>
-                <th className="px-4 py-3 text-left font-semibold text-gray-600 dark:text-gray-400 hidden md:table-cell">
-                  Текст
+                  Заголовок / Текст
                 </th>
                 <th className="px-4 py-3 text-left font-semibold text-gray-600 dark:text-gray-400">
                   Статус
                 </th>
-                <th className="px-4 py-3 text-left font-semibold text-gray-600 dark:text-gray-400 hidden lg:table-cell">
+                <th className="px-4 py-3 text-left font-semibold text-gray-600 dark:text-gray-400 hidden md:table-cell">
                   Тип
                 </th>
-                <th className="px-4 py-3 text-left font-semibold text-gray-600 dark:text-gray-400 hidden lg:table-cell">
-                  Источник
+                <th className="px-4 py-3 text-center font-semibold text-gray-600 dark:text-gray-400 hidden lg:table-cell">
+                  Всего
+                </th>
+                <th className="px-4 py-3 text-center font-semibold text-gray-600 dark:text-gray-400 hidden lg:table-cell">
+                  Успешно
+                </th>
+                <th className="px-4 py-3 text-center font-semibold text-gray-600 dark:text-gray-400 hidden lg:table-cell">
+                  Ошибок
+                </th>
+                <th className="px-4 py-3 text-center font-semibold text-gray-600 dark:text-gray-400 hidden xl:table-cell">
+                  TG
+                </th>
+                <th className="px-4 py-3 text-center font-semibold text-gray-600 dark:text-gray-400 hidden xl:table-cell">
+                  Mobile
+                </th>
+                <th className="px-4 py-3 text-left font-semibold text-gray-600 dark:text-gray-400 hidden xl:table-cell">
+                  Создал
                 </th>
                 <th className="px-4 py-3 text-left font-semibold text-gray-600 dark:text-gray-400 hidden lg:table-cell">
                   Дата
@@ -648,19 +660,16 @@ function CampaignsTab({
             </thead>
             <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
               {isLoading ? (
-                <SkeletonRows cols={7} />
+                <SkeletonRows cols={11} />
               ) : error ? (
                 <tr>
-                  <td
-                    colSpan={7}
-                    className="px-4 py-3 text-center text-red-500"
-                  >
+                  <td colSpan={11} className="px-4 py-3 text-center text-red-500">
                     {error}
                   </td>
                 </tr>
               ) : items.length === 0 ? (
                 <tr>
-                  <td colSpan={7}>
+                  <td colSpan={11}>
                     <EmptyState message="Нет кампаний" />
                   </td>
                 </tr>
@@ -673,32 +682,53 @@ function CampaignsTab({
                     <td className="px-4 py-3 text-gray-500 dark:text-gray-400 tabular-nums">
                       {page * PAGE_SIZE + idx + 1}
                     </td>
-                    <td className="px-4 py-3 text-gray-900 dark:text-gray-100 font-medium">
-                      <div className="max-w-[200px] truncate">
+                    <td className="px-4 py-3">
+                      <div className="font-medium text-gray-900 dark:text-gray-100 max-w-[220px] truncate">
                         {item.titleRu || item.title || "—"}
                       </div>
                       {item.titleRu && item.title && item.title !== item.titleRu && (
-                        <div className="text-xs text-gray-400 dark:text-gray-500 truncate max-w-[200px]">
+                        <div className="text-xs text-gray-400 dark:text-gray-500 max-w-[220px] truncate">
                           {item.title}
                         </div>
                       )}
-                    </td>
-                    <td className="px-4 py-3 text-gray-600 dark:text-gray-400 hidden md:table-cell">
-                      <div className="max-w-[280px] truncate">
-                        {item.bodyRu || item.body || "—"}
+                      <div className="text-xs text-gray-500 dark:text-gray-400 max-w-[220px] truncate mt-0.5">
+                        {item.bodyRu || item.body || ""}
                       </div>
                     </td>
                     <td className="px-4 py-3">
                       <StatusBadge status={item.status} />
                     </td>
-                    <td className="px-4 py-3 text-gray-500 dark:text-gray-400 hidden lg:table-cell">
-                      {item.type || "—"}
+                    <td className="px-4 py-3 hidden md:table-cell">
+                      <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300">
+                        {item.type || "—"}
+                      </span>
                     </td>
-                    <td className="px-4 py-3 text-gray-500 dark:text-gray-400 hidden lg:table-cell">
-                      {item.source || "—"}
+                    <td className="px-4 py-3 text-center hidden lg:table-cell">
+                      <span className="font-semibold text-gray-700 dark:text-gray-300">
+                        {item.totalCount ?? "—"}
+                      </span>
                     </td>
-                    <td className="px-4 py-3 text-gray-500 dark:text-gray-400 hidden lg:table-cell text-xs">
-                      {formatDate(item.createdAt)}
+                    <td className="px-4 py-3 text-center hidden lg:table-cell">
+                      <span className="font-semibold text-green-600 dark:text-green-400">
+                        {item.successCount ?? "—"}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3 text-center hidden lg:table-cell">
+                      <span className={`font-semibold ${(item.failCount ?? 0) > 0 ? "text-red-500 dark:text-red-400" : "text-gray-400 dark:text-gray-500"}`}>
+                        {item.failCount ?? "—"}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3 text-center hidden xl:table-cell text-gray-600 dark:text-gray-400">
+                      {item.tgCount ?? "—"}
+                    </td>
+                    <td className="px-4 py-3 text-center hidden xl:table-cell text-gray-600 dark:text-gray-400">
+                      {item.mobileCount ?? "—"}
+                    </td>
+                    <td className="px-4 py-3 hidden xl:table-cell text-gray-500 dark:text-gray-400 text-xs">
+                      {item.createdBy || "—"}
+                    </td>
+                    <td className="px-4 py-3 hidden lg:table-cell text-gray-500 dark:text-gray-400 text-xs whitespace-nowrap">
+                      {formatDate(item.creationDate || item.createdAt)}
                     </td>
                   </tr>
                 ))
