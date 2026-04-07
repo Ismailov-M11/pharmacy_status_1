@@ -13,6 +13,13 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Bell,
@@ -23,6 +30,10 @@ import {
   ChevronLeft,
   ChevronRight,
   AlertCircle,
+  Filter,
+  X,
+  User,
+  Smartphone,
 } from "lucide-react";
 import { toast } from "sonner";
 import {
@@ -351,24 +362,56 @@ function CreateCampaignModal({
 
 // ─── Notifications Tab ────────────────────────────────────────────────────────
 
+interface NotifFilters {
+  searchKey: string;
+  status: string;
+  campaignId: string;
+  fromDate: string;
+  toDate: string;
+}
+
+const EMPTY_NOTIF_FILTERS: NotifFilters = {
+  searchKey: "",
+  status: "",
+  campaignId: "",
+  fromDate: "",
+  toDate: "",
+};
+
 function NotificationsTab({ token }: { token: string }) {
   const [items, setItems] = useState<Notification[]>([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(0);
-  const [search, setSearch] = useState("");
-  const [searchInput, setSearchInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showFilters, setShowFilters] = useState(false);
+
+  // Applied filters (trigger reload)
+  const [appliedFilters, setAppliedFilters] = useState<NotifFilters>(EMPTY_NOTIF_FILTERS);
+  // Draft filters (in the form)
+  const [draftFilters, setDraftFilters] = useState<NotifFilters>(EMPTY_NOTIF_FILTERS);
+
+  const hasActiveFilters =
+    appliedFilters.status !== "" ||
+    appliedFilters.campaignId !== "" ||
+    appliedFilters.fromDate !== "" ||
+    appliedFilters.toDate !== "" ||
+    appliedFilters.searchKey !== "";
 
   const load = useCallback(
-    async (p: number, s: string) => {
+    async (p: number, filters: NotifFilters) => {
       setIsLoading(true);
       setError(null);
       try {
         const data = await fetchNotifications(token, {
           page: p,
           size: PAGE_SIZE,
-          searchKey: s || undefined,
+          searchKey: filters.searchKey || undefined,
+          status: filters.status || undefined,
+          campaignId: filters.campaignId ? Number(filters.campaignId) : undefined,
+          fromDate: filters.fromDate ? new Date(filters.fromDate).toISOString() : undefined,
+          toDate: filters.toDate ? new Date(filters.toDate).toISOString() : undefined,
+          dateField: filters.fromDate || filters.toDate ? "processedAt" : undefined,
         });
         setItems(extractNotifications(data));
         setTotal(extractNotificationTotal(data));
@@ -383,43 +426,77 @@ function NotificationsTab({ token }: { token: string }) {
   );
 
   useEffect(() => {
-    load(page, search);
-  }, [page, search, load]);
+    load(page, appliedFilters);
+  }, [page, appliedFilters, load]);
 
-  const handleSearch = () => {
+  const handleApply = () => {
     setPage(0);
-    setSearch(searchInput);
+    setAppliedFilters({ ...draftFilters });
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter") handleSearch();
+  const handleReset = () => {
+    setDraftFilters(EMPTY_NOTIF_FILTERS);
+    setAppliedFilters(EMPTY_NOTIF_FILTERS);
+    setPage(0);
+  };
+
+  const handleSearchKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") handleApply();
   };
 
   return (
     <div>
-      {/* Search bar */}
-      <div className="flex items-center gap-2 mb-4">
+      {/* Toolbar */}
+      <div className="flex items-center gap-2 mb-3">
         <div className="relative flex-1 max-w-sm">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
           <Input
-            placeholder="Поиск уведомлений..."
-            value={searchInput}
-            onChange={(e) => setSearchInput(e.target.value)}
-            onKeyDown={handleKeyDown}
+            placeholder="Поиск..."
+            value={draftFilters.searchKey}
+            onChange={(e) =>
+              setDraftFilters((f) => ({ ...f, searchKey: e.target.value }))
+            }
+            onKeyDown={handleSearchKeyDown}
             className="pl-9 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-100"
           />
         </div>
         <Button
           variant="outline"
-          onClick={handleSearch}
+          onClick={handleApply}
           className="dark:border-gray-700 dark:text-gray-300"
         >
           Найти
         </Button>
         <Button
+          variant={showFilters ? "default" : "outline"}
+          onClick={() => setShowFilters((v) => !v)}
+          className={
+            showFilters
+              ? "bg-purple-600 hover:bg-purple-700 text-white gap-1"
+              : "dark:border-gray-700 dark:text-gray-300 gap-1"
+          }
+        >
+          <Filter className="h-4 w-4" />
+          Фильтры
+          {hasActiveFilters && (
+            <span className="ml-1 h-2 w-2 rounded-full bg-orange-400 inline-block" />
+          )}
+        </Button>
+        {hasActiveFilters && (
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={handleReset}
+            title="Сбросить фильтры"
+            className="text-gray-400 hover:text-red-500"
+          >
+            <X className="h-4 w-4" />
+          </Button>
+        )}
+        <Button
           variant="ghost"
           size="icon"
-          onClick={() => load(page, search)}
+          onClick={() => load(page, appliedFilters)}
           className="text-gray-500 dark:text-gray-400 hover:text-purple-600"
           title="Обновить"
         >
@@ -427,85 +504,265 @@ function NotificationsTab({ token }: { token: string }) {
         </Button>
       </div>
 
+      {/* Filter panel */}
+      {showFilters && (
+        <div className="mb-4 p-4 rounded-lg bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 space-y-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+            {/* Status */}
+            <div className="space-y-1">
+              <label className="text-xs font-medium text-gray-600 dark:text-gray-400">
+                Статус
+              </label>
+              <Select
+                value={draftFilters.status || "ALL"}
+                onValueChange={(v) =>
+                  setDraftFilters((f) => ({ ...f, status: v === "ALL" ? "" : v }))
+                }
+              >
+                <SelectTrigger className="dark:bg-gray-800 dark:border-gray-600 dark:text-gray-100 h-9 text-sm">
+                  <SelectValue placeholder="Все статусы" />
+                </SelectTrigger>
+                <SelectContent className="dark:bg-gray-800 dark:border-gray-700">
+                  <SelectItem value="ALL">Все статусы</SelectItem>
+                  <SelectItem value="SUCCESS">SUCCESS</SelectItem>
+                  <SelectItem value="FAILED">FAILED</SelectItem>
+                  <SelectItem value="PENDING">PENDING</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Campaign ID */}
+            <div className="space-y-1">
+              <label className="text-xs font-medium text-gray-600 dark:text-gray-400">
+                ID кампании
+              </label>
+              <Input
+                type="number"
+                placeholder="Например: 40"
+                value={draftFilters.campaignId}
+                onChange={(e) =>
+                  setDraftFilters((f) => ({ ...f, campaignId: e.target.value }))
+                }
+                className="h-9 text-sm dark:bg-gray-800 dark:border-gray-600 dark:text-gray-100"
+              />
+            </div>
+
+            {/* From date */}
+            <div className="space-y-1">
+              <label className="text-xs font-medium text-gray-600 dark:text-gray-400">
+                Дата от
+              </label>
+              <Input
+                type="date"
+                value={draftFilters.fromDate}
+                onChange={(e) =>
+                  setDraftFilters((f) => ({ ...f, fromDate: e.target.value }))
+                }
+                className="h-9 text-sm dark:bg-gray-800 dark:border-gray-600 dark:text-gray-100"
+              />
+            </div>
+
+            {/* To date */}
+            <div className="space-y-1">
+              <label className="text-xs font-medium text-gray-600 dark:text-gray-400">
+                Дата до
+              </label>
+              <Input
+                type="date"
+                value={draftFilters.toDate}
+                onChange={(e) =>
+                  setDraftFilters((f) => ({ ...f, toDate: e.target.value }))
+                }
+                className="h-9 text-sm dark:bg-gray-800 dark:border-gray-600 dark:text-gray-100"
+              />
+            </div>
+          </div>
+
+          <div className="flex gap-2 pt-1">
+            <Button
+              size="sm"
+              onClick={handleApply}
+              className="bg-purple-600 hover:bg-purple-700 text-white"
+            >
+              Применить
+            </Button>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={handleReset}
+              className="dark:border-gray-600 dark:text-gray-300"
+            >
+              Сбросить
+            </Button>
+          </div>
+        </div>
+      )}
+
       {/* Table */}
       <div className="rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
               <tr className="bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
-                <th className="px-4 py-3 text-left font-semibold text-gray-600 dark:text-gray-400 w-14">
+                <th className="px-4 py-3 text-left font-semibold text-gray-600 dark:text-gray-400 w-12">
                   №
                 </th>
                 <th className="px-4 py-3 text-left font-semibold text-gray-600 dark:text-gray-400">
-                  Заголовок
+                  Кампания
                 </th>
                 <th className="px-4 py-3 text-left font-semibold text-gray-600 dark:text-gray-400 hidden md:table-cell">
-                  Текст
+                  Получатель
                 </th>
                 <th className="px-4 py-3 text-left font-semibold text-gray-600 dark:text-gray-400">
                   Статус
                 </th>
                 <th className="px-4 py-3 text-left font-semibold text-gray-600 dark:text-gray-400 hidden lg:table-cell">
-                  Источник
+                  Канал
                 </th>
                 <th className="px-4 py-3 text-left font-semibold text-gray-600 dark:text-gray-400 hidden lg:table-cell">
-                  Дата
+                  Обработано
+                </th>
+                <th className="px-4 py-3 text-left font-semibold text-gray-600 dark:text-gray-400 hidden xl:table-cell">
+                  Ошибка
                 </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
               {isLoading ? (
-                <SkeletonRows cols={6} />
+                <SkeletonRows cols={7} />
               ) : error ? (
                 <tr>
-                  <td
-                    colSpan={6}
-                    className="px-4 py-3 text-center text-red-500"
-                  >
+                  <td colSpan={7} className="px-4 py-3 text-center text-red-500">
                     {error}
                   </td>
                 </tr>
               ) : items.length === 0 ? (
                 <tr>
-                  <td colSpan={6}>
+                  <td colSpan={7}>
                     <EmptyState message="Нет уведомлений за выбранный период" />
                   </td>
                 </tr>
               ) : (
-                items.map((item, idx) => (
-                  <tr
-                    key={item.id ?? idx}
-                    className="hover:bg-gray-50 dark:hover:bg-gray-800/60 transition-colors"
-                  >
-                    <td className="px-4 py-3 text-gray-500 dark:text-gray-400 tabular-nums">
-                      {page * PAGE_SIZE + idx + 1}
-                    </td>
-                    <td className="px-4 py-3 text-gray-900 dark:text-gray-100 font-medium">
-                      <div className="max-w-[200px] truncate">
-                        {item.titleRu || item.title || "—"}
-                      </div>
-                      {item.titleRu && item.title && item.title !== item.titleRu && (
-                        <div className="text-xs text-gray-400 dark:text-gray-500 truncate max-w-[200px]">
-                          {item.title}
-                        </div>
-                      )}
-                    </td>
-                    <td className="px-4 py-3 text-gray-600 dark:text-gray-400 hidden md:table-cell">
-                      <div className="max-w-[280px] truncate">
-                        {item.bodyRu || item.body || "—"}
-                      </div>
-                    </td>
-                    <td className="px-4 py-3">
-                      <StatusBadge status={item.status} />
-                    </td>
-                    <td className="px-4 py-3 text-gray-500 dark:text-gray-400 hidden lg:table-cell">
-                      {item.source || "—"}
-                    </td>
-                    <td className="px-4 py-3 text-gray-500 dark:text-gray-400 hidden lg:table-cell text-xs">
-                      {formatDate(item.createdAt || item.sentAt)}
-                    </td>
-                  </tr>
-                ))
+                items.map((item, idx) => {
+                  const camp = item.campaign;
+                  const usr = item.user;
+                  const dev = item.device;
+                  const channel = usr && !dev ? "user" : dev ? "device" : null;
+                  return (
+                    <tr
+                      key={item.id ?? idx}
+                      className="hover:bg-gray-50 dark:hover:bg-gray-800/60 transition-colors"
+                    >
+                      <td className="px-4 py-3 text-gray-500 dark:text-gray-400 tabular-nums">
+                        {page * PAGE_SIZE + idx + 1}
+                      </td>
+                      {/* Campaign */}
+                      <td className="px-4 py-3">
+                        {camp ? (
+                          <>
+                            <div className="font-medium text-gray-900 dark:text-gray-100 max-w-[200px] truncate">
+                              {camp.titleRu || camp.title || `#${camp.id}`}
+                            </div>
+                            {camp.titleRu && camp.title && camp.title !== camp.titleRu && (
+                              <div className="text-xs text-gray-400 dark:text-gray-500 max-w-[200px] truncate">
+                                {camp.title}
+                              </div>
+                            )}
+                            <div className="text-xs text-gray-500 dark:text-gray-400 max-w-[200px] truncate mt-0.5">
+                              {camp.bodyRu || camp.body || ""}
+                            </div>
+                            <div className="flex items-center gap-1 mt-1">
+                              <span className="text-xs px-1.5 py-0.5 rounded bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400">
+                                #{camp.id}
+                              </span>
+                              {camp.type && (
+                                <span className="text-xs px-1.5 py-0.5 rounded bg-purple-50 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400">
+                                  {camp.type}
+                                </span>
+                              )}
+                            </div>
+                          </>
+                        ) : (
+                          <span className="text-gray-400">—</span>
+                        )}
+                      </td>
+                      {/* Recipient */}
+                      <td className="px-4 py-3 hidden md:table-cell">
+                        {usr ? (
+                          <div className="flex items-start gap-1.5">
+                            <User className="h-3.5 w-3.5 text-blue-400 mt-0.5 shrink-0" />
+                            <div>
+                              {(usr.firstName || usr.lastName) && (
+                                <div className="text-gray-900 dark:text-gray-100 text-xs font-medium">
+                                  {[usr.firstName, usr.lastName].filter(Boolean).join(" ")}
+                                </div>
+                              )}
+                              <div className="text-gray-500 dark:text-gray-400 text-xs">
+                                {usr.phone || `#${usr.id}`}
+                              </div>
+                              {usr.gender && (
+                                <div className="text-gray-400 dark:text-gray-500 text-xs">
+                                  {usr.gender === "MALE" ? "М" : "Ж"}
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        ) : dev ? (
+                          <div className="flex items-start gap-1.5">
+                            <Smartphone className="h-3.5 w-3.5 text-green-400 mt-0.5 shrink-0" />
+                            <div>
+                              <div className="text-gray-600 dark:text-gray-400 text-xs">
+                                {dev.deviceType || dev.name || "Устройство"}
+                              </div>
+                              {dev.token && (
+                                <div
+                                  className="text-gray-400 dark:text-gray-500 text-xs max-w-[160px] truncate"
+                                  title={dev.token}
+                                >
+                                  {dev.token.slice(0, 20)}…
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        ) : (
+                          <span className="text-gray-400 text-xs">—</span>
+                        )}
+                      </td>
+                      {/* Status */}
+                      <td className="px-4 py-3">
+                        <StatusBadge status={item.status ?? undefined} />
+                      </td>
+                      {/* Channel */}
+                      <td className="px-4 py-3 hidden lg:table-cell">
+                        {channel === "user" ? (
+                          <span className="inline-flex items-center gap-1 text-xs text-blue-600 dark:text-blue-400">
+                            <User className="h-3 w-3" /> App
+                          </span>
+                        ) : channel === "device" ? (
+                          <span className="inline-flex items-center gap-1 text-xs text-green-600 dark:text-green-400">
+                            <Smartphone className="h-3 w-3" /> Push
+                          </span>
+                        ) : (
+                          <span className="text-gray-400 text-xs">—</span>
+                        )}
+                      </td>
+                      {/* Processed At */}
+                      <td className="px-4 py-3 hidden lg:table-cell text-gray-500 dark:text-gray-400 text-xs whitespace-nowrap">
+                        {formatDate(item.processedAt ?? undefined)}
+                      </td>
+                      {/* Error */}
+                      <td className="px-4 py-3 hidden xl:table-cell">
+                        {item.error ? (
+                          <span className="text-xs text-red-500 dark:text-red-400 max-w-[160px] truncate block" title={item.error}>
+                            {item.error}
+                          </span>
+                        ) : (
+                          <span className="text-gray-300 dark:text-gray-600 text-xs">—</span>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })
               )}
             </tbody>
           </table>

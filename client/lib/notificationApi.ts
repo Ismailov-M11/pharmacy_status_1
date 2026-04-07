@@ -18,6 +18,10 @@ export interface NotificationListRequest {
   dateField?: string;
   fromDate?: string;
   toDate?: string;
+  gender?: "MALE" | "FEMALE";
+  age?: number;
+  minAge?: number;
+  maxAge?: number;
 }
 
 export interface CampaignListRequest {
@@ -47,17 +51,58 @@ export interface CreateCampaignRequest {
   source: "HAMBI";
 }
 
+export interface NotificationCampaign {
+  id: number;
+  title?: string | null;
+  titleRu?: string | null;
+  body?: string | null;
+  bodyRu?: string | null;
+  type?: string | null;
+  status?: string | null;
+  totalCount?: number;
+  successCount?: number;
+  failCount?: number;
+  tgCount?: number | null;
+  mobileCount?: number | null;
+  createdBy?: string | null;
+  creationDate?: string | null;
+  modifiedDate?: string | null;
+}
+
+export interface NotificationUser {
+  id: number;
+  firstName?: string | null;
+  lastName?: string | null;
+  phone?: string | null;
+  gender?: string | null;
+  dateOfBirth?: string | null;
+  age?: number | null;
+  source?: string | null;
+  isVerified?: boolean | null;
+  deviceVerified?: boolean;
+}
+
+export interface NotificationDevice {
+  name?: string | null;
+  token?: string | null;
+  version?: string | null;
+  deviceId?: string | null;
+  deviceInfo?: string | null;
+  deviceType?: string | null;
+  lastLoginTime?: string | null;
+  createdDate?: string | null;
+  modifiedDate?: string | null;
+}
+
 export interface Notification {
   id: number;
-  title?: string;
-  titleRu?: string;
-  body?: string;
-  bodyRu?: string;
-  status?: string;
-  source?: string;
-  campaignId?: number;
-  createdAt?: string;
-  sentAt?: string;
+  campaign?: NotificationCampaign | null;
+  user?: NotificationUser | null;
+  device?: NotificationDevice | null;
+  status?: string | null;
+  error?: string | null;
+  processedAt?: string | null;
+  destination?: string | null;
   [key: string]: any;
 }
 
