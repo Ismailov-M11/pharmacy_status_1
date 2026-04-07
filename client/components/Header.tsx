@@ -341,21 +341,7 @@ export function Header() {
                 })}
               </div>
 
-              {/* Footer */}
-              <div className="mx-2 mb-2 mt-1 border-t border-gray-100 dark:border-gray-800 pt-2">
-                <button
-                  onClick={() => {
-                    handleLogout();
-                    setMenuOpen(false);
-                  }}
-                  className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-red-500 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors duration-150 group"
-                >
-                  <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-red-100 dark:bg-red-900/40 shrink-0 group-hover:scale-105 transition-transform duration-150">
-                    <LogOut className="h-4 w-4 text-red-500 dark:text-red-400" />
-                  </div>
-                  <span className="font-medium">{t.logout || "Выход"}</span>
-                </button>
-              </div>
+              <div className="pb-2" />
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
