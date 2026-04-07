@@ -779,6 +779,190 @@ function NotificationsTab({ token }: { token: string }) {
   );
 }
 
+// ─── Campaign Detail Modal ────────────────────────────────────────────────────
+
+function CampaignDetailModal({
+  campaign,
+  onClose,
+}: {
+  campaign: Campaign | null;
+  onClose: () => void;
+}) {
+  if (!campaign) return null;
+
+  const total = campaign.totalCount ?? 0;
+  const success = campaign.successCount ?? 0;
+  const fail = campaign.failCount ?? 0;
+  const successPct = total > 0 ? Math.round((success / total) * 100) : 0;
+  const failPct = total > 0 ? Math.round((fail / total) * 100) : 0;
+
+  return (
+    <Dialog open={!!campaign} onOpenChange={onClose}>
+      <DialogContent className="max-w-lg dark:bg-gray-800 dark:border-gray-700 p-0 overflow-hidden">
+        {/* Header */}
+        <div className="bg-gradient-to-r from-purple-600 to-purple-700 dark:from-purple-800 dark:to-purple-900 px-6 py-5">
+          <div className="flex items-start justify-between gap-3">
+            <div className="flex items-center gap-3">
+              <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-white/20 shrink-0">
+                <Megaphone className="h-5 w-5 text-white" />
+              </div>
+              <div>
+                <div className="text-white font-semibold text-base leading-tight">
+                  {campaign.titleRu || campaign.title || `Кампания #${campaign.id}`}
+                </div>
+                {campaign.titleRu && campaign.title && campaign.title !== campaign.titleRu && (
+                  <div className="text-purple-200 text-xs mt-0.5">{campaign.title}</div>
+                )}
+              </div>
+            </div>
+            <div className="flex items-center gap-2 shrink-0">
+              {campaign.type && (
+                <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-white/20 text-white">
+                  {campaign.type}
+                </span>
+              )}
+              <StatusBadge status={campaign.status} />
+            </div>
+          </div>
+          <div className="mt-1 ml-[52px] text-purple-300 text-xs">
+            #{campaign.id}
+          </div>
+        </div>
+
+        <div className="px-6 py-5 space-y-5">
+          {/* Message body */}
+          {(campaign.bodyRu || campaign.body) && (
+            <div className="space-y-3">
+              {campaign.bodyRu && (
+                <div>
+                  <div className="text-[10px] font-semibold uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-1">
+                    Текст (RU)
+                  </div>
+                  <div className="text-sm text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-900/50 rounded-lg px-3 py-2.5 leading-relaxed">
+                    {campaign.bodyRu}
+                  </div>
+                </div>
+              )}
+              {campaign.body && campaign.body !== campaign.bodyRu && (
+                <div>
+                  <div className="text-[10px] font-semibold uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-1">
+                    Текст (UZ)
+                  </div>
+                  <div className="text-sm text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-900/50 rounded-lg px-3 py-2.5 leading-relaxed">
+                    {campaign.body}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Stats */}
+          {total > 0 && (
+            <div>
+              <div className="text-[10px] font-semibold uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-3">
+                Статистика отправки
+              </div>
+              <div className="grid grid-cols-3 gap-3 mb-3">
+                <div className="bg-gray-50 dark:bg-gray-900/50 rounded-xl px-3 py-3 text-center">
+                  <div className="text-xl font-bold text-gray-800 dark:text-gray-100">
+                    {total}
+                  </div>
+                  <div className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Всего</div>
+                </div>
+                <div className="bg-green-50 dark:bg-green-900/20 rounded-xl px-3 py-3 text-center">
+                  <div className="text-xl font-bold text-green-600 dark:text-green-400">
+                    {success}
+                  </div>
+                  <div className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                    Успешно · {successPct}%
+                  </div>
+                </div>
+                <div className={`rounded-xl px-3 py-3 text-center ${fail > 0 ? "bg-red-50 dark:bg-red-900/20" : "bg-gray-50 dark:bg-gray-900/50"}`}>
+                  <div className={`text-xl font-bold ${fail > 0 ? "text-red-500 dark:text-red-400" : "text-gray-400 dark:text-gray-500"}`}>
+                    {fail}
+                  </div>
+                  <div className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                    Ошибок · {failPct}%
+                  </div>
+                </div>
+              </div>
+
+              {/* Progress bar */}
+              <div className="h-2 rounded-full bg-gray-200 dark:bg-gray-700 overflow-hidden">
+                <div
+                  className="h-full bg-green-500 dark:bg-green-400 rounded-full transition-all"
+                  style={{ width: `${successPct}%` }}
+                />
+              </div>
+
+              {/* Channels */}
+              {(campaign.tgCount != null || campaign.mobileCount != null) && (
+                <div className="flex gap-3 mt-3">
+                  {campaign.tgCount != null && (
+                    <div className="flex-1 flex items-center gap-2 bg-sky-50 dark:bg-sky-900/20 rounded-lg px-3 py-2">
+                      <div className="w-2 h-2 rounded-full bg-sky-500 shrink-0" />
+                      <span className="text-xs text-gray-600 dark:text-gray-400">Telegram</span>
+                      <span className="ml-auto font-semibold text-sm text-sky-600 dark:text-sky-400">
+                        {campaign.tgCount}
+                      </span>
+                    </div>
+                  )}
+                  {campaign.mobileCount != null && (
+                    <div className="flex-1 flex items-center gap-2 bg-purple-50 dark:bg-purple-900/20 rounded-lg px-3 py-2">
+                      <div className="w-2 h-2 rounded-full bg-purple-500 shrink-0" />
+                      <span className="text-xs text-gray-600 dark:text-gray-400">Mobile</span>
+                      <span className="ml-auto font-semibold text-sm text-purple-600 dark:text-purple-400">
+                        {campaign.mobileCount}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Meta */}
+          <div>
+            <div className="text-[10px] font-semibold uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-2">
+              Информация
+            </div>
+            <div className="space-y-2">
+              {[
+                { label: "Создал", value: campaign.createdBy },
+                { label: "Изменил", value: campaign.modifiedBy },
+                { label: "Дата создания", value: formatDate(campaign.creationDate) },
+                { label: "Последнее изменение", value: formatDate(campaign.modifiedDate) },
+              ]
+                .filter((r) => r.value && r.value !== "—")
+                .map((row) => (
+                  <div
+                    key={row.label}
+                    className="flex items-center justify-between text-sm"
+                  >
+                    <span className="text-gray-500 dark:text-gray-400">{row.label}</span>
+                    <span className="text-gray-800 dark:text-gray-200 font-medium">
+                      {row.value}
+                    </span>
+                  </div>
+                ))}
+            </div>
+          </div>
+        </div>
+
+        <DialogFooter className="px-6 py-4 border-t border-gray-100 dark:border-gray-700">
+          <Button
+            variant="outline"
+            onClick={onClose}
+            className="w-full dark:border-gray-600 dark:text-gray-300"
+          >
+            Закрыть
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
 // ─── Campaigns Tab ────────────────────────────────────────────────────────────
 
 function CampaignsTab({
@@ -797,6 +981,7 @@ function CampaignsTab({
   const [searchInput, setSearchInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [selectedCampaign, setSelectedCampaign] = useState<Campaign | null>(null);
 
   const load = useCallback(
     async (p: number, s: string) => {
@@ -934,7 +1119,8 @@ function CampaignsTab({
                 items.map((item, idx) => (
                   <tr
                     key={item.id ?? idx}
-                    className="hover:bg-gray-50 dark:hover:bg-gray-800/60 transition-colors"
+                    onClick={() => setSelectedCampaign(item)}
+                    className="hover:bg-purple-50 dark:hover:bg-purple-900/10 transition-colors cursor-pointer"
                   >
                     <td className="px-4 py-3 text-gray-500 dark:text-gray-400 tabular-nums">
                       {page * PAGE_SIZE + idx + 1}
@@ -1000,6 +1186,11 @@ function CampaignsTab({
         total={total}
         pageSize={PAGE_SIZE}
         onChange={setPage}
+      />
+
+      <CampaignDetailModal
+        campaign={selectedCampaign}
+        onClose={() => setSelectedCampaign(null)}
       />
     </div>
   );
