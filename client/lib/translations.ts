@@ -260,6 +260,15 @@ export const translations = {
     excluded: "Исключено",
     filterByPharmacy: "Фильтр по аптеке",
     noOrdersFound: "Заказы не найдены",
+
+    // Notification Center
+    notificationCenter: "Центр уведомлений",
+    notificationCenterDescription: "Управление уведомлениями и кампаниями",
+    notifications: "Уведомления",
+    campaigns: "Кампании",
+    createCampaign: "Создать кампанию",
+    noNotifications: "Нет уведомлений",
+    noCampaigns: "Нет кампаний",
   },
   uz: {
     // Common
@@ -523,6 +532,15 @@ export const translations = {
     excluded: "Istisno qilingan",
     filterByPharmacy: "Dorixona bo'yicha filtr",
     noOrdersFound: "Buyurtmalar topilmadi",
+
+    // Notification Center
+    notificationCenter: "Bildirishnomalar markazi",
+    notificationCenterDescription: "Bildirishnomalar va kampaniyalarni boshqarish",
+    notifications: "Bildirishnomalar",
+    campaigns: "Kampaniyalar",
+    createCampaign: "Kampaniya yaratish",
+    noNotifications: "Bildirishnomalar yo'q",
+    noCampaigns: "Kampaniyalar yo'q",
   },
 };
 

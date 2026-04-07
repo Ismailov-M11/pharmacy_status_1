@@ -18,6 +18,7 @@ import PharmaciesActivity from "./pages/PharmaciesActivity";
 import NewPharmacies from "./pages/NewPharmacies";
 import DeliveryAnalytics from "./pages/DeliveryAnalytics";
 import OsonList from "./pages/OsonList";
+import NotificationCenter from "./pages/NotificationCenter";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -142,6 +143,16 @@ const App = () => (
                   }
                 />
                 <Route path="/" element={<Navigate to="/login" replace />} />
+                <Route
+                  path="/notification-center"
+                  element={
+                    <RoleBasedRoute
+                      allowedRoles={["ROLE_ADMIN", "ROLE_AGENT", "ROLE_OPERATOR"]}
+                    >
+                      <NotificationCenter />
+                    </RoleBasedRoute>
+                  }
+                />
                 <Route
                   path="/oson-list"
                   element={

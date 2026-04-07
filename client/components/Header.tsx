@@ -18,6 +18,7 @@ import {
   Sun,
   TrendingUp,
   ShoppingBag,
+  Bell,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -45,6 +46,11 @@ export function Header() {
   // Add role-specific and common navigation items
   if (role === "ROLE_ADMIN") {
     navigationItems.push(
+      {
+        label: t.notificationCenter || "Центр уведомлений",
+        path: "/notification-center",
+        icon: Bell,
+      },
       { label: t.adminPanel || "Админ", path: "/admin", icon: User },
       { label: t.leadsTitle || "Лиды", path: "/leads", icon: UserCog },
       { label: t.maps || "Карты", path: "/maps", icon: Map },
@@ -76,6 +82,11 @@ export function Header() {
         : t.agentPanel || "Панель агента";
     const agentIcon = role === "ROLE_OPERATOR" ? Headset : UserCog;
     navigationItems.push(
+      {
+        label: t.notificationCenter || "Центр уведомлений",
+        path: "/notification-center",
+        icon: Bell,
+      },
       {
         label: agentLabel,
         path: "/agent",
