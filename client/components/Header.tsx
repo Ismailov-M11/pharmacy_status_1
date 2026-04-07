@@ -83,11 +83,6 @@ export function Header() {
     const agentIcon = role === "ROLE_OPERATOR" ? Headset : UserCog;
     navigationItems.push(
       {
-        label: t.notificationCenter || "Центр уведомлений",
-        path: "/notification-center",
-        icon: Bell,
-      },
-      {
         label: agentLabel,
         path: "/agent",
         icon: agentIcon,

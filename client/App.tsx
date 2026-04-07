@@ -146,9 +146,7 @@ const App = () => (
                 <Route
                   path="/notification-center"
                   element={
-                    <RoleBasedRoute
-                      allowedRoles={["ROLE_ADMIN", "ROLE_AGENT", "ROLE_OPERATOR"]}
-                    >
+                    <RoleBasedRoute allowedRoles={["ROLE_ADMIN"]}>
                       <NotificationCenter />
                     </RoleBasedRoute>
                   }
