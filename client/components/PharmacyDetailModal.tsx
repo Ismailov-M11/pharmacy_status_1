@@ -563,36 +563,6 @@ export function PharmacyDetailModal({
                 </>
               )}
 
-              {/* Add Comment */}
-              <div>
-                <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  {t.addComment || "Добавить комментарий"}
-                </label>
-                <div className="flex gap-2">
-                  <Textarea
-                    value={newComment}
-                    onChange={(e) => setNewComment(e.target.value)}
-                    placeholder={t.commentPlaceholder || "Введите комментарий..."}
-                    className="flex-1 text-xs sm:text-sm resize-none"
-                    rows={2}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) {
-                        e.preventDefault();
-                        handleCreateComment();
-                      }
-                    }}
-                  />
-                  <Button
-                    onClick={handleCreateComment}
-                    disabled={isSubmittingComment || !newComment.trim()}
-                    size="sm"
-                    className="bg-blue-600 hover:bg-blue-700 self-end"
-                  >
-                    {isSubmittingComment ? "..." : (t.send || "Отправить")}
-                  </Button>
-                </div>
-                <p className="text-xs text-gray-400 mt-1">Ctrl+Enter для отправки</p>
-              </div>
             </div>
           )}
 
@@ -741,59 +711,102 @@ export function PharmacyDetailModal({
 
           {/* Lead History Tab Content */}
           {activeTab === "leadHistory" && (
-            <div className="overflow-x-auto border rounded-md">
-              {isLoadingNotes ? (
-                <div className="px-4 py-8 text-center text-gray-500 dark:text-gray-400">
-                  {t.loading || "Loading..."}
+            <div className="space-y-4">
+              {/* Add Comment Form */}
+              <div>
+                <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  {t.addComment || "Добавить комментарий"}
+                </label>
+                <div className="flex gap-2">
+                  <Textarea
+                    value={newComment}
+                    onChange={(e) => setNewComment(e.target.value)}
+                    placeholder={t.commentPlaceholder || "Введите комментарий..."}
+                    className="flex-1 text-xs sm:text-sm resize-none"
+                    rows={2}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) {
+                        e.preventDefault();
+                        handleCreateComment();
+                      }
+                    }}
+                  />
+                  <Button
+                    onClick={handleCreateComment}
+                    disabled={isSubmittingComment || !newComment.trim()}
+                    size="sm"
+                    className="bg-blue-600 hover:bg-blue-700 self-end"
+                  >
+                    {isSubmittingComment ? "..." : (t.send || "Отправить")}
+                  </Button>
                 </div>
-              ) : (
-                <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                  <thead className="bg-gray-50 dark:bg-gray-700">
-                    <tr>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                        {t.lastCommentDate || "Date"}
-                      </th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                        {t.lastCommentUser || "User"}
-                      </th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                        {t.lastComment || "Comment"}
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                    {leadNotes.length > 0 ? (
-                      leadNotes.map((note, index) => {
-                        const dateStr = note.createdAt || note.date || note.createdDate || "";
-                        const userInfo = note.creator || note.user;
-                        const userPhone = userInfo?.phone || userInfo?.name || userInfo?.username || "-";
-                        const noteText = note.note || note.text || note.comment || "-";
-                        return (
-                          <tr key={note.id || index} className="hover:bg-gray-50 dark:hover:bg-gray-700">
-                            <td className="px-4 py-3 text-sm text-gray-900 dark:text-gray-100 whitespace-nowrap align-top">
-                              {dateStr ? formatDate(dateStr) : "-"}
-                            </td>
-                            <td className="px-4 py-3 text-sm text-gray-600 dark:text-gray-400 whitespace-nowrap align-top">
-                              {userPhone}
-                            </td>
-                            <td className="px-4 py-3 text-sm text-gray-600 dark:text-gray-400 align-top">
-                              <div className="break-words max-w-sm whitespace-pre-wrap">
-                                {noteText}
-                              </div>
-                            </td>
-                          </tr>
-                        );
-                      })
-                    ) : (
+                <p className="text-xs text-gray-400 mt-1">Ctrl+Enter для отправки</p>
+              </div>
+
+              {/* Notes Table */}
+              <div className="overflow-x-auto border rounded-md">
+                {isLoadingNotes ? (
+                  <div className="px-4 py-8 text-center text-gray-500 dark:text-gray-400">
+                    {t.loading || "Loading..."}
+                  </div>
+                ) : (
+                  <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                    <thead className="bg-gray-50 dark:bg-gray-700">
                       <tr>
-                        <td colSpan={3} className="px-4 py-8 text-center text-gray-500 dark:text-gray-400">
-                          {t.noData || "No data"}
-                        </td>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                          {t.lastCommentDate || "Дата"}
+                        </th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                          {t.lastCommentUser || "Автор"}
+                        </th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                          Комментарий
+                        </th>
                       </tr>
-                    )}
-                  </tbody>
-                </table>
-              )}
+                    </thead>
+                    <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                      {leadNotes.length > 0 ? (
+                        leadNotes.map((note, index) => {
+                          const dateStr = note.createdAt || note.date || note.createdDate || "";
+                          const userInfo = note.creator || note.user;
+                          const userPhone = userInfo?.phone || userInfo?.name || userInfo?.username || "-";
+                          const noteText = note.note || note.text || note.comment || "-";
+                          const formattedDate = dateStr
+                            ? new Date(dateStr).toLocaleString("ru-RU", {
+                                day: "numeric",
+                                month: "long",
+                                year: "numeric",
+                                hour: "2-digit",
+                                minute: "2-digit",
+                              })
+                            : "-";
+                          return (
+                            <tr key={note.id || index} className="hover:bg-gray-50 dark:hover:bg-gray-700">
+                              <td className="px-4 py-3 text-sm text-gray-900 dark:text-gray-100 whitespace-nowrap align-top">
+                                {formattedDate}
+                              </td>
+                              <td className="px-4 py-3 text-sm text-gray-600 dark:text-gray-400 whitespace-nowrap align-top">
+                                {userPhone}
+                              </td>
+                              <td className="px-4 py-3 text-sm text-gray-600 dark:text-gray-400 align-top">
+                                <div className="break-words max-w-sm whitespace-pre-wrap">
+                                  {noteText}
+                                </div>
+                              </td>
+                            </tr>
+                          );
+                        })
+                      ) : (
+                        <tr>
+                          <td colSpan={3} className="px-4 py-8 text-center text-gray-500 dark:text-gray-400">
+                            {t.noData || "No data"}
+                          </td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                )}
+              </div>
             </div>
           )}
 
