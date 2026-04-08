@@ -14,7 +14,6 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
-const LEADS_PAGE_SIZE = 50;
 
 export default function LeadsPanel() {
     const { t } = useLanguage();
@@ -25,6 +24,7 @@ export default function LeadsPanel() {
     const [filteredLeads, setFilteredLeads] = useState<Pharmacy[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [currentPage, setCurrentPage] = useState(0);
+    const [pageSize, setPageSize] = useState(50);
 
     // Modal State
     const [selectedPharmacy, setSelectedPharmacy] = useState<Pharmacy | null>(null);
@@ -449,7 +449,7 @@ export default function LeadsPanel() {
         }
 
         setFilteredLeads(filtered);
-        setCurrentPage(0);
+        setCurrentPage(0); // reset page on filter change
     }, [searchQuery, leads, leadStatusFilter, activeFilter, commentUserFilter, commentDateFilter, stirFilter, stirSortOrder, telegramBotFilter, brandedPacketFilter, trainingFilter, merchantStatusFilter, regionFilter, districtFilter, regionSortOrder, districtSortOrder]);
 
     if (authLoading) {
@@ -460,10 +460,10 @@ export default function LeadsPanel() {
         );
     }
 
-    const totalPages = Math.max(1, Math.ceil(filteredLeads.length / LEADS_PAGE_SIZE));
+    const totalPages = Math.max(1, Math.ceil(filteredLeads.length / pageSize));
     const pagedLeads = filteredLeads.slice(
-        currentPage * LEADS_PAGE_SIZE,
-        (currentPage + 1) * LEADS_PAGE_SIZE
+        currentPage * pageSize,
+        (currentPage + 1) * pageSize
     );
 
     return (
@@ -478,11 +478,29 @@ export default function LeadsPanel() {
 
                 <div className="bg-white dark:bg-gray-800 shadow">
                     {/* Pagination top bar */}
-                    {!isLoading && filteredLeads.length > LEADS_PAGE_SIZE && (
+                    {!isLoading && filteredLeads.length > 0 && (
                         <div className="flex items-center justify-between px-4 py-2 border-b border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 text-sm text-gray-500 dark:text-gray-400">
-                            <span>
-                                {t.shown || "Показано"} {currentPage * LEADS_PAGE_SIZE + 1}–{Math.min((currentPage + 1) * LEADS_PAGE_SIZE, filteredLeads.length)} {t.of || "из"} {filteredLeads.length}
-                            </span>
+                            <div className="flex items-center gap-2">
+                                <span>
+                                    {t.shown || "Показано"} {currentPage * pageSize + 1}–{Math.min((currentPage + 1) * pageSize, filteredLeads.length)} {t.of || "из"} {filteredLeads.length}
+                                </span>
+                                <span className="text-gray-300 dark:text-gray-600">|</span>
+                                <div className="flex items-center gap-1.5">
+                                    <span className="text-xs">{t.rowsPerPage || "Строк:"}</span>
+                                    <input
+                                        type="number"
+                                        min={1}
+                                        max={filteredLeads.length}
+                                        value={pageSize}
+                                        onChange={e => {
+                                            const val = Math.max(1, parseInt(e.target.value) || 1);
+                                            setPageSize(val);
+                                            setCurrentPage(0);
+                                        }}
+                                        className="text-xs border border-gray-200 dark:border-gray-600 rounded px-1.5 py-0.5 w-16 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 focus:outline-none focus:ring-1 focus:ring-purple-500"
+                                    />
+                                </div>
+                            </div>
                             <div className="flex items-center gap-1">
                                 <Button variant="ghost" size="icon" className="h-7 w-7" disabled={currentPage === 0} onClick={() => setCurrentPage(p => p - 1)}>
                                     <ChevronLeft className="h-4 w-4" />
@@ -569,11 +587,29 @@ export default function LeadsPanel() {
                         }}
                     />
                     {/* Pagination bottom bar */}
-                    {!isLoading && filteredLeads.length > LEADS_PAGE_SIZE && (
+                    {!isLoading && filteredLeads.length > 0 && (
                         <div className="flex items-center justify-between px-4 py-3 border-t border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 text-sm text-gray-500 dark:text-gray-400">
-                            <span>
-                                {t.shown || "Показано"} {currentPage * LEADS_PAGE_SIZE + 1}–{Math.min((currentPage + 1) * LEADS_PAGE_SIZE, filteredLeads.length)} {t.of || "из"} {filteredLeads.length}
-                            </span>
+                            <div className="flex items-center gap-2">
+                                <span>
+                                    {t.shown || "Показано"} {currentPage * pageSize + 1}–{Math.min((currentPage + 1) * pageSize, filteredLeads.length)} {t.of || "из"} {filteredLeads.length}
+                                </span>
+                                <span className="text-gray-300 dark:text-gray-600">|</span>
+                                <div className="flex items-center gap-1.5">
+                                    <span className="text-xs">{t.rowsPerPage || "Строк:"}</span>
+                                    <input
+                                        type="number"
+                                        min={1}
+                                        max={filteredLeads.length}
+                                        value={pageSize}
+                                        onChange={e => {
+                                            const val = Math.max(1, parseInt(e.target.value) || 1);
+                                            setPageSize(val);
+                                            setCurrentPage(0);
+                                        }}
+                                        className="text-xs border border-gray-200 dark:border-gray-600 rounded px-1.5 py-0.5 w-16 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 focus:outline-none focus:ring-1 focus:ring-purple-500"
+                                    />
+                                </div>
+                            </div>
                             <div className="flex items-center gap-1">
                                 <Button variant="ghost" size="icon" className="h-8 w-8" disabled={currentPage === 0} onClick={() => { setCurrentPage(p => p - 1); window.scrollTo({ top: 0, behavior: "smooth" }); }}>
                                     <ChevronLeft className="h-4 w-4" />

@@ -792,7 +792,6 @@ function SyncProgressBar({ progress }: { progress: OsonProgress }) {
     </div>
   );
 }
-const OSON_PAGE_SIZE = 100;
 
 function ListTab({
   pharmacies,
@@ -805,12 +804,13 @@ function ListTab({
 }) {
   const [selectedPharmacy, setSelectedPharmacy] = useState<OsonPharmacy | null>(null);
   const [page, setPage] = useState(0);
+  const [pageSize, setPageSize] = useState(100);
 
-  // Reset page when pharmacies list changes (filter/search applied)
-  useEffect(() => { setPage(0); }, [pharmacies]);
+  // Reset page when pharmacies list or pageSize changes
+  useEffect(() => { setPage(0); }, [pharmacies, pageSize]);
 
-  const totalPages = Math.max(1, Math.ceil(pharmacies.length / OSON_PAGE_SIZE));
-  const pagedPharmacies = pharmacies.slice(page * OSON_PAGE_SIZE, (page + 1) * OSON_PAGE_SIZE);
+  const totalPages = Math.max(1, Math.ceil(pharmacies.length / pageSize));
+  const pagedPharmacies = pharmacies.slice(page * pageSize, (page + 1) * pageSize);
 
   if (isLoading) {
     return (
@@ -892,7 +892,7 @@ function ListTab({
               >
                 {/* # Row number */}
                 <td className="px-3 py-2.5 text-center text-xs text-gray-400 dark:text-gray-500 font-mono whitespace-nowrap">
-                  {page * OSON_PAGE_SIZE + index + 1}
+                  {page * pageSize + index + 1}
                 </td>
 
                 {/* Название */}
@@ -991,9 +991,29 @@ function ListTab({
 
       {/* Footer with pagination */}
       <div className="shrink-0 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 px-4 py-2 text-xs text-gray-400 flex flex-wrap justify-between items-center gap-2 w-full shadow-[0_-4px_6px_-1px_rgb(0,0,0,0.05)]">
-        <span>
-          Показано {page * OSON_PAGE_SIZE + 1}–{Math.min((page + 1) * OSON_PAGE_SIZE, pharmacies.length)} из {pharmacies.length.toLocaleString()} аптек
-        </span>
+        {/* Left: count + rows-per-page */}
+        <div className="flex items-center gap-3">
+          <span>
+            Показано {page * pageSize + 1}–{Math.min((page + 1) * pageSize, pharmacies.length)} из {pharmacies.length.toLocaleString()} аптек
+          </span>
+          <span className="text-gray-200 dark:text-gray-600">|</span>
+          <div className="flex items-center gap-1.5">
+            <span>Строк:</span>
+            <input
+              type="number"
+              min={1}
+              max={pharmacies.length}
+              value={pageSize}
+              onChange={e => {
+                const val = Math.max(1, parseInt(e.target.value) || 1);
+                setPageSize(val);
+              }}
+              className="border border-gray-200 dark:border-gray-600 rounded px-1.5 py-0.5 w-16 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 focus:outline-none focus:ring-1 focus:ring-purple-500 text-xs"
+            />
+          </div>
+        </div>
+
+        {/* Right: legend + nav */}
         <div className="flex items-center gap-3">
           <div className="hidden sm:flex items-center gap-4">
             <span className="flex items-center gap-1">

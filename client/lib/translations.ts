@@ -272,6 +272,7 @@ export const translations = {
 
     // Pagination
     of: "из",
+    rowsPerPage: "Строк:",
   },
   uz: {
     // Common
@@ -547,6 +548,7 @@ export const translations = {
 
     // Pagination
     of: "dan",
+    rowsPerPage: "Qatorlar:",
   },
 };
 
