@@ -717,13 +717,14 @@ export function PharmacyDetailModal({
                 <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   {t.addComment || "Добавить комментарий"}
                 </label>
-                <div className="flex gap-2">
+                <div className="flex items-stretch gap-2">
                   <Textarea
                     value={newComment}
                     onChange={(e) => setNewComment(e.target.value)}
                     placeholder={t.commentPlaceholder || "Введите комментарий..."}
-                    className="flex-1 text-xs sm:text-sm resize-none"
+                    className="flex-1 text-xs sm:text-sm resize-y"
                     rows={2}
+                    style={{ minHeight: "64px" }}
                     onKeyDown={(e) => {
                       if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) {
                         e.preventDefault();
@@ -735,7 +736,7 @@ export function PharmacyDetailModal({
                     onClick={handleCreateComment}
                     disabled={isSubmittingComment || !newComment.trim()}
                     size="sm"
-                    className="bg-blue-600 hover:bg-blue-700 self-end"
+                    className="bg-blue-600 hover:bg-blue-700 self-start mt-0 h-[64px] px-4"
                   >
                     {isSubmittingComment ? "..." : (t.send || "Отправить")}
                   </Button>
