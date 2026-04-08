@@ -389,6 +389,7 @@ function NotificationsTab({ token, baseUrl }: { token: string; baseUrl: string }
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showFilters, setShowFilters] = useState(false);
+  const [selectedNotification, setSelectedNotification] = useState<Notification | null>(null);
 
   // Applied filters (trigger reload)
   const [appliedFilters, setAppliedFilters] = useState<NotifFilters>(EMPTY_NOTIF_FILTERS);
@@ -659,7 +660,8 @@ function NotificationsTab({ token, baseUrl }: { token: string; baseUrl: string }
                   return (
                     <tr
                       key={item.id ?? idx}
-                      className="hover:bg-gray-50 dark:hover:bg-gray-800/60 transition-colors"
+                      className="hover:bg-gray-50 dark:hover:bg-gray-800/60 transition-colors cursor-pointer"
+                      onClick={() => setSelectedNotification(item)}
                     >
                       <td className="px-4 py-3 text-gray-500 dark:text-gray-400 tabular-nums">
                         {page * PAGE_SIZE + idx + 1}
@@ -744,11 +746,11 @@ function NotificationsTab({ token, baseUrl }: { token: string; baseUrl: string }
                       <td className="px-4 py-3 hidden lg:table-cell">
                         {channel === "user" ? (
                           <span className="inline-flex items-center gap-1 text-xs text-blue-600 dark:text-blue-400">
-                            <User className="h-3 w-3" /> App
+                            <User className="h-3 w-3" /> Telegram
                           </span>
                         ) : channel === "device" ? (
                           <span className="inline-flex items-center gap-1 text-xs text-green-600 dark:text-green-400">
-                            <Smartphone className="h-3 w-3" /> Push
+                            <Smartphone className="h-3 w-3" /> Mobile App
                           </span>
                         ) : (
                           <span className="text-gray-400 text-xs">—</span>
@@ -783,7 +785,169 @@ function NotificationsTab({ token, baseUrl }: { token: string; baseUrl: string }
         pageSize={PAGE_SIZE}
         onChange={setPage}
       />
+
+      <NotificationDetailModal
+        notification={selectedNotification}
+        onClose={() => setSelectedNotification(null)}
+      />
     </div>
+  );
+}
+
+// ─── Notification Detail Modal ────────────────────────────────────────────────
+
+function NotificationDetailModal({
+  notification,
+  onClose,
+}: {
+  notification: Notification | null;
+  onClose: () => void;
+}) {
+  if (!notification) return null;
+
+  const camp = notification.campaign;
+  const usr = notification.user;
+  const dev = notification.device;
+  const isDevice = !!dev && !usr;
+
+  const Field = ({ label, value }: { label: string; value?: string | number | null }) =>
+    value != null && value !== "" ? (
+      <div>
+        <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-0.5">{label}</label>
+        <div className="p-2 bg-gray-50 dark:bg-gray-900 rounded border border-gray-200 dark:border-gray-700 text-xs sm:text-sm text-gray-900 dark:text-gray-100 break-all">
+          {String(value)}
+        </div>
+      </div>
+    ) : null;
+
+  return (
+    <Dialog open={!!notification} onOpenChange={onClose}>
+      <DialogContent className="w-[95vw] max-w-lg max-h-[90vh] overflow-y-auto p-0 bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 [&>button]:hidden">
+        {/* Header */}
+        <div className={`px-6 py-5 relative ${isDevice ? "bg-gradient-to-r from-green-600 to-green-700 dark:from-green-800 dark:to-green-900" : "bg-gradient-to-r from-blue-600 to-blue-700 dark:from-blue-800 dark:to-blue-900"}`}>
+          <button
+            onClick={onClose}
+            className="absolute top-3 right-3 rounded-full w-7 h-7 flex items-center justify-center bg-white/20 hover:bg-white/30 text-white transition-colors"
+          >
+            <X className="h-4 w-4" />
+          </button>
+          <div className="flex items-center gap-3 pr-8">
+            <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-white/20 shrink-0">
+              {isDevice ? <Smartphone className="h-5 w-5 text-white" /> : <User className="h-5 w-5 text-white" />}
+            </div>
+            <div>
+              <DialogTitle className="text-white font-semibold text-base leading-tight">
+                Уведомление #{notification.id}
+              </DialogTitle>
+              <div className="flex items-center gap-2 mt-1.5 flex-wrap">
+                <StatusBadge status={notification.status ?? undefined} />
+                <span className={`px-2 py-0.5 rounded-full text-xs font-medium bg-white/20 text-white`}>
+                  {isDevice ? "Mobile App" : "Telegram"}
+                </span>
+                {camp?.type && (
+                  <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-white/20 text-white">
+                    {camp.type}
+                  </span>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="px-6 py-5 space-y-5">
+          {/* Кампания */}
+          {camp && (
+            <div>
+              <div className="text-[10px] font-semibold uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-3">
+                Кампания
+              </div>
+              <div className="space-y-2">
+                <Field label="ID кампании" value={camp.id} />
+                <Field label="Заголовок (RU)" value={camp.titleRu} />
+                <Field label="Заголовок (UZ)" value={camp.title} />
+                <Field label="Текст (RU)" value={camp.bodyRu} />
+                <Field label="Текст (UZ)" value={camp.body} />
+                <div className="grid grid-cols-3 gap-2">
+                  <Field label="Всего" value={camp.totalCount} />
+                  <Field label="Успешно" value={camp.successCount} />
+                  <Field label="Ошибок" value={camp.failCount} />
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  <Field label="Telegram" value={camp.tgCount} />
+                  <Field label="Mobile" value={camp.mobileCount} />
+                </div>
+                <Field label="Статус кампании" value={camp.status} />
+                <Field label="Создал" value={camp.createdBy} />
+                <Field label="Дата создания" value={camp.creationDate ? formatDate(camp.creationDate) : null} />
+              </div>
+            </div>
+          )}
+
+          {/* Получатель */}
+          {(usr || dev) && (
+            <div>
+              <div className="text-[10px] font-semibold uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-3">
+                Получатель
+              </div>
+              {usr && (
+                <div className="space-y-2">
+                  <Field label="ID пользователя" value={usr.id} />
+                  <div className="grid grid-cols-2 gap-2">
+                    <Field label="Имя" value={usr.firstName} />
+                    <Field label="Фамилия" value={usr.lastName} />
+                  </div>
+                  <Field label="Телефон" value={usr.phone} />
+                  <div className="grid grid-cols-2 gap-2">
+                    <Field label="Пол" value={usr.gender === "MALE" ? "Мужской" : usr.gender === "FEMALE" ? "Женский" : usr.gender} />
+                    <Field label="Возраст" value={usr.age} />
+                  </div>
+                  <Field label="Дата рождения" value={usr.dateOfBirth} />
+                  <Field label="Источник" value={usr.source} />
+                </div>
+              )}
+              {dev && (
+                <div className="space-y-2">
+                  <Field label="Название устройства" value={dev.name} />
+                  <Field label="Тип устройства" value={dev.deviceType} />
+                  <Field label="Device ID" value={dev.deviceId} />
+                  <Field label="Версия" value={dev.version} />
+                  <Field label="Инфо" value={dev.deviceInfo} />
+                  <Field label="Последний вход" value={dev.lastLoginTime ? formatDate(dev.lastLoginTime) : null} />
+                  <Field label="Создано" value={dev.createdDate ? formatDate(dev.createdDate) : null} />
+                  {dev.token && (
+                    <div>
+                      <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-0.5">Token</label>
+                      <div className="p-2 bg-gray-50 dark:bg-gray-900 rounded border border-gray-200 dark:border-gray-700 text-xs text-gray-600 dark:text-gray-400 break-all font-mono">
+                        {dev.token}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Детали отправки */}
+          <div>
+            <div className="text-[10px] font-semibold uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-3">
+              Детали отправки
+            </div>
+            <div className="space-y-2">
+              <Field label="Обработано в" value={notification.processedAt ? formatDate(notification.processedAt) : null} />
+              <Field label="Назначение" value={notification.destination} />
+              {notification.error && (
+                <div>
+                  <label className="block text-xs font-medium text-red-500 mb-0.5">Ошибка</label>
+                  <div className="p-2 bg-red-50 dark:bg-red-900/20 rounded border border-red-200 dark:border-red-800 text-xs text-red-600 dark:text-red-400 break-all">
+                    {notification.error}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 }
 
