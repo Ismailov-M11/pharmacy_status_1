@@ -541,3 +541,44 @@ export async function saveUserColumnSettings(
   }
 }
 
+// ============================================
+// LEAD NOTES API
+// ============================================
+
+export interface LeadNote {
+  id: number;
+  note?: string;
+  text?: string;
+  comment?: string;
+  createdAt?: string;
+  date?: string;
+  createdDate?: string;
+  creator?: { id?: number; phone?: string; username?: string; name?: string };
+  user?: { id?: number; phone?: string; username?: string; name?: string };
+  [key: string]: any;
+}
+
+export async function getLeadNotes(
+  token: string,
+  leadId: number
+): Promise<LeadNote[]> {
+  const response = await fetch(`${API_BASE_URL}/lead/notes/${leadId}`, {
+    method: "GET",
+    headers: {
+      accept: "application/json, text/plain, */*",
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error(`HTTP error ${response.status}`);
+  }
+
+  const data = await response.json();
+  // API may return array directly or wrapped
+  if (Array.isArray(data)) return data;
+  if (Array.isArray(data?.payload)) return data.payload;
+  if (Array.isArray(data?.payload?.list)) return data.payload.list;
+  if (Array.isArray(data?.list)) return data.list;
+  return [];
+}

@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, ChangeEvent } from "react";
-import { Pharmacy, StatusHistoryRecord, uploadPharmacyFile } from "@/lib/api";
+import { Pharmacy, StatusHistoryRecord, uploadPharmacyFile, getLeadNotes, LeadNote } from "@/lib/api";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
@@ -68,6 +68,23 @@ export function PharmacyDetailModal({
   const [packageError, setPackageError] = useState("");
   const [pendingTraining, setPendingTraining] = useState<boolean | null>(null);
   const [pendingPacket, setPendingPacket] = useState<boolean | null>(null);
+
+  const [leadNotes, setLeadNotes] = useState<LeadNote[]>([]);
+  const [isLoadingNotes, setIsLoadingNotes] = useState(false);
+
+  useEffect(() => {
+    if (activeTab === "leadHistory" && pharmacy) {
+      const leadId = pharmacy.lead?.id || pharmacy.id;
+      const authToken = token || localStorage.getItem("auth_token");
+      if (!authToken) return;
+      setIsLoadingNotes(true);
+      setLeadNotes([]);
+      getLeadNotes(authToken, leadId)
+        .then(setLeadNotes)
+        .catch(() => setLeadNotes([]))
+        .finally(() => setIsLoadingNotes(false));
+    }
+  }, [activeTab, pharmacy?.id]);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -311,6 +328,17 @@ export function PharmacyDetailModal({
                   {pharmacy.name}
                 </div>
               </div>
+
+              {(pharmacy as any).slug && (
+                <div>
+                  <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    Slug
+                  </label>
+                  <div className="p-2 bg-gray-50 dark:bg-gray-900 rounded border border-gray-200 dark:border-gray-700 text-xs sm:text-sm break-words text-gray-900 dark:text-gray-100 font-mono">
+                    {(pharmacy as any).slug}
+                  </div>
+                </div>
+              )}
 
               <div>
                 <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -664,48 +692,58 @@ export function PharmacyDetailModal({
           {/* Lead History Tab Content */}
           {activeTab === "leadHistory" && (
             <div className="overflow-x-auto border rounded-md">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      {t.lastCommentDate || "Date"}
-                    </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      {t.lastCommentUser || "User"}
-                    </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      {t.lastComment || "Comment"}
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                  {pharmacy.comments && pharmacy.comments.length > 0 ? (
-                    [...pharmacy.comments]
-                      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-                      .map((comment, index) => (
-                        <tr key={comment.id || index} className="hover:bg-gray-50">
-                          <td className="px-4 py-3 text-sm text-gray-900 whitespace-nowrap align-top">
-                            {formatDate(comment.createdAt)}
-                          </td>
-                          <td className="px-4 py-3 text-sm text-gray-600 whitespace-nowrap align-top">
-                            {comment.creator?.phone || "-"}
-                          </td>
-                          <td className="px-4 py-3 text-sm text-gray-600 align-top">
-                            <div className="break-words max-w-sm whitespace-pre-wrap">
-                              {comment.coment || "-"}
-                            </div>
-                          </td>
-                        </tr>
-                      ))
-                  ) : (
+              {isLoadingNotes ? (
+                <div className="px-4 py-8 text-center text-gray-500 dark:text-gray-400">
+                  {t.loading || "Loading..."}
+                </div>
+              ) : (
+                <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                  <thead className="bg-gray-50 dark:bg-gray-700">
                     <tr>
-                      <td colSpan={3} className="px-4 py-8 text-center text-gray-500 dark:text-gray-400">
-                        {t.noData || "No data"}
-                      </td>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                        {t.lastCommentDate || "Date"}
+                      </th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                        {t.lastCommentUser || "User"}
+                      </th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                        {t.lastComment || "Comment"}
+                      </th>
                     </tr>
-                  )}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                    {leadNotes.length > 0 ? (
+                      leadNotes.map((note, index) => {
+                        const dateStr = note.createdAt || note.date || note.createdDate || "";
+                        const userInfo = note.creator || note.user;
+                        const userPhone = userInfo?.phone || userInfo?.name || userInfo?.username || "-";
+                        const noteText = note.note || note.text || note.comment || "-";
+                        return (
+                          <tr key={note.id || index} className="hover:bg-gray-50 dark:hover:bg-gray-700">
+                            <td className="px-4 py-3 text-sm text-gray-900 dark:text-gray-100 whitespace-nowrap align-top">
+                              {dateStr ? formatDate(dateStr) : "-"}
+                            </td>
+                            <td className="px-4 py-3 text-sm text-gray-600 dark:text-gray-400 whitespace-nowrap align-top">
+                              {userPhone}
+                            </td>
+                            <td className="px-4 py-3 text-sm text-gray-600 dark:text-gray-400 align-top">
+                              <div className="break-words max-w-sm whitespace-pre-wrap">
+                                {noteText}
+                              </div>
+                            </td>
+                          </tr>
+                        );
+                      })
+                    ) : (
+                      <tr>
+                        <td colSpan={3} className="px-4 py-8 text-center text-gray-500 dark:text-gray-400">
+                          {t.noData || "No data"}
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              )}
             </div>
           )}
 
