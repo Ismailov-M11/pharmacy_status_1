@@ -46,6 +46,8 @@ import {
   extractCampaignTotal,
   Notification,
   Campaign,
+  DEV_API_BASE_URL,
+  PROD_API_BASE_URL,
 } from "@/lib/notificationApi";
 
 const PAGE_SIZE = 20;
@@ -200,6 +202,7 @@ interface CreateCampaignModalProps {
   onClose: () => void;
   onCreated: () => void;
   token: string;
+  baseUrl: string;
 }
 
 function CreateCampaignModal({
@@ -207,6 +210,7 @@ function CreateCampaignModal({
   onClose,
   onCreated,
   token,
+  baseUrl,
 }: CreateCampaignModalProps) {
   const [form, setForm] = useState({
     title: "",
@@ -239,7 +243,7 @@ function CreateCampaignModal({
         body: form.body,
         bodyRu: form.bodyRu,
         source: "HAMBI",
-      });
+      }, baseUrl);
       toast.success("Кампания успешно создана");
       setForm({ title: "", titleRu: "", body: "", bodyRu: "" });
       onCreated();
@@ -378,7 +382,7 @@ const EMPTY_NOTIF_FILTERS: NotifFilters = {
   toDate: "",
 };
 
-function NotificationsTab({ token }: { token: string }) {
+function NotificationsTab({ token, baseUrl }: { token: string; baseUrl: string }) {
   const [items, setItems] = useState<Notification[]>([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(0);
@@ -412,7 +416,7 @@ function NotificationsTab({ token }: { token: string }) {
           fromDate: filters.fromDate ? new Date(filters.fromDate).toISOString() : undefined,
           toDate: filters.toDate ? new Date(filters.toDate).toISOString() : undefined,
           dateField: filters.fromDate || filters.toDate ? "processedAt" : undefined,
-        });
+        }, baseUrl);
         setItems(extractNotifications(data));
         setTotal(extractNotificationTotal(data));
       } catch (err: any) {
@@ -422,8 +426,12 @@ function NotificationsTab({ token }: { token: string }) {
         setIsLoading(false);
       }
     },
-    [token]
+    [token, baseUrl]
   );
+
+  useEffect(() => {
+    setPage(0);
+  }, [baseUrl]);
 
   useEffect(() => {
     load(page, appliedFilters);
@@ -969,10 +977,12 @@ function CampaignsTab({
   token,
   onCreateClick,
   refreshKey,
+  baseUrl,
 }: {
   token: string;
   onCreateClick: () => void;
   refreshKey: number;
+  baseUrl: string;
 }) {
   const { t } = useLanguage();
   const [items, setItems] = useState<Campaign[]>([]);
@@ -993,7 +1003,7 @@ function CampaignsTab({
           page: p,
           size: PAGE_SIZE,
           searchKey: s || undefined,
-        });
+        }, baseUrl);
         setItems(extractCampaigns(data));
         setTotal(extractCampaignTotal(data));
       } catch (err: any) {
@@ -1003,8 +1013,12 @@ function CampaignsTab({
         setIsLoading(false);
       }
     },
-    [token]
+    [token, baseUrl]
   );
+
+  useEffect(() => {
+    setPage(0);
+  }, [baseUrl]);
 
   useEffect(() => {
     load(page, search);
@@ -1206,6 +1220,8 @@ export default function NotificationCenter() {
 
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [campaignRefreshKey, setCampaignRefreshKey] = useState(0);
+  const [env, setEnv] = useState<"dev" | "prod">("dev");
+  const baseUrl = env === "dev" ? DEV_API_BASE_URL : PROD_API_BASE_URL;
 
   useEffect(() => {
     if (authLoading) return;
@@ -1233,17 +1249,43 @@ export default function NotificationCenter() {
       <main className="w-full max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-6">
         {/* Page Header */}
         <div className="mb-6">
-          <div className="flex items-center gap-3 mb-1">
-            <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-purple-100 dark:bg-purple-900">
-              <Bell className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+          <div className="flex items-center justify-between gap-3 mb-1">
+            <div className="flex items-center gap-3">
+              <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-purple-100 dark:bg-purple-900">
+                <Bell className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+              </div>
+              <div>
+                <h1 className="text-xl font-bold text-gray-900 dark:text-gray-100">
+                  {t.notificationCenter || "Центр уведомлений"}
+                </h1>
+                <p className="text-sm text-gray-500 dark:text-gray-400">
+                  {t.notificationCenterDescription || "Управление уведомлениями и рекламными кампаниями"}
+                </p>
+              </div>
             </div>
-            <div>
-              <h1 className="text-xl font-bold text-gray-900 dark:text-gray-100">
-                {t.notificationCenter || "Центр уведомлений"}
-              </h1>
-              <p className="text-sm text-gray-500 dark:text-gray-400">
-                {t.notificationCenterDescription || "Управление уведомлениями и рекламными кампаниями"}
-              </p>
+
+            {/* Dev / Prod toggle */}
+            <div className="flex items-center gap-1 bg-gray-100 dark:bg-gray-800 rounded-lg p-1">
+              <button
+                onClick={() => setEnv("dev")}
+                className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-all ${
+                  env === "dev"
+                    ? "bg-amber-500 text-white shadow-sm"
+                    : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
+                }`}
+              >
+                DEV
+              </button>
+              <button
+                onClick={() => setEnv("prod")}
+                className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-all ${
+                  env === "prod"
+                    ? "bg-green-600 text-white shadow-sm"
+                    : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
+                }`}
+              >
+                PROD
+              </button>
             </div>
           </div>
         </div>
@@ -1269,7 +1311,7 @@ export default function NotificationCenter() {
 
           <TabsContent value="notifications">
             <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm p-4 md:p-6">
-              <NotificationsTab token={token} />
+              <NotificationsTab token={token} baseUrl={baseUrl} />
             </div>
           </TabsContent>
 
@@ -1277,6 +1319,7 @@ export default function NotificationCenter() {
             <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm p-4 md:p-6">
               <CampaignsTab
                 token={token}
+                baseUrl={baseUrl}
                 onCreateClick={() => setIsCreateModalOpen(true)}
                 refreshKey={campaignRefreshKey}
               />
@@ -1290,6 +1333,7 @@ export default function NotificationCenter() {
         onClose={() => setIsCreateModalOpen(false)}
         onCreated={handleCampaignCreated}
         token={token}
+        baseUrl={baseUrl}
       />
     </div>
   );

@@ -1,4 +1,5 @@
-const DEV_API_BASE_URL = "https://dev-api.davodelivery.uz/api";
+export const DEV_API_BASE_URL = "https://dev-api.davodelivery.uz/api";
+export const PROD_API_BASE_URL = "https://api.davodelivery.uz/api";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -167,10 +168,11 @@ export interface CampaignListResponse {
 
 export async function fetchNotifications(
   token: string,
-  params: NotificationListRequest
+  params: NotificationListRequest,
+  baseUrl: string = DEV_API_BASE_URL
 ): Promise<NotificationListResponse> {
   const response = await fetch(
-    `${DEV_API_BASE_URL}/campaign/notification/list`,
+    `${baseUrl}/campaign/notification/list`,
     {
       method: "POST",
       headers: {
@@ -191,9 +193,10 @@ export async function fetchNotifications(
 
 export async function fetchCampaigns(
   token: string,
-  params: CampaignListRequest
+  params: CampaignListRequest,
+  baseUrl: string = DEV_API_BASE_URL
 ): Promise<CampaignListResponse> {
-  const response = await fetch(`${DEV_API_BASE_URL}/campaign/list`, {
+  const response = await fetch(`${baseUrl}/campaign/list`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -212,9 +215,10 @@ export async function fetchCampaigns(
 
 export async function createCampaign(
   token: string,
-  data: CreateCampaignRequest
+  data: CreateCampaignRequest,
+  baseUrl: string = DEV_API_BASE_URL
 ): Promise<any> {
-  const response = await fetch(`${DEV_API_BASE_URL}/campaign/create`, {
+  const response = await fetch(`${baseUrl}/campaign/create`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
