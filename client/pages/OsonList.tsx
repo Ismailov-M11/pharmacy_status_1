@@ -29,6 +29,8 @@ import {
   Map,
   Search,
   ChevronDown,
+  ChevronLeft,
+  ChevronRight,
   Phone,
   Clock,
   MapPin,
@@ -790,6 +792,8 @@ function SyncProgressBar({ progress }: { progress: OsonProgress }) {
     </div>
   );
 }
+const OSON_PAGE_SIZE = 100;
+
 function ListTab({
   pharmacies,
   isLoading,
@@ -800,6 +804,13 @@ function ListTab({
   language: string;
 }) {
   const [selectedPharmacy, setSelectedPharmacy] = useState<OsonPharmacy | null>(null);
+  const [page, setPage] = useState(0);
+
+  // Reset page when pharmacies list changes (filter/search applied)
+  useEffect(() => { setPage(0); }, [pharmacies]);
+
+  const totalPages = Math.max(1, Math.ceil(pharmacies.length / OSON_PAGE_SIZE));
+  const pagedPharmacies = pharmacies.slice(page * OSON_PAGE_SIZE, (page + 1) * OSON_PAGE_SIZE);
 
   if (isLoading) {
     return (
@@ -848,7 +859,7 @@ function ListTab({
           </tr>
         </thead>
         <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
-          {pharmacies.map((pharmacy, index) => {
+          {pagedPharmacies.map((pharmacy, index) => {
             const name =
               language === "uz"
                 ? pharmacy.name_uz || pharmacy.name_ru
@@ -881,7 +892,7 @@ function ListTab({
               >
                 {/* # Row number */}
                 <td className="px-3 py-2.5 text-center text-xs text-gray-400 dark:text-gray-500 font-mono whitespace-nowrap">
-                  {index + 1}
+                  {page * OSON_PAGE_SIZE + index + 1}
                 </td>
 
                 {/* Название */}
@@ -978,22 +989,47 @@ function ListTab({
       </table>
       </div>
 
-      {/* Footer */}
-      <div className="shrink-0 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 px-4 py-2 text-xs text-gray-400 flex justify-between items-center w-full shadow-[0_-4px_6px_-1px_rgb(0,0,0,0.05)]">
-        <span>Показано {pharmacies.length.toLocaleString()} аптек</span>
-        <div className="flex items-center gap-4">
-          <span className="flex items-center gap-1">
-            <span className="w-2 h-2 rounded-full bg-emerald-500 inline-block" />
-            Подключён
-          </span>
-          <span className="flex items-center gap-1">
-            <span className="w-2 h-2 rounded-full bg-amber-500 inline-block" />
-            Не подключён
-          </span>
-          <span className="flex items-center gap-1">
-            <span className="w-2 h-2 rounded-full bg-red-500 inline-block" />
-            Удалён
-          </span>
+      {/* Footer with pagination */}
+      <div className="shrink-0 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 px-4 py-2 text-xs text-gray-400 flex flex-wrap justify-between items-center gap-2 w-full shadow-[0_-4px_6px_-1px_rgb(0,0,0,0.05)]">
+        <span>
+          Показано {page * OSON_PAGE_SIZE + 1}–{Math.min((page + 1) * OSON_PAGE_SIZE, pharmacies.length)} из {pharmacies.length.toLocaleString()} аптек
+        </span>
+        <div className="flex items-center gap-3">
+          <div className="hidden sm:flex items-center gap-4">
+            <span className="flex items-center gap-1">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 inline-block" />
+              Подключён
+            </span>
+            <span className="flex items-center gap-1">
+              <span className="w-2 h-2 rounded-full bg-amber-500 inline-block" />
+              Не подключён
+            </span>
+            <span className="flex items-center gap-1">
+              <span className="w-2 h-2 rounded-full bg-red-500 inline-block" />
+              Удалён
+            </span>
+          </div>
+          {totalPages > 1 && (
+            <div className="flex items-center gap-1">
+              <button
+                className="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-30 disabled:cursor-not-allowed"
+                disabled={page === 0}
+                onClick={() => setPage(p => p - 1)}
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </button>
+              <span className="px-2 tabular-nums font-medium text-gray-600 dark:text-gray-300">
+                {page + 1} / {totalPages}
+              </span>
+              <button
+                className="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-30 disabled:cursor-not-allowed"
+                disabled={page >= totalPages - 1}
+                onClick={() => setPage(p => p + 1)}
+              >
+                <ChevronRight className="h-4 w-4" />
+              </button>
+            </div>
+          )}
         </div>
       </div>
 

@@ -269,6 +269,9 @@ export const translations = {
     createCampaign: "Создать кампанию",
     noNotifications: "Нет уведомлений",
     noCampaigns: "Нет кампаний",
+
+    // Pagination
+    of: "из",
   },
   uz: {
     // Common
@@ -541,6 +544,9 @@ export const translations = {
     createCampaign: "Kampaniya yaratish",
     noNotifications: "Bildirishnomalar yo'q",
     noCampaigns: "Kampaniyalar yo'q",
+
+    // Pagination
+    of: "dan",
   },
 };
 

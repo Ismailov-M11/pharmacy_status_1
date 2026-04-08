@@ -974,6 +974,7 @@ function CampaignsTab({
   onCreateClick: () => void;
   refreshKey: number;
 }) {
+  const { t } = useLanguage();
   const [items, setItems] = useState<Campaign[]>([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(0);
@@ -1054,8 +1055,8 @@ function CampaignsTab({
           className="bg-purple-600 hover:bg-purple-700 text-white gap-2"
         >
           <Plus className="h-4 w-4" />
-          <span className="hidden sm:inline">Создать кампанию</span>
-          <span className="sm:hidden">Создать</span>
+          <span className="hidden sm:inline">{t.createCampaign || "Создать кампанию"}</span>
+          <span className="sm:hidden">{t.createCampaign || "Создать"}</span>
         </Button>
       </div>
 
@@ -1238,10 +1239,10 @@ export default function NotificationCenter() {
             </div>
             <div>
               <h1 className="text-xl font-bold text-gray-900 dark:text-gray-100">
-                Центр уведомлений
+                {t.notificationCenter || "Центр уведомлений"}
               </h1>
               <p className="text-sm text-gray-500 dark:text-gray-400">
-                Управление уведомлениями и рекламными кампаниями
+                {t.notificationCenterDescription || "Управление уведомлениями и рекламными кампаниями"}
               </p>
             </div>
           </div>
@@ -1255,14 +1256,14 @@ export default function NotificationCenter() {
               className="gap-2 data-[state=active]:bg-white dark:data-[state=active]:bg-gray-700 data-[state=active]:text-purple-700 dark:data-[state=active]:text-purple-300"
             >
               <Bell className="h-4 w-4" />
-              Уведомления
+              {t.notifications || "Уведомления"}
             </TabsTrigger>
             <TabsTrigger
               value="campaigns"
               className="gap-2 data-[state=active]:bg-white dark:data-[state=active]:bg-gray-700 data-[state=active]:text-purple-700 dark:data-[state=active]:text-purple-300"
             >
               <Megaphone className="h-4 w-4" />
-              Кампании
+              {t.campaigns || "Кампании"}
             </TabsTrigger>
           </TabsList>
 

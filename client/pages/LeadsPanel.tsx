@@ -11,6 +11,10 @@ import { StirFilterModal } from "@/components/StirFilterModal";
 import { GenericFilterModal } from "@/components/GenericFilterModal";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+
+const LEADS_PAGE_SIZE = 50;
 
 export default function LeadsPanel() {
     const { t } = useLanguage();
@@ -20,6 +24,7 @@ export default function LeadsPanel() {
     const [leads, setLeads] = useState<Pharmacy[]>([]);
     const [filteredLeads, setFilteredLeads] = useState<Pharmacy[]>([]);
     const [isLoading, setIsLoading] = useState(true);
+    const [currentPage, setCurrentPage] = useState(0);
 
     // Modal State
     const [selectedPharmacy, setSelectedPharmacy] = useState<Pharmacy | null>(null);
@@ -444,6 +449,7 @@ export default function LeadsPanel() {
         }
 
         setFilteredLeads(filtered);
+        setCurrentPage(0);
     }, [searchQuery, leads, leadStatusFilter, activeFilter, commentUserFilter, commentDateFilter, stirFilter, stirSortOrder, telegramBotFilter, brandedPacketFilter, trainingFilter, merchantStatusFilter, regionFilter, districtFilter, regionSortOrder, districtSortOrder]);
 
     if (authLoading) {
@@ -453,6 +459,12 @@ export default function LeadsPanel() {
             </div>
         );
     }
+
+    const totalPages = Math.max(1, Math.ceil(filteredLeads.length / LEADS_PAGE_SIZE));
+    const pagedLeads = filteredLeads.slice(
+        currentPage * LEADS_PAGE_SIZE,
+        (currentPage + 1) * LEADS_PAGE_SIZE
+    );
 
     return (
         <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -465,8 +477,25 @@ export default function LeadsPanel() {
                 </div>
 
                 <div className="bg-white dark:bg-gray-800 shadow">
+                    {/* Pagination top bar */}
+                    {!isLoading && filteredLeads.length > LEADS_PAGE_SIZE && (
+                        <div className="flex items-center justify-between px-4 py-2 border-b border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 text-sm text-gray-500 dark:text-gray-400">
+                            <span>
+                                {t.shown || "Показано"} {currentPage * LEADS_PAGE_SIZE + 1}–{Math.min((currentPage + 1) * LEADS_PAGE_SIZE, filteredLeads.length)} {t.of || "из"} {filteredLeads.length}
+                            </span>
+                            <div className="flex items-center gap-1">
+                                <Button variant="ghost" size="icon" className="h-7 w-7" disabled={currentPage === 0} onClick={() => setCurrentPage(p => p - 1)}>
+                                    <ChevronLeft className="h-4 w-4" />
+                                </Button>
+                                <span className="px-2 tabular-nums">{currentPage + 1} / {totalPages}</span>
+                                <Button variant="ghost" size="icon" className="h-7 w-7" disabled={currentPage >= totalPages - 1} onClick={() => setCurrentPage(p => p + 1)}>
+                                    <ChevronRight className="h-4 w-4" />
+                                </Button>
+                            </div>
+                        </div>
+                    )}
                     <PharmacyTable
-                        pharmacies={filteredLeads}
+                        pharmacies={pagedLeads}
                         isLoading={isLoading}
                         isAdmin={true}
                         showComments={true} // Enable comments columns
@@ -539,6 +568,23 @@ export default function LeadsPanel() {
                             setIsDistrictModalOpen(true);
                         }}
                     />
+                    {/* Pagination bottom bar */}
+                    {!isLoading && filteredLeads.length > LEADS_PAGE_SIZE && (
+                        <div className="flex items-center justify-between px-4 py-3 border-t border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 text-sm text-gray-500 dark:text-gray-400">
+                            <span>
+                                {t.shown || "Показано"} {currentPage * LEADS_PAGE_SIZE + 1}–{Math.min((currentPage + 1) * LEADS_PAGE_SIZE, filteredLeads.length)} {t.of || "из"} {filteredLeads.length}
+                            </span>
+                            <div className="flex items-center gap-1">
+                                <Button variant="ghost" size="icon" className="h-8 w-8" disabled={currentPage === 0} onClick={() => { setCurrentPage(p => p - 1); window.scrollTo({ top: 0, behavior: "smooth" }); }}>
+                                    <ChevronLeft className="h-4 w-4" />
+                                </Button>
+                                <span className="px-2 tabular-nums font-medium">{currentPage + 1} / {totalPages}</span>
+                                <Button variant="ghost" size="icon" className="h-8 w-8" disabled={currentPage >= totalPages - 1} onClick={() => { setCurrentPage(p => p + 1); window.scrollTo({ top: 0, behavior: "smooth" }); }}>
+                                    <ChevronRight className="h-4 w-4" />
+                                </Button>
+                            </div>
+                        </div>
+                    )}
                 </div>
             </main>
 
