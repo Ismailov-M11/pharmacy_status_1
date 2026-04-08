@@ -862,23 +862,11 @@ function NotificationDetailModal({
                 Кампания
               </div>
               <div className="space-y-2">
-                <Field label="ID кампании" value={camp.id} />
-                <Field label="Заголовок (RU)" value={camp.titleRu} />
-                <Field label="Заголовок (UZ)" value={camp.title} />
+                <Field label="ID" value={camp.id} />
+                <Field label="Название (RU)" value={camp.titleRu} />
+                <Field label="Название (UZ)" value={camp.title} />
                 <Field label="Текст (RU)" value={camp.bodyRu} />
                 <Field label="Текст (UZ)" value={camp.body} />
-                <div className="grid grid-cols-3 gap-2">
-                  <Field label="Всего" value={camp.totalCount} />
-                  <Field label="Успешно" value={camp.successCount} />
-                  <Field label="Ошибок" value={camp.failCount} />
-                </div>
-                <div className="grid grid-cols-2 gap-2">
-                  <Field label="Telegram" value={camp.tgCount} />
-                  <Field label="Mobile" value={camp.mobileCount} />
-                </div>
-                <Field label="Статус кампании" value={camp.status} />
-                <Field label="Создал" value={camp.createdBy} />
-                <Field label="Дата создания" value={camp.creationDate ? formatDate(camp.creationDate) : null} />
               </div>
             </div>
           )}
