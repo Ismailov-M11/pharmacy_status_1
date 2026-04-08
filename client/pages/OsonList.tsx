@@ -1002,12 +1002,10 @@ function ListTab({
             <input
               type="number"
               min={1}
-              max={pharmacies.length}
-              value={pageSize}
-              onChange={e => {
-                const val = Math.max(1, parseInt(e.target.value) || 1);
-                setPageSize(val);
-              }}
+              defaultValue={pageSize}
+              key={pageSize}
+              onBlur={e => { const val = Math.max(1, parseInt(e.target.value) || 1); setPageSize(val); }}
+              onKeyDown={e => { if (e.key === "Enter") { const val = Math.max(1, parseInt((e.target as HTMLInputElement).value) || 1); setPageSize(val); (e.target as HTMLInputElement).blur(); } }}
               className="border border-gray-200 dark:border-gray-600 rounded px-1.5 py-0.5 w-16 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 focus:outline-none focus:ring-1 focus:ring-purple-500 text-xs"
             />
           </div>

@@ -490,13 +490,10 @@ export default function LeadsPanel() {
                                     <input
                                         type="number"
                                         min={1}
-                                        max={filteredLeads.length}
-                                        value={pageSize}
-                                        onChange={e => {
-                                            const val = Math.max(1, parseInt(e.target.value) || 1);
-                                            setPageSize(val);
-                                            setCurrentPage(0);
-                                        }}
+                                        defaultValue={pageSize}
+                                        key={pageSize}
+                                        onBlur={e => { const val = Math.max(1, parseInt(e.target.value) || 1); setPageSize(val); setCurrentPage(0); }}
+                                        onKeyDown={e => { if (e.key === "Enter") { const val = Math.max(1, parseInt((e.target as HTMLInputElement).value) || 1); setPageSize(val); setCurrentPage(0); (e.target as HTMLInputElement).blur(); } }}
                                         className="text-xs border border-gray-200 dark:border-gray-600 rounded px-1.5 py-0.5 w-16 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 focus:outline-none focus:ring-1 focus:ring-purple-500"
                                     />
                                 </div>
@@ -599,13 +596,10 @@ export default function LeadsPanel() {
                                     <input
                                         type="number"
                                         min={1}
-                                        max={filteredLeads.length}
-                                        value={pageSize}
-                                        onChange={e => {
-                                            const val = Math.max(1, parseInt(e.target.value) || 1);
-                                            setPageSize(val);
-                                            setCurrentPage(0);
-                                        }}
+                                        defaultValue={pageSize}
+                                        key={pageSize}
+                                        onBlur={e => { const val = Math.max(1, parseInt(e.target.value) || 1); setPageSize(val); setCurrentPage(0); }}
+                                        onKeyDown={e => { if (e.key === "Enter") { const val = Math.max(1, parseInt((e.target as HTMLInputElement).value) || 1); setPageSize(val); setCurrentPage(0); (e.target as HTMLInputElement).blur(); } }}
                                         className="text-xs border border-gray-200 dark:border-gray-600 rounded px-1.5 py-0.5 w-16 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 focus:outline-none focus:ring-1 focus:ring-purple-500"
                                     />
                                 </div>
