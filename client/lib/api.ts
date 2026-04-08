@@ -558,6 +558,28 @@ export interface LeadNote {
   [key: string]: any;
 }
 
+export async function createLeadNote(
+  token: string,
+  leadId: number,
+  comment: string
+): Promise<void> {
+  const response = await fetch(
+    `${API_BASE_URL}/lead/notes/${leadId}?comment=${encodeURIComponent(comment)}`,
+    {
+      method: "POST",
+      headers: {
+        accept: "application/json, text/plain, */*",
+        "content-type": "application/x-www-form-urlencoded",
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error(`HTTP error ${response.status}`);
+  }
+}
+
 export async function getLeadNotes(
   token: string,
   leadId: number

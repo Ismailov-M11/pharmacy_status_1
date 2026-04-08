@@ -54,6 +54,7 @@ interface PharmacyTableProps {
   filesFilter?: boolean | null;
   onFilesFilterChange?: (value: boolean | null) => void;
   onFilesClick?: (pharmacy: Pharmacy) => void;
+  onLeadHistoryClick?: (pharmacy: Pharmacy) => void;
   // Region and District Filter props
   regionFilter?: string[];
   onRegionFilterClick?: (e: React.MouseEvent<HTMLTableCellElement>) => void;
@@ -102,6 +103,7 @@ export function PharmacyTable({
   filesFilter,
   onFilesFilterChange,
   onFilesClick,
+  onLeadHistoryClick,
 
   regionFilter = [],
   onRegionFilterClick,
@@ -602,9 +604,9 @@ export function PharmacyTable({
 
       case "leadStatus": return isAdmin ? <td key={col.id} className="px-2 md:px-4 py-2 md:py-3 text-gray-900 text-xs">{pharmacy.lead?.status || "-"}</td> : null;
 
-      case "commentDate": return <td key={col.id} className="px-2 md:px-4 py-2 md:py-3 text-gray-900 text-xs whitespace-nowrap align-middle">{(() => { const last = getLastComment(pharmacy.comments || []); if (!last) return "-"; return <span className="font-semibold">{formatDate(last.createdAt)}</span>; })()}</td>;
-      case "commentUser": return <td key={col.id} className="px-2 md:px-4 py-2 md:py-3 text-gray-900 text-xs whitespace-nowrap align-middle">{(() => { const last = getLastComment(pharmacy.comments || []); if (!last) return "-"; return <span className="text-gray-500 text-xs">{last.creator?.phone || "-"}</span>; })()}</td>;
-      case "comments": return <td key={col.id} className="px-2 md:px-4 py-2 md:py-3 text-gray-900 text-xs align-middle"><div className="max-w-[200px] break-words">{getLastComment(pharmacy.comments || [])?.coment || getLastComment(pharmacy.comments || [])?.comment || "-"}</div></td>;
+      case "commentDate": return <td key={col.id} className="px-2 md:px-4 py-2 md:py-3 text-gray-900 text-xs whitespace-nowrap align-middle" onClick={() => onLeadHistoryClick?.(pharmacy)} style={onLeadHistoryClick ? { cursor: "pointer" } : {}}>{(() => { const last = getLastComment(pharmacy.comments || []); if (!last) return "-"; return <span className="font-semibold hover:text-blue-600 hover:underline">{formatDate(last.createdAt)}</span>; })()}</td>;
+      case "commentUser": return <td key={col.id} className="px-2 md:px-4 py-2 md:py-3 text-gray-900 text-xs whitespace-nowrap align-middle" onClick={() => onLeadHistoryClick?.(pharmacy)} style={onLeadHistoryClick ? { cursor: "pointer" } : {}}>{(() => { const last = getLastComment(pharmacy.comments || []); if (!last) return "-"; return <span className="text-gray-500 text-xs hover:text-blue-600 hover:underline">{last.creator?.phone || "-"}</span>; })()}</td>;
+      case "comments": return <td key={col.id} className="px-2 md:px-4 py-2 md:py-3 text-gray-900 text-xs align-middle" onClick={() => onLeadHistoryClick?.(pharmacy)} style={onLeadHistoryClick ? { cursor: "pointer" } : {}}><div className="max-w-[200px] break-words hover:text-blue-600 hover:underline">{getLastComment(pharmacy.comments || [])?.coment || getLastComment(pharmacy.comments || [])?.comment || "-"}</div></td>;
       case "creationDate": return <td key={col.id} className="px-2 md:px-4 py-2 md:py-3 text-gray-900 text-xs whitespace-nowrap align-middle">{formatDate(pharmacy.creationDate)}</td>;
 
       case "stir": return <td key={col.id} className="px-2 md:px-4 py-2 md:py-3 text-gray-900 text-xs whitespace-nowrap align-middle">{pharmacy.stir || "-"}</td>;
@@ -1689,28 +1691,28 @@ export function PharmacyTable({
                             {showComments && (
                               <>
                                 {/* Date Column: Just Date */}
-                                <td className="px-2 md:px-4 py-2 md:py-3 text-gray-900 text-xs whitespace-nowrap align-middle">
+                                <td className="px-2 md:px-4 py-2 md:py-3 text-gray-900 text-xs whitespace-nowrap align-middle" onClick={() => onLeadHistoryClick?.(pharmacy)} style={onLeadHistoryClick ? { cursor: "pointer" } : {}}>
                                   {(() => {
                                     const last = getLastComment(pharmacy.comments || []);
                                     if (!last) return "-";
                                     return (
-                                      <span className="font-semibold">{formatDate(last.createdAt)}</span>
+                                      <span className="font-semibold hover:text-blue-600 hover:underline">{formatDate(last.createdAt)}</span>
                                     );
                                   })()}
                                 </td>
                                 {/* Author Column: Just Phone/Name */}
-                                <td className="px-2 md:px-4 py-2 md:py-3 text-gray-900 text-xs whitespace-nowrap align-middle">
+                                <td className="px-2 md:px-4 py-2 md:py-3 text-gray-900 text-xs whitespace-nowrap align-middle" onClick={() => onLeadHistoryClick?.(pharmacy)} style={onLeadHistoryClick ? { cursor: "pointer" } : {}}>
                                   {(() => {
                                     const last = getLastComment(pharmacy.comments || []);
                                     if (!last) return "-";
                                     return (
-                                      <span className="text-gray-500 text-xs">{last.creator?.phone || "-"}</span>
+                                      <span className="text-gray-500 text-xs hover:text-blue-600 hover:underline">{last.creator?.phone || "-"}</span>
                                     );
                                   })()}
                                 </td>
                                 {/* Comment Text Column */}
-                                <td className="px-2 md:px-4 py-2 md:py-3 text-gray-900 text-xs align-middle">
-                                  <div className="max-w-[200px] break-words">
+                                <td className="px-2 md:px-4 py-2 md:py-3 text-gray-900 text-xs align-middle" onClick={() => onLeadHistoryClick?.(pharmacy)} style={onLeadHistoryClick ? { cursor: "pointer" } : {}}>
+                                  <div className="max-w-[200px] break-words hover:text-blue-600 hover:underline">
                                     {getLastComment(pharmacy.comments || [])?.coment || getLastComment(pharmacy.comments || [])?.comment || "-"}
                                   </div>
                                 </td>

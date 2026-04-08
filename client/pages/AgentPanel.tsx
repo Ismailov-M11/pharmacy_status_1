@@ -40,7 +40,7 @@ export default function AgentPanel() {
     null,
   );
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [initialModalTab, setInitialModalTab] = useState<"details" | "files">("details");
+  const [initialModalTab, setInitialModalTab] = useState<"details" | "files" | "leadHistory">("details");
   const [changeHistory, setChangeHistory] = useState<StatusHistoryRecord[]>([]);
   const [isLoadingHistory, setIsLoadingHistory] = useState(false);
 

@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, ChangeEvent } from "react";
-import { Pharmacy, StatusHistoryRecord, uploadPharmacyFile, getLeadNotes, LeadNote } from "@/lib/api";
+import { Pharmacy, StatusHistoryRecord, uploadPharmacyFile, getLeadNotes, LeadNote, createLeadNote } from "@/lib/api";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
@@ -40,7 +40,7 @@ interface PharmacyDetailModalProps {
   changeHistory?: StatusHistoryRecord[];
   onDeleteHistory?: (ids: number[]) => void;
   onUpdate?: () => void;
-  initialTab?: "details" | "files";
+  initialTab?: "details" | "files" | "leadHistory";
 }
 
 export function PharmacyDetailModal({
@@ -71,6 +71,8 @@ export function PharmacyDetailModal({
 
   const [leadNotes, setLeadNotes] = useState<LeadNote[]>([]);
   const [isLoadingNotes, setIsLoadingNotes] = useState(false);
+  const [newComment, setNewComment] = useState("");
+  const [isSubmittingComment, setIsSubmittingComment] = useState(false);
 
   useEffect(() => {
     if (activeTab === "leadHistory" && pharmacy) {
@@ -142,6 +144,23 @@ export function PharmacyDetailModal({
   }
 
   if (!pharmacy) return null;
+
+  const handleCreateComment = async () => {
+    if (!newComment.trim() || !pharmacy) return;
+    const authToken = token || localStorage.getItem("auth_token");
+    if (!authToken) return;
+    const leadId = pharmacy.lead?.id || pharmacy.id;
+    setIsSubmittingComment(true);
+    try {
+      await createLeadNote(authToken, leadId, newComment.trim());
+      setNewComment("");
+      toast.success(t.saved || "Saved");
+    } catch (error) {
+      toast.error(t.error || "Error");
+    } finally {
+      setIsSubmittingComment(false);
+    }
+  };
 
   const handleStatusChange = async (
     field: "brandedPacket" | "training",
@@ -543,6 +562,37 @@ export function PharmacyDetailModal({
                   </div>
                 </>
               )}
+
+              {/* Add Comment */}
+              <div>
+                <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  {t.addComment || "Добавить комментарий"}
+                </label>
+                <div className="flex gap-2">
+                  <Textarea
+                    value={newComment}
+                    onChange={(e) => setNewComment(e.target.value)}
+                    placeholder={t.commentPlaceholder || "Введите комментарий..."}
+                    className="flex-1 text-xs sm:text-sm resize-none"
+                    rows={2}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) {
+                        e.preventDefault();
+                        handleCreateComment();
+                      }
+                    }}
+                  />
+                  <Button
+                    onClick={handleCreateComment}
+                    disabled={isSubmittingComment || !newComment.trim()}
+                    size="sm"
+                    className="bg-blue-600 hover:bg-blue-700 self-end"
+                  >
+                    {isSubmittingComment ? "..." : (t.send || "Отправить")}
+                  </Button>
+                </div>
+                <p className="text-xs text-gray-400 mt-1">Ctrl+Enter для отправки</p>
+              </div>
             </div>
           )}
 
