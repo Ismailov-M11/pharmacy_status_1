@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -61,48 +61,78 @@ const PAGE_SIZE = 20;
 function StatusBadge({ status }: { status?: string }) {
   if (!status) return <span className="text-gray-400">—</span>;
 
-  const map: Record<string, { label: string; className: string }> = {
+  const map: Record<string, { label: string; dot: string; className: string; animate?: boolean }> = {
     ACTIVE: {
       label: "Активен",
-      className:
-        "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300",
+      dot: "bg-green-500",
+      className: "bg-green-100 text-green-700 dark:bg-green-900/50 dark:text-green-300 border border-green-200 dark:border-green-800",
     },
     INACTIVE: {
       label: "Неактивен",
-      className:
-        "bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300",
+      dot: "bg-gray-400",
+      className: "bg-gray-100 text-gray-500 dark:bg-gray-700/50 dark:text-gray-400 border border-gray-200 dark:border-gray-600",
     },
     SENT: {
       label: "Отправлен",
-      className:
-        "bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300",
+      dot: "bg-blue-500",
+      className: "bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-300 border border-blue-200 dark:border-blue-800",
+    },
+    COMPLETED: {
+      label: "Завершён",
+      dot: "bg-teal-500",
+      className: "bg-teal-100 text-teal-700 dark:bg-teal-900/50 dark:text-teal-300 border border-teal-200 dark:border-teal-800",
     },
     PENDING: {
       label: "В ожидании",
-      className:
-        "bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-300",
+      dot: "bg-yellow-500",
+      className: "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/50 dark:text-yellow-300 border border-yellow-200 dark:border-yellow-800",
+    },
+    PROCESSING: {
+      label: "Обрабатывается",
+      dot: "bg-amber-500",
+      className: "bg-amber-100 text-amber-700 dark:bg-amber-900/50 dark:text-amber-300 border border-amber-200 dark:border-amber-800",
+      animate: true,
+    },
+    SENDING: {
+      label: "Отправляется",
+      dot: "bg-blue-400",
+      className: "bg-blue-50 text-blue-600 dark:bg-blue-900/40 dark:text-blue-300 border border-blue-200 dark:border-blue-800",
+      animate: true,
+    },
+    IN_PROGRESS: {
+      label: "В процессе",
+      dot: "bg-orange-500",
+      className: "bg-orange-100 text-orange-700 dark:bg-orange-900/50 dark:text-orange-300 border border-orange-200 dark:border-orange-800",
+      animate: true,
     },
     FAILED: {
       label: "Ошибка",
-      className: "bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300",
+      dot: "bg-red-500",
+      className: "bg-red-100 text-red-700 dark:bg-red-900/50 dark:text-red-300 border border-red-200 dark:border-red-800",
     },
     DRAFT: {
       label: "Черновик",
-      className:
-        "bg-purple-100 text-purple-700 dark:bg-purple-900 dark:text-purple-300",
+      dot: "bg-purple-400",
+      className: "bg-purple-100 text-purple-700 dark:bg-purple-900/50 dark:text-purple-300 border border-purple-200 dark:border-purple-800",
+    },
+    CANCELLED: {
+      label: "Отменён",
+      dot: "bg-gray-400",
+      className: "bg-gray-100 text-gray-500 dark:bg-gray-700/50 dark:text-gray-400 border border-gray-200 dark:border-gray-600",
     },
   };
 
   const config = map[status.toUpperCase()] ?? {
     label: status,
-    className:
-      "bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300",
+    dot: "bg-gray-400",
+    className: "bg-gray-100 text-gray-600 dark:bg-gray-700/50 dark:text-gray-300 border border-gray-200 dark:border-gray-600",
   };
 
   return (
     <span
-      className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${config.className}`}
+      className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold ${config.className}`}
     >
+      <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${config.dot} ${config.animate ? "animate-pulse" : ""}`} />
       {config.label}
     </span>
   );
@@ -223,6 +253,8 @@ function CreateCampaignModal({
     bodyRu: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitProgress, setSubmitProgress] = useState(0);
+  const progressRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   // ── "Copy from existing" section ──────────────────────────────────────────
   const [showExisting, setShowExisting] = useState(false);
@@ -257,6 +289,21 @@ function CreateCampaignModal({
     setForm((prev) => ({ ...prev, [field]: value }));
   };
 
+  const startProgress = () => {
+    setSubmitProgress(0);
+    let cur = 0;
+    progressRef.current = setInterval(() => {
+      cur += Math.random() * 12 + 5;
+      if (cur >= 88) { cur = 88; clearInterval(progressRef.current!); }
+      setSubmitProgress(Math.round(cur));
+    }, 200);
+  };
+
+  const finishProgress = (success: boolean) => {
+    if (progressRef.current) clearInterval(progressRef.current);
+    setSubmitProgress(success ? 100 : 0);
+  };
+
   const handleSubmit = async () => {
     if (!form.title.trim() || !form.titleRu.trim()) {
       toast.error("Заполните заголовок на обоих языках");
@@ -268,6 +315,7 @@ function CreateCampaignModal({
     }
 
     setIsSubmitting(true);
+    startProgress();
     try {
       await createCampaign(token, {
         type: "IN_APP",
@@ -277,11 +325,16 @@ function CreateCampaignModal({
         bodyRu: form.bodyRu,
         source: "HAMBI",
       }, baseUrl);
+      finishProgress(true);
       toast.success("Кампания успешно создана");
-      setForm({ title: "", titleRu: "", body: "", bodyRu: "" });
-      onCreated();
-      onClose();
+      setTimeout(() => {
+        setForm({ title: "", titleRu: "", body: "", bodyRu: "" });
+        setSubmitProgress(0);
+        onCreated();
+        onClose();
+      }, 600);
     } catch (err: any) {
+      finishProgress(false);
       toast.error(`Ошибка при создании: ${err?.message ?? "Неизвестная ошибка"}`);
     } finally {
       setIsSubmitting(false);
@@ -290,7 +343,9 @@ function CreateCampaignModal({
 
   const handleClose = () => {
     if (isSubmitting) return;
+    if (progressRef.current) clearInterval(progressRef.current);
     setForm({ title: "", titleRu: "", body: "", bodyRu: "" });
+    setSubmitProgress(0);
     setShowExisting(false);
     setExistingSearch("");
     onClose();
@@ -479,6 +534,29 @@ function CreateCampaignModal({
             />
           </div>
         </div>
+
+        {/* Progress bar */}
+        {isSubmitting && (
+          <div className="px-1 pb-2">
+            <div className="w-full bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 rounded-lg px-4 py-2.5 flex flex-col gap-1.5">
+              <div className="flex items-center justify-between text-xs">
+                <span className="flex items-center gap-1.5 text-purple-700 dark:text-purple-400 font-medium">
+                  <RefreshCw className="h-3 w-3 animate-spin" />
+                  {submitProgress < 88 ? "Создание кампании..." : submitProgress === 100 ? "Готово!" : "Завершение..."}
+                </span>
+                <span className="font-bold text-purple-800 dark:text-purple-300">
+                  {submitProgress}%
+                </span>
+              </div>
+              <div className="w-full bg-purple-200 dark:bg-purple-800/50 rounded-full h-2 overflow-hidden">
+                <div
+                  className="h-2 rounded-full bg-purple-500 dark:bg-purple-400 transition-all duration-300"
+                  style={{ width: `${Math.max(submitProgress, 3)}%` }}
+                />
+              </div>
+            </div>
+          </div>
+        )}
 
         <DialogFooter className="gap-2">
           <Button
