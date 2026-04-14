@@ -1274,18 +1274,22 @@ function CampaignDetailModal({
 
 // ─── Campaigns Tab ────────────────────────────────────────────────────────────
 
+const FINAL_STATUSES = new Set(["COMPLETED", "SENT", "FAILED", "CANCELLED"]);
+
 function CampaignsTab({
   token,
   onCreateClick,
   refreshKey,
   baseUrl,
   newCampaignId,
+  onCampaignFinished,
 }: {
   token: string;
   onCreateClick: () => void;
   refreshKey: number;
   baseUrl: string;
   newCampaignId?: number | null;
+  onCampaignFinished?: () => void;
 }) {
   const { t } = useLanguage();
   const [items, setItems] = useState<Campaign[]>([]);
@@ -1297,8 +1301,11 @@ function CampaignsTab({
   const [error, setError] = useState<string | null>(null);
   const [selectedCampaign, setSelectedCampaign] = useState<Campaign | null>(null);
 
+  const onCampaignFinishedRef = useRef(onCampaignFinished);
+  useEffect(() => { onCampaignFinishedRef.current = onCampaignFinished; }, [onCampaignFinished]);
+
   const load = useCallback(
-    async (p: number, s: string) => {
+    async (p: number, s: string, trackId?: number | null) => {
       setIsLoading(true);
       setError(null);
       try {
@@ -1307,8 +1314,17 @@ function CampaignsTab({
           size: PAGE_SIZE,
           searchKey: s || undefined,
         }, baseUrl);
-        setItems(extractCampaigns(data));
+        const loaded = extractCampaigns(data);
+        setItems(loaded);
         setTotal(extractCampaignTotal(data));
+
+        // Stop polling when tracked campaign reaches a final status
+        if (trackId != null) {
+          const tracked = loaded.find((c) => c.id === trackId);
+          if (tracked && tracked.status && FINAL_STATUSES.has(tracked.status.toUpperCase())) {
+            onCampaignFinishedRef.current?.();
+          }
+        }
       } catch (err: any) {
         setError(err?.message ?? "Ошибка загрузки");
         toast.error("Не удалось загрузить кампании");
@@ -1324,8 +1340,8 @@ function CampaignsTab({
   }, [baseUrl]);
 
   useEffect(() => {
-    load(page, search);
-  }, [page, search, load, refreshKey]);
+    load(page, search, newCampaignId);
+  }, [page, search, load, refreshKey, newCampaignId]);
 
   const handleSearch = () => {
     setPage(0);
@@ -1733,6 +1749,7 @@ export default function NotificationCenter() {
                 onCreateClick={() => setIsCreateModalOpen(true)}
                 refreshKey={campaignRefreshKey}
                 newCampaignId={activeCampaignId}
+                onCampaignFinished={() => stopCampaignTracking(true)}
               />
             </div>
           </TabsContent>
