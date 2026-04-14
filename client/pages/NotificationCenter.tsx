@@ -1101,7 +1101,7 @@ function CampaignDetailModal({
 
   return (
     <Dialog open={!!campaign} onOpenChange={onClose}>
-      <DialogContent className="w-[95vw] max-w-lg max-h-[90vh] overflow-y-auto dark:bg-gray-800 dark:border-gray-700 p-0 overflow-hidden [&>button]:hidden">
+      <DialogContent className="w-[95vw] max-w-lg max-h-[90vh] overflow-y-auto dark:bg-gray-800 dark:border-gray-700 p-0 [&>button]:hidden">
         {/* Header */}
         <div className="bg-gradient-to-r from-purple-600 to-purple-700 dark:from-purple-800 dark:to-purple-900 px-6 py-5 relative">
           {/* X button */}
