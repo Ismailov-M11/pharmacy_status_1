@@ -34,12 +34,16 @@ import {
   X,
   User,
   Smartphone,
+  Copy,
+  ChevronDown,
+  ChevronUp,
 } from "lucide-react";
 import { toast } from "sonner";
 import {
   fetchNotifications,
   fetchCampaigns,
   createCampaign,
+  sendCampaign,
   extractNotifications,
   extractNotificationTotal,
   extractCampaigns,
@@ -220,6 +224,35 @@ function CreateCampaignModal({
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // ── "Copy from existing" section ──────────────────────────────────────────
+  const [showExisting, setShowExisting] = useState(false);
+  const [existingSearch, setExistingSearch] = useState("");
+  const [existingItems, setExistingItems] = useState<Campaign[]>([]);
+  const [existingLoading, setExistingLoading] = useState(false);
+
+  useEffect(() => {
+    if (!showExisting || !open) return;
+    let cancelled = false;
+    setExistingLoading(true);
+    fetchCampaigns(token, { page: 0, size: 50, searchKey: existingSearch || undefined }, baseUrl)
+      .then((data) => { if (!cancelled) setExistingItems(extractCampaigns(data)); })
+      .catch(() => {})
+      .finally(() => { if (!cancelled) setExistingLoading(false); });
+    return () => { cancelled = true; };
+  }, [showExisting, existingSearch, open, token, baseUrl]);
+
+  const handleCopyFrom = (campaign: Campaign) => {
+    setForm({
+      title: campaign.title ?? "",
+      titleRu: campaign.titleRu ?? "",
+      body: campaign.body ?? "",
+      bodyRu: campaign.bodyRu ?? "",
+    });
+    setShowExisting(false);
+    setExistingSearch("");
+  };
+  // ──────────────────────────────────────────────────────────────────────────
+
   const handleChange = (field: keyof typeof form, value: string) => {
     setForm((prev) => ({ ...prev, [field]: value }));
   };
@@ -258,6 +291,8 @@ function CreateCampaignModal({
   const handleClose = () => {
     if (isSubmitting) return;
     setForm({ title: "", titleRu: "", body: "", bodyRu: "" });
+    setShowExisting(false);
+    setExistingSearch("");
     onClose();
   };
 
@@ -280,6 +315,74 @@ function CreateCampaignModal({
             <Badge className="bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300 border-0 text-xs">
               HAMBI
             </Badge>
+          </div>
+
+          {/* Copy from existing */}
+          <div className="rounded-lg border border-gray-200 dark:border-gray-700">
+            <button
+              type="button"
+              onClick={() => setShowExisting((v) => !v)}
+              className="w-full flex items-center justify-between px-3 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50 rounded-lg transition-colors"
+            >
+              <span className="flex items-center gap-2">
+                <Copy className="h-4 w-4 text-purple-500" />
+                Выбрать из существующих кампаний
+              </span>
+              {showExisting
+                ? <ChevronUp className="h-4 w-4 text-gray-400" />
+                : <ChevronDown className="h-4 w-4 text-gray-400" />
+              }
+            </button>
+
+            {showExisting && (
+              <div className="border-t border-gray-200 dark:border-gray-700 p-3 space-y-2">
+                <div className="relative">
+                  <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-gray-400" />
+                  <Input
+                    placeholder="Поиск по названию..."
+                    value={existingSearch}
+                    onChange={(e) => setExistingSearch(e.target.value)}
+                    className="pl-8 h-8 text-xs dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100"
+                  />
+                </div>
+                <div className="max-h-48 overflow-y-auto space-y-1">
+                  {existingLoading ? (
+                    <div className="flex items-center justify-center py-4 text-xs text-gray-400">
+                      <RefreshCw className="h-3.5 w-3.5 mr-2 animate-spin" />
+                      Загрузка...
+                    </div>
+                  ) : existingItems.length === 0 ? (
+                    <div className="py-4 text-center text-xs text-gray-400">Нет кампаний</div>
+                  ) : (
+                    existingItems.map((c) => (
+                      <button
+                        key={c.id}
+                        type="button"
+                        onClick={() => handleCopyFrom(c)}
+                        className="w-full text-left px-3 py-2 rounded-md hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-colors group"
+                      >
+                        <div className="flex items-center justify-between gap-2">
+                          <div className="min-w-0">
+                            <div className="text-xs font-medium text-gray-800 dark:text-gray-200 truncate">
+                              {c.titleRu || c.title || `#${c.id}`}
+                            </div>
+                            {c.titleRu && c.title && c.title !== c.titleRu && (
+                              <div className="text-[11px] text-gray-400 truncate">{c.title}</div>
+                            )}
+                            <div className="text-[11px] text-gray-400 dark:text-gray-500 truncate mt-0.5">
+                              {c.bodyRu || c.body || ""}
+                            </div>
+                          </div>
+                          <span className="shrink-0 text-[10px] px-1.5 py-0.5 rounded bg-purple-100 dark:bg-purple-900/40 text-purple-600 dark:text-purple-400 opacity-0 group-hover:opacity-100 transition-opacity">
+                            Выбрать
+                          </span>
+                        </div>
+                      </button>
+                    ))
+                  )}
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Title UZ */}
