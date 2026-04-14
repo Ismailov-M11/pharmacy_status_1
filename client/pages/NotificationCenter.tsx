@@ -234,7 +234,7 @@ function SkeletonRows({ cols }: { cols: number }) {
 interface CreateCampaignModalProps {
   open: boolean;
   onClose: () => void;
-  onCreated: () => void;
+  onCreated: (campaignId?: number) => void;
   token: string;
   baseUrl: string;
 }
@@ -253,8 +253,6 @@ function CreateCampaignModal({
     bodyRu: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitProgress, setSubmitProgress] = useState(0);
-  const progressRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   // ── "Copy from existing" section ──────────────────────────────────────────
   const [showExisting, setShowExisting] = useState(false);
@@ -289,21 +287,6 @@ function CreateCampaignModal({
     setForm((prev) => ({ ...prev, [field]: value }));
   };
 
-  const startProgress = () => {
-    setSubmitProgress(0);
-    let cur = 0;
-    progressRef.current = setInterval(() => {
-      cur += Math.random() * 12 + 5;
-      if (cur >= 88) { cur = 88; clearInterval(progressRef.current!); }
-      setSubmitProgress(Math.round(cur));
-    }, 200);
-  };
-
-  const finishProgress = (success: boolean) => {
-    if (progressRef.current) clearInterval(progressRef.current);
-    setSubmitProgress(success ? 100 : 0);
-  };
-
   const handleSubmit = async () => {
     if (!form.title.trim() || !form.titleRu.trim()) {
       toast.error("Заполните заголовок на обоих языках");
@@ -315,9 +298,8 @@ function CreateCampaignModal({
     }
 
     setIsSubmitting(true);
-    startProgress();
     try {
-      await createCampaign(token, {
+      const result = await createCampaign(token, {
         type: "IN_APP",
         title: form.title,
         titleRu: form.titleRu,
@@ -325,16 +307,14 @@ function CreateCampaignModal({
         bodyRu: form.bodyRu,
         source: "HAMBI",
       }, baseUrl);
-      finishProgress(true);
-      toast.success("Кампания успешно создана");
-      setTimeout(() => {
-        setForm({ title: "", titleRu: "", body: "", bodyRu: "" });
-        setSubmitProgress(0);
-        onCreated();
-        onClose();
-      }, 600);
+      const campaignId: number | undefined =
+        result?.payload?.id ?? result?.id ?? undefined;
+      setForm({ title: "", titleRu: "", body: "", bodyRu: "" });
+      setShowExisting(false);
+      setExistingSearch("");
+      onClose();
+      onCreated(campaignId);
     } catch (err: any) {
-      finishProgress(false);
       toast.error(`Ошибка при создании: ${err?.message ?? "Неизвестная ошибка"}`);
     } finally {
       setIsSubmitting(false);
@@ -343,9 +323,7 @@ function CreateCampaignModal({
 
   const handleClose = () => {
     if (isSubmitting) return;
-    if (progressRef.current) clearInterval(progressRef.current);
     setForm({ title: "", titleRu: "", body: "", bodyRu: "" });
-    setSubmitProgress(0);
     setShowExisting(false);
     setExistingSearch("");
     onClose();
@@ -534,29 +512,6 @@ function CreateCampaignModal({
             />
           </div>
         </div>
-
-        {/* Progress bar */}
-        {isSubmitting && (
-          <div className="px-1 pb-2">
-            <div className="w-full bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 rounded-lg px-4 py-2.5 flex flex-col gap-1.5">
-              <div className="flex items-center justify-between text-xs">
-                <span className="flex items-center gap-1.5 text-purple-700 dark:text-purple-400 font-medium">
-                  <RefreshCw className="h-3 w-3 animate-spin" />
-                  {submitProgress < 88 ? "Создание кампании..." : submitProgress === 100 ? "Готово!" : "Завершение..."}
-                </span>
-                <span className="font-bold text-purple-800 dark:text-purple-300">
-                  {submitProgress}%
-                </span>
-              </div>
-              <div className="w-full bg-purple-200 dark:bg-purple-800/50 rounded-full h-2 overflow-hidden">
-                <div
-                  className="h-2 rounded-full bg-purple-500 dark:bg-purple-400 transition-all duration-300"
-                  style={{ width: `${Math.max(submitProgress, 3)}%` }}
-                />
-              </div>
-            </div>
-          </div>
-        )}
 
         <DialogFooter className="gap-2">
           <Button
@@ -1324,11 +1279,13 @@ function CampaignsTab({
   onCreateClick,
   refreshKey,
   baseUrl,
+  newCampaignId,
 }: {
   token: string;
   onCreateClick: () => void;
   refreshKey: number;
   baseUrl: string;
+  newCampaignId?: number | null;
 }) {
   const { t } = useLanguage();
   const [items, setItems] = useState<Campaign[]>([]);
@@ -1477,14 +1434,31 @@ function CampaignsTab({
                   </td>
                 </tr>
               ) : (
-                items.map((item, idx) => (
+                items.map((item, idx) => {
+                  const isNew = newCampaignId != null && item.id === newCampaignId;
+                  return (
                   <tr
                     key={item.id ?? idx}
                     onClick={() => setSelectedCampaign(item)}
-                    className="hover:bg-purple-50 dark:hover:bg-purple-900/10 transition-colors cursor-pointer"
+                    className={`cursor-pointer ${
+                      isNew
+                        ? "animate-row-blink"
+                        : "hover:bg-purple-50 dark:hover:bg-purple-900/10 transition-colors"
+                    }`}
                   >
-                    <td className="px-4 py-3 text-gray-500 dark:text-gray-400 tabular-nums">
-                      {page * PAGE_SIZE + idx + 1}
+                    <td className="py-3 text-gray-500 dark:text-gray-400 tabular-nums">
+                      <div className="flex items-center">
+                        {isNew && (
+                          <div className="w-1 self-stretch bg-purple-500 rounded-r mr-2 shrink-0" />
+                        )}
+                        <span className={isNew ? "" : "px-4"}>
+                          {isNew ? (
+                            <span className="pl-0 pr-4">{page * PAGE_SIZE + idx + 1}</span>
+                          ) : (
+                            page * PAGE_SIZE + idx + 1
+                          )}
+                        </span>
+                      </div>
                     </td>
                     <td className="px-4 py-3">
                       <div className="font-medium text-gray-900 dark:text-gray-100 max-w-[220px] truncate">
@@ -1535,7 +1509,8 @@ function CampaignsTab({
                       {formatDate(item.creationDate || item.createdAt)}
                     </td>
                   </tr>
-                ))
+                  );
+                })
               )}
             </tbody>
           </table>
@@ -1569,6 +1544,50 @@ export default function NotificationCenter() {
   const [env, setEnv] = useState<"dev" | "prod">("dev");
   const baseUrl = env === "dev" ? DEV_API_BASE_URL : PROD_API_BASE_URL;
 
+  // ── Campaign creation progress tracking ──────────────────────────────────
+  const [activeCampaignId, setActiveCampaignId] = useState<number | null>(null);
+  const [creationProgress, setCreationProgress] = useState(0);
+  const creationProgressRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const pollingRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const stopTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const stopCampaignTracking = useCallback((success = true) => {
+    if (creationProgressRef.current) clearInterval(creationProgressRef.current);
+    if (pollingRef.current) clearInterval(pollingRef.current);
+    if (stopTimeoutRef.current) clearTimeout(stopTimeoutRef.current);
+    setCreationProgress(success ? 100 : 0);
+    setTimeout(() => {
+      setActiveCampaignId(null);
+      setCreationProgress(0);
+    }, 2000);
+  }, []);
+
+  const startCampaignTracking = useCallback((campaignId?: number) => {
+    // Clear previous if any
+    if (creationProgressRef.current) clearInterval(creationProgressRef.current);
+    if (pollingRef.current) clearInterval(pollingRef.current);
+    if (stopTimeoutRef.current) clearTimeout(stopTimeoutRef.current);
+
+    setActiveCampaignId(campaignId ?? null);
+    setCreationProgress(5);
+
+    // Fake progress animation up to 90%
+    let cur = 5;
+    creationProgressRef.current = setInterval(() => {
+      cur += Math.random() * 2.5 + 0.5;
+      if (cur >= 90) { cur = 90; clearInterval(creationProgressRef.current!); }
+      setCreationProgress(Math.round(cur));
+    }, 600);
+
+    // Auto-refresh table every 3 seconds
+    pollingRef.current = setInterval(() => {
+      setCampaignRefreshKey((k) => k + 1);
+    }, 3000);
+
+    // Auto-stop after 60 seconds
+    stopTimeoutRef.current = setTimeout(() => stopCampaignTracking(true), 60000);
+  }, [stopCampaignTracking]);
+
   useEffect(() => {
     if (authLoading) return;
     if (!isAuthenticated) navigate("/login");
@@ -1584,8 +1603,10 @@ export default function NotificationCenter() {
 
   if (!token) return null;
 
-  const handleCampaignCreated = () => {
+  const handleCampaignCreated = (campaignId?: number) => {
     setCampaignRefreshKey((k) => k + 1);
+    toast.success("Кампания успешно создана");
+    startCampaignTracking(campaignId);
   };
 
   return (
@@ -1655,6 +1676,49 @@ export default function NotificationCenter() {
             </TabsTrigger>
           </TabsList>
 
+          {/* Campaign creation progress bar */}
+          {activeCampaignId != null && (
+            <div className="w-full bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 rounded-xl px-5 py-3 flex flex-col gap-2 shadow-sm">
+              <div className="flex items-center justify-between text-xs">
+                <span className="flex items-center gap-2 text-purple-700 dark:text-purple-300 font-semibold">
+                  <RefreshCw className="h-3.5 w-3.5 animate-spin" />
+                  {creationProgress < 90
+                    ? "Кампания создана — идёт отправка уведомлений..."
+                    : creationProgress === 100
+                    ? "Отправка завершена!"
+                    : "Завершение отправки..."}
+                  {activeCampaignId > 0 && (
+                    <span className="text-purple-400 dark:text-purple-500 font-normal">
+                      #{activeCampaignId}
+                    </span>
+                  )}
+                </span>
+                <div className="flex items-center gap-3">
+                  <span className="font-bold text-purple-800 dark:text-purple-300 tabular-nums">
+                    {creationProgress}%
+                  </span>
+                  <button
+                    onClick={() => stopCampaignTracking(true)}
+                    className="text-purple-400 hover:text-purple-600 dark:hover:text-purple-300 transition-colors"
+                    title="Скрыть"
+                  >
+                    <X className="h-3.5 w-3.5" />
+                  </button>
+                </div>
+              </div>
+              <div className="w-full bg-purple-200 dark:bg-purple-800/50 rounded-full h-2.5 overflow-hidden">
+                <div
+                  className="h-2.5 rounded-full bg-gradient-to-r from-purple-500 to-purple-400 dark:from-purple-400 dark:to-purple-300 transition-all duration-700 ease-out"
+                  style={{ width: `${Math.max(creationProgress, 3)}%` }}
+                />
+              </div>
+              <div className="flex items-center gap-1 text-[11px] text-purple-500 dark:text-purple-400">
+                <span className="w-1.5 h-1.5 rounded-full bg-purple-400 dark:bg-purple-500 animate-pulse inline-block" />
+                Таблица обновляется автоматически каждые 3 секунды
+              </div>
+            </div>
+          )}
+
           <TabsContent value="notifications">
             <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm p-4 md:p-6">
               <NotificationsTab token={token} baseUrl={baseUrl} />
@@ -1668,6 +1732,7 @@ export default function NotificationCenter() {
                 baseUrl={baseUrl}
                 onCreateClick={() => setIsCreateModalOpen(true)}
                 refreshKey={campaignRefreshKey}
+                newCampaignId={activeCampaignId}
               />
             </div>
           </TabsContent>
@@ -1677,7 +1742,7 @@ export default function NotificationCenter() {
       <CreateCampaignModal
         open={isCreateModalOpen}
         onClose={() => setIsCreateModalOpen(false)}
-        onCreated={handleCampaignCreated}
+        onCreated={(id) => handleCampaignCreated(id)}
         token={token}
         baseUrl={baseUrl}
       />

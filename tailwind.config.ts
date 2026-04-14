@@ -71,25 +71,26 @@ export default {
       },
       keyframes: {
         "accordion-down": {
-          from: {
-            height: "0",
-          },
-          to: {
-            height: "var(--radix-accordion-content-height)",
-          },
+          from: { height: "0" },
+          to: { height: "var(--radix-accordion-content-height)" },
         },
         "accordion-up": {
-          from: {
-            height: "var(--radix-accordion-content-height)",
-          },
-          to: {
-            height: "0",
-          },
+          from: { height: "var(--radix-accordion-content-height)" },
+          to: { height: "0" },
+        },
+        "row-blink": {
+          "0%, 100%": { backgroundColor: "rgb(245 243 255)" },
+          "50%": { backgroundColor: "rgb(233 213 255)" },
+        },
+        "row-blink-dark": {
+          "0%, 100%": { backgroundColor: "rgba(109, 40, 217, 0.12)" },
+          "50%": { backgroundColor: "rgba(109, 40, 217, 0.28)" },
         },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+        "row-blink": "row-blink 1.4s ease-in-out infinite",
       },
     },
   },
